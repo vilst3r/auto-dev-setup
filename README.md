@@ -1,6 +1,6 @@
 # env-setup
 
-Scripts to replicate personal development environment across any machine with proper packaging and editor profiles and settings.
+Python scripts to replicate personal development environment across any machine with proper packaging and editor profiles and settings.
 
 # Process
 1.
