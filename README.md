@@ -9,3 +9,11 @@ Python scripts to replicate personal development environment across any machine 
 4.
 5.
 ...
+
+# Todo
+- Refactor installations of homebrew packages into one function
+- Set up git credentials into keychain
+- Kill subprocesses after command finishes through context managers
+- Consolidate the powerline configurations with the fonts and styling applied
+- Configure styling of vim gruvbox theme into setup
+
