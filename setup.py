@@ -24,6 +24,21 @@ def process_realtime_output(process: subprocess.Popen) -> int:
     return_code = process.poll()
     return return_code
 
+def install_homebrew_packages():
+    '''
+    Reads brew.txt file in child config directory to install all brew packages
+    '''
+    
+    with open('config/brew.txt') as text_file:
+        lines = text_file.readlines()
+        
+        for line in lines:
+            command = 'brew install ' + line
+            with subprocess.Popen(command.split(), stdout=subprocess.PIPE, stderr=subprocess.STDOUT) as process:
+                process_realtime_output(process)
+        print('Installation of brew packages are complete!')
+
+
 #def config_vim() -> int:
 #    return
 
@@ -42,33 +57,13 @@ def install_homebrew() -> int:
     out = process.communicate(input=b'one')[0]
     print(out.decode('utf-8'))
 
-
-    return process_realtime_output(process)
-
-def install_git() -> int:
-    '''
-    Install git if it doesn't exist in *nix environment
-    '''
-
-    command = 'brew install git'
-    process = subprocess.Popen(command.split(), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-
-    return process_realtime_output(process)
-
 def initialise_git_keychain() -> int:
     '''
     Initialise keychain for git in usr level
     '''
     return 0
 
-def install_iterm2() -> int:
-    '''
-    Install iterm2 through cask
-    '''
-
-    command = 'brew cask install iterm2'
-    process = subprocess.Popen(command.split(), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    return process_realtime_output(process)
+   return process_realtime_output(process)
 
 def install_vim_configs() -> int:
     '''
@@ -95,8 +90,6 @@ def install_powerline_status():
     process = subprocess.Popen(command.split(), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     return process_realtime_output(process)
 
-# install all brew dependencies in brew.txt & brew-cask.txt
-# cat brew.txt | xargs brew install
 def install_powerline_fonts():
     '''
     Install powerline through git interface
@@ -111,15 +104,14 @@ def install_powerline_gitstatus():
     '''
     Install powerline through git interface
     '''
-    command = 'pip install --user powerline-gitstatus'
+    command = 'pip3 install --user powerline-gitstatus'
     process = subprocess.Popen(command.split(), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     return process_realtime_output(process)
 
 if __name__ == '__main__':
+    install_homebrew_packages()
 #    install_powerline_status()
 #    install_powerline_fonts()
-    install_powerline_gitstatus()
+#    install_powerline_gitstatus()
 #    install_vim_configs()
-#    install_git()
 #    install_homebrew()
-#    install_iterm2()    

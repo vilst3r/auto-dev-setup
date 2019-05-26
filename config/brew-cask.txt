@@ -9,3 +9,4 @@ visual-studio-code
 slack
 postman
 microsoft-office
+docker
