@@ -5,6 +5,7 @@ Script to automate setup of unix environment with personal configurations and to
 '''
 
 import subprocess
+import pathlib
 
 def process_realtime_output(process: subprocess.Popen) -> int:
     '''
@@ -94,8 +95,30 @@ def install_powerline_status():
     process = subprocess.Popen(command.split(), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     return process_realtime_output(process)
 
+# install all brew dependencies in brew.txt & brew-cask.txt
+# cat brew.txt | xargs brew install
+def install_powerline_fonts():
+    '''
+    Install powerline through git interface
+    '''
+    home_dir = str(pathlib.Path.home())
+    
+    command = 'git clone git@github.com:vilst3r/fonts.git ' + home_dir + '/.config/powerline/fonts'
+    process = subprocess.Popen(command.split(), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    return process_realtime_output(process)
+
+def install_powerline_gitstatus():
+    '''
+    Install powerline through git interface
+    '''
+    command = 'pip install --user powerline-gitstatus'
+    process = subprocess.Popen(command.split(), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    return process_realtime_output(process)
+
 if __name__ == '__main__':
-    install_powerline_status()
+#    install_powerline_status()
+#    install_powerline_fonts()
+    install_powerline_gitstatus()
 #    install_vim_configs()
 #    install_git()
 #    install_homebrew()

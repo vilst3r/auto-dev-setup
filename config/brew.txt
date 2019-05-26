@@ -1,4 +1,7 @@
 go
+git
 postgresql
 python
+node
 docker
+vim

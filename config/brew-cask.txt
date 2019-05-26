@@ -1,4 +1,11 @@
 iterm2
 google-chrome
+sublime-text
 spotify
 intellij-idea-ce
+emacs
+google-drive
+visual-studio-code
+slack
+postman
+microsoft-office

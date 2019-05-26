@@ -1,2 +1,5 @@
-export PATH="/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+alias python=python3
+alias pip=pip3
+# Prioritise using homebrew binaries over system
+export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 set -o vi
