@@ -30,11 +30,17 @@ def install_homebrew() -> int:
     '''
     Install homebrew if it doesn't exist in *nix environment
     '''
+    command = '/usr/bin/ruby -e \"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)\"'
+    command_list = []
+    command_list.append('sh')
+    command_list.append('-c')
+    command_list.append(command)
 
-    command = '/usr/bin/ruby -e'.split()
-    command.append("$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)")
-    print(command)
-    process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    print(command_list)
+    process = subprocess.Popen(command_list, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    out = process.communicate(input=b'one')[0]
+    print(out.decode('utf-8'))
+
 
     return process_realtime_output(process)
 
@@ -52,7 +58,7 @@ def initialise_git_keychain() -> int:
     '''
     Initialise keychain for git in usr level
     '''
-    return
+    return 0
 
 def install_iterm2() -> int:
     '''
@@ -70,15 +76,27 @@ def install_vim_configs() -> int:
 
     # Check if credentials are configured
     with open('config/git-credentials.txt') as text_file:
-        lines = text_file.readlines().split(':')
-        print(lines)
+        lines = text_file.readlines()
+
+        for line in lines:
+            key, val = line.split(':')
+
+            if not val or val == '\n':
+                raise Exception('Credentials are not initialised')
     return
 
+def install_powerline_status():
+    '''
+    Install powerline through git interface
+    '''
+    
+    command = 'pip3 install powerline-status'
+    process = subprocess.Popen(command.split(), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    return process_realtime_output(process)
+
 if __name__ == '__main__':
-    install_vim_configs()
-#    if install_git() != 0:
-#        raise Exception('Failed to install git')
-#    if install_homebrew() != 0:
-#       raise Exception('Failed to install homebrew')
-#    if install_iterm2() != 0:
-#       raise Exception('Failed to install iterm2')
+    install_powerline_status()
+#    install_vim_configs()
+#    install_git()
+#    install_homebrew()
+#    install_iterm2()    

@@ -1,0 +1,4 @@
+iterm2
+google-chrome
+spotify
+intellij-idea-ce
