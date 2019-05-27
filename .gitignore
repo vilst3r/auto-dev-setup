@@ -1,2 +1,5 @@
 # sensitive files
 /config/git-credentials.txt
+
+# redundant files
+*.swp

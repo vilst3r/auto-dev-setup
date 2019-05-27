@@ -83,6 +83,7 @@ def install_powerline():
     command = '/bin/bash ./install.sh'
     subprocess.call(command.split(), cwd=f'{home_dir}/{config_dir}/fonts')
 
+    # Install forked powerline-gitstatus & configure it
     command = 'pip3 install --user powerline-gitstatus'
     subprocess.check_call(command.split())
 
@@ -90,4 +91,4 @@ if __name__ == '__main__':
 #    install_homebrew()
 #    install_vim_configs()
 #    install_homebrew_packages()
-    install_powerline()
+#    install_powerline()
