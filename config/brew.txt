@@ -4,5 +4,4 @@ postgresql
 python
 node
 docker
-docker-machine
 vim

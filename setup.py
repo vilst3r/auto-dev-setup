@@ -6,38 +6,19 @@ Script to automate setup of unix environment with personal configurations and to
 
 import subprocess
 import pathlib
-
-def process_realtime_output(process: subprocess.Popen) -> int:
-    '''
-    Output child stdout in root process call
-    '''
-    if not process:
-        return 1
-
-    while True:
-        output = process.stdout.readline()
-
-        if output:
-            print(output.strip().decode('utf-8'))
-        else:
-            break
-    return_code = process.poll()
-    return return_code
+import time
 
 def install_homebrew_packages():
     '''
     Reads brew.txt file in child config directory to install all brew packages
     '''
-    
     with open('config/brew.txt') as text_file:
         lines = text_file.readlines()
-        
+
         for line in lines:
             command = 'brew install ' + line
-            with subprocess.Popen(command.split(), stdout=subprocess.PIPE, stderr=subprocess.STDOUT) as process:
-                process_realtime_output(process)
+            subprocess.check_call(command.split())
         print('Installation of brew packages are complete!')
-
 
 #def config_vim() -> int:
 #    return
@@ -63,8 +44,6 @@ def initialise_git_keychain() -> int:
     '''
     return 0
 
-   return process_realtime_output(process)
-
 def install_vim_configs() -> int:
     '''
     Configure vim settings including allocated theme
@@ -81,37 +60,34 @@ def install_vim_configs() -> int:
                 raise Exception('Credentials are not initialised')
     return
 
-def install_powerline_status():
+def install_powerline():
     '''
-    Install powerline through git interface
-    '''
-    
-    command = 'pip3 install powerline-status'
-    process = subprocess.Popen(command.split(), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    return process_realtime_output(process)
-
-def install_powerline_fonts():
-    '''
-    Install powerline through git interface
+    Install powerline & configure it to bash & vim
     '''
     home_dir = str(pathlib.Path.home())
+    config_dir = '.config/powerline'
+    git_username = 'vilst3r'
     
-    command = 'git clone git@github.com:vilst3r/fonts.git ' + home_dir + '/.config/powerline/fonts'
-    process = subprocess.Popen(command.split(), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    return process_realtime_output(process)
+    command = 'pip3 install powerline-status'
+    subprocess.check_call(command.split())
+    
+    # Copy powerline build to user config
+    command = f'mkdir {home_dir}/{config_dir}'
+    subprocess.call(command.split())
+    command = f'cp -r /usr/local/lib/python3.7/site-packages/powerline/config_files/ {home_dir}/{config_dir}'
+    subprocess.call(command.split())
 
-def install_powerline_gitstatus():
-    '''
-    Install powerline through git interface
-    '''
+    # Download & install fonts
+    command = f'git clone git@github.com:{git_username}/fonts.git'
+    subprocess.call(command.split(), cwd=f'{home_dir}/{config_dir}')
+    command = '/bin/bash ./install.sh'
+    subprocess.call(command.split(), cwd=f'{home_dir}/{config_dir}/fonts')
+
     command = 'pip3 install --user powerline-gitstatus'
-    process = subprocess.Popen(command.split(), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    return process_realtime_output(process)
+    subprocess.check_call(command.split())
 
 if __name__ == '__main__':
-    install_homebrew_packages()
-#    install_powerline_status()
-#    install_powerline_fonts()
-#    install_powerline_gitstatus()
-#    install_vim_configs()
 #    install_homebrew()
+#    install_vim_configs()
+#    install_homebrew_packages()
+    install_powerline()
