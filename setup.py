@@ -17,7 +17,12 @@ def install_homebrew_packages():
 
         for line in lines:
             command = 'brew install ' + line
-            subprocess.check_call(command.split())
+            return_code = subprocess.call(command.split())
+
+            # Try updating if package is not up to date
+            if return_code != 0:
+                command = 'brew upgrade ' + line
+                subprocess.check_call(command.split())
         print('Installation of brew packages are complete!')
 
 #def config_vim() -> int:
@@ -27,16 +32,17 @@ def install_homebrew() -> int:
     '''
     Install homebrew if it doesn't exist in *nix environment
     '''
-    command = '/usr/bin/ruby -e \"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)\"'
+    ruby_bin = '/usr/bin/ruby'
+    brew_url = 'https://raw.githubusercontent.com/Homebrew/install/master/install'
+
     command_list = []
     command_list.append('sh')
     command_list.append('-c')
-    command_list.append(command)
-
-    print(command_list)
-    process = subprocess.Popen(command_list, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    out = process.communicate(input=b'one')[0]
-    print(out.decode('utf-8'))
+    command_list.append(f'{ruby_bin} -e \"$(curl -fsSL {brew_url})\"')
+    process = subprocess.Popen(command_list, stdin=subprocess.PIPE)
+    #out, err = process.communicate(input=b'')
+    #print(out)
+    #print(err)
 
 def initialise_git_keychain() -> int:
     '''
@@ -44,7 +50,7 @@ def initialise_git_keychain() -> int:
     '''
     return 0
 
-def install_vim_configs() -> int:
+def install_vim_configs():
     '''
     Configure vim settings including allocated theme
     '''
@@ -58,7 +64,6 @@ def install_vim_configs() -> int:
 
             if not val or val == '\n':
                 raise Exception('Credentials are not initialised')
-    return
 
 def install_powerline():
     '''
@@ -67,10 +72,10 @@ def install_powerline():
     home_dir = str(pathlib.Path.home())
     config_dir = '.config/powerline'
     git_username = 'vilst3r'
-    
+
     command = 'pip3 install powerline-status'
     subprocess.check_call(command.split())
-    
+
     # Copy powerline build to user config
     command = f'mkdir {home_dir}/{config_dir}'
     subprocess.call(command.split())
@@ -88,7 +93,7 @@ def install_powerline():
     subprocess.check_call(command.split())
 
 if __name__ == '__main__':
-#    install_homebrew()
+    install_homebrew()
 #    install_vim_configs()
-#    install_homebrew_packages()
+    # install_homebrew_packages()
 #    install_powerline()
