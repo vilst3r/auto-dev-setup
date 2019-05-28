@@ -28,10 +28,17 @@ def install_homebrew_packages():
 #def config_vim() -> int:
 #    return
 
-def install_homebrew() -> int:
+def install_homebrew():
     '''
-    Install homebrew if it doesn't exist in *nix environment
+    Install homebrew if it doesn't exist in *nix environment and requires password input
     '''
+    # Check if homebrew is installed already curl command
+    command = 'ls /usr/local/Cellar'
+    ls_rc = subprocess.call(command.split(), stdout=subprocess.DEVNULL)
+    if ls_rc == 0:
+        print('Homebrew is already installed!')
+        return
+
     ruby_bin = '/usr/bin/ruby'
     brew_url = 'https://raw.githubusercontent.com/Homebrew/install/master/install'
 
@@ -40,9 +47,10 @@ def install_homebrew() -> int:
     command_list.append('-c')
     command_list.append(f'{ruby_bin} -e \"$(curl -fsSL {brew_url})\"')
     process = subprocess.Popen(command_list, stdin=subprocess.PIPE)
-    #out, err = process.communicate(input=b'')
-    #print(out)
-    #print(err)
+    process.communicate()
+
+    command = 'brew tap caskroom/cask'
+    subprocess.call(command.split())
 
 def initialise_git_keychain() -> int:
     '''
@@ -94,6 +102,6 @@ def install_powerline():
 
 if __name__ == '__main__':
     install_homebrew()
+    install_homebrew_packages()
 #    install_vim_configs()
-    # install_homebrew_packages()
 #    install_powerline()
