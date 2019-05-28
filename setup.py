@@ -12,10 +12,9 @@ def print_title(message: str):
     '''
     Prints each step of the setup in a pretty format
     '''
-    n = len(message)
-    top = ''.join(['-' for _ in range(n + 4)])
+    top = ''.join(['-' for _ in range(len(message) + 4)])
     middle = ''.join(list(f'| {message} |'))
-    bottom = ''.join(['-' for _ in range(n + 4)] + ['\n'])
+    bottom = ''.join(['-' for _ in range(len(message) + 4)] + ['\n'])
 
     print(top)
     print(middle)
@@ -36,7 +35,7 @@ def install_homebrew_packages():
             if install_rc != 0:
                 command = 'brew upgrade ' + line
                 upgrade_rc = subprocess.call(command.split())
-                
+
                 if upgrade_rc != 0:
                     print(f'Error with this package in brew.txt - {line}')
 
@@ -71,7 +70,7 @@ def install_homebrew():
     command = 'brew tap caskroom/cask'
     subprocess.call(command.split())
     print_title('Installation of homebrew is complete')
-     
+
 def initialise_git_keychain() -> int:
     '''
     Initialise keychain for git in usr level
@@ -98,23 +97,24 @@ def install_powerline():
     Install powerline & configure it to bash & vim
     '''
     home_dir = str(pathlib.Path.home())
-    config_dir = '.config/powerline'
+    user_config_dir = '.config/powerline'
+    system_config_dir = '/usr/local/lib/python3.7/site-packages/powerline/config_files/'
     git_username = 'vilst3r'
 
     command = 'pip3 install powerline-status'
     subprocess.check_call(command.split())
 
-    # Copy powerline build to user config
-    command = f'mkdir {home_dir}/{config_dir}'
+    # Copy powerline system config to user config
+    command = f'mkdir {home_dir}/{user_config_dir}'
     subprocess.call(command.split())
-    command = f'cp -r /usr/local/lib/python3.7/site-packages/powerline/config_files/ {home_dir}/{config_dir}'
+    command = f'cp -r {system_config_dir} {home_dir}/{user_config_dir}'
     subprocess.call(command.split())
 
     # Download & install fonts
     command = f'git clone git@github.com:{git_username}/fonts.git'
-    subprocess.call(command.split(), cwd=f'{home_dir}/{config_dir}')
+    subprocess.call(command.split(), cwd=f'{home_dir}/{user_config_dir}')
     command = '/bin/bash ./install.sh'
-    subprocess.call(command.split(), cwd=f'{home_dir}/{config_dir}/fonts')
+    subprocess.call(command.split(), cwd=f'{home_dir}/{user_config_dir}/fonts')
 
     # Install forked powerline-gitstatus & configure it
     command = 'pip3 install --user powerline-gitstatus'
