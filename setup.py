@@ -17,13 +17,22 @@ def install_homebrew_packages():
 
         for line in lines:
             command = 'brew install ' + line
-            return_code = subprocess.call(command.split())
+            install_rc = subprocess.call(command.split())
 
             # Try updating if package is not up to date
-            if return_code != 0:
+            if install_rc != 0:
                 command = 'brew upgrade ' + line
-                subprocess.check_call(command.split())
+                upgrade_rc = subprocess.call(command.split())
+                
+                if upgrade_rc != 0:
+                    print(f'Error with this package in brew.txt - {line}')
+
+        # Use brew python over system
+        subprocess.call('brew link --overwrite python'.split())
+
+
         print('Installation of brew packages are complete!')
+
 
 #def config_vim() -> int:
 #    return
