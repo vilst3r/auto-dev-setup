@@ -8,15 +8,30 @@ import subprocess
 import pathlib
 import time
 
-STEP_NO = 0
+class Counter():
+    '''
+    Wrapper object to track state of counter
+    '''
+    def __init__(self):
+        self.step = 0
+
+    def __str__(self):
+        return f'Step number is {self.step}'
+
+    def increment_step(self):
+        '''
+        Increment counter
+        '''
+        self.step += 1
+
+COUNTER = Counter()
 
 def print_process_step(message: str):
     '''
     Prints each step of the setup in a pretty format
     '''
-    global STEP_NO
-    STEP_NO += 1
-    step_str = f'| {STEP_NO}. {message} |'
+    COUNTER.increment_step()
+    step_str = f'| {COUNTER.step}. {message} |'
     row_len = len(step_str)
 
     top = ''.join(['-' for _ in range(row_len)])
@@ -152,6 +167,6 @@ def install_powerline():
 if __name__ == '__main__':
     install_homebrew()
     install_brew_packages()
-    install_cask_packages()
+#    install_cask_packages()
 #    install_vim_configs()
 #    install_powerline()
