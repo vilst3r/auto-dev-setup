@@ -28,3 +28,9 @@ nnoremap k gk
 
 " Allow backward compatibility for latest version of vim in insert mode
 set backspace=indent,eol,start
+
+" Powerline
+" Note: Update python directory if version is more later
+set rtp+=/usr/local/lib/python3.7/site-packages/powerline/bindings/vim
+set laststatus=2
+set t_Co=256

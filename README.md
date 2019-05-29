@@ -16,3 +16,4 @@ Python scripts to replicate personal development environment across any machine 
 - Configure styling of vim gruvbox theme into setup
 - Configure iterm2 profile somehow...
 - Modify forks to be compatible with setup script & replace pip3 commands with git 
+- Move themes, fonts and etc to disk instead?

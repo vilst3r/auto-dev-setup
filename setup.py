@@ -8,15 +8,24 @@ import subprocess
 import pathlib
 import time
 
-class Counter():
+class SetupWrapper():
     '''
     Wrapper object to track state of counter
     '''
     def __init__(self):
+        # Configure directory map
+        self.dir = {}
+        self.dir['home'] = str(pathlib.Path.home()) 
+        self.dir['user_powerline_config'] = '.config/powerline'
+        self.dir['system_powerline_config'] = '/usr/local/lib/python3.7/site-packages/powerline/config_files/'
+        self.git_username = 'vilst3r'    
         self.step = 0
 
     def __str__(self):
-        return f'Step number is {self.step}'
+        str_vals = {} + self.dir.items()
+        str_vals['git_username'] = 'vilst3r'
+        str_vals['step'] = 0
+        return str_vals
 
     def increment_step(self):
         '''
@@ -24,7 +33,7 @@ class Counter():
         '''
         self.step += 1
 
-COUNTER = Counter()
+COUNTER = SetupWrapper()
 
 def print_process_step(message: str):
     '''
@@ -87,9 +96,6 @@ def install_cask_packages():
         subprocess.call('brew link --overwrite python'.split())
         print_process_step('Installation of brew cask packages are complete!')
 
-#def config_vim() -> int:
-#    return
-
 def install_homebrew():
     '''
     Install homebrew if it doesn't exist in *nix environment and requires password input
@@ -125,18 +131,9 @@ def install_vim_configs():
     '''
     Configure vim settings including allocated theme
     '''
+    command = 'cp .vimrc ~/.vimrc'
+    subprocess.call(command.split(), cwd=home_dir)
 
-    # Check if credentials are configured
-    with open('config/git-credentials.txt') as text_file:
-        lines = text_file.readlines()
-
-        for line in lines:
-            key, val = line.split(':')
-
-            if not val or val == '\n':
-                raise Exception('Credentials are not initialised')
-
-def install_powerline():
     '''
     Install powerline & configure it to bash & vim
     '''
