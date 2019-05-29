@@ -8,19 +8,25 @@ import subprocess
 import pathlib
 import time
 
-def print_title(message: str):
+STEP_NO = 0
+
+def print_process_step(message: str):
     '''
     Prints each step of the setup in a pretty format
     '''
-    top = ''.join(['-' for _ in range(len(message) + 4)])
-    middle = ''.join(list(f'| {message} |'))
-    bottom = ''.join(['-' for _ in range(len(message) + 4)] + ['\n'])
+    global STEP_NO
+    STEP_NO += 1
+    step_str = f'| {STEP_NO}. {message} |'
+    row_len = len(step_str)
+
+    top = ''.join(['-' for _ in range(row_len)])
+    bottom = ''.join(['-' for _ in range(row_len)] + ['\n'])
 
     print(top)
-    print(middle)
+    print(step_str)
     print(bottom)
 
-def install_homebrew_packages():
+def install_brew_packages():
     '''
     Reads brew.txt file in child config directory to install all brew packages
     '''
@@ -41,7 +47,30 @@ def install_homebrew_packages():
 
         # Use brew python over system
         subprocess.call('brew link --overwrite python'.split())
-        print_title('Installation of brew packages are complete!')
+        print_process_step('Installation of brew packages are complete!')
+
+def install_cask_packages():
+    '''
+    Reads brew-cask.txt file in child config directory to install all software applications
+    '''
+    with open('config/brew-cask.txt') as text_file:
+        lines = text_file.readlines()
+
+        for line in lines:
+            command = 'brew cask install ' + line
+            install_rc = subprocess.call(command.split())
+
+            # Try updating if package is not up to date
+            if install_rc != 0:
+                command = 'brew upgrade ' + line
+                upgrade_rc = subprocess.call(command.split())
+
+                if upgrade_rc != 0:
+                    print(f'Error with this package in brew.txt - {line}')
+
+        # Use brew python over system
+        subprocess.call('brew link --overwrite python'.split())
+        print_process_step('Installation of brew cask packages are complete!')
 
 #def config_vim() -> int:
 #    return
@@ -54,7 +83,7 @@ def install_homebrew():
     command = 'ls /usr/local/Cellar'
     ls_rc = subprocess.call(command.split(), stdout=subprocess.DEVNULL)
     if ls_rc == 0:
-        print_title('Homebrew is already installed!')
+        print_process_step('Homebrew is already installed!')
         return
 
     ruby_bin = '/usr/bin/ruby'
@@ -69,7 +98,7 @@ def install_homebrew():
 
     command = 'brew tap caskroom/cask'
     subprocess.call(command.split())
-    print_title('Installation of homebrew is complete')
+    print_process_step('Installation of homebrew is complete')
 
 def initialise_git_keychain() -> int:
     '''
@@ -122,6 +151,7 @@ def install_powerline():
 
 if __name__ == '__main__':
     install_homebrew()
-    install_homebrew_packages()
+    install_brew_packages()
+    install_cask_packages()
 #    install_vim_configs()
 #    install_powerline()
