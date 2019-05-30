@@ -6,8 +6,9 @@ Python scripts to replicate personal development environment across any machine 
 1. Installs homebrew
 2. Installs brew packages from './config/brew.txt'
 3. Installs brew cask software from './config/brew-cask.txt'
-4. Configures vim
-5.
+4. Configures vim & bash from project directory
+5. Configure git ssh key
+6. Install powerline
 ...
 
 # Todo

@@ -6,26 +6,26 @@ Script to automate setup of unix environment with personal configurations and to
 
 import subprocess
 import pathlib
-import time
 
 class SetupWrapper():
     '''
     Wrapper object to track state of counter
     '''
     def __init__(self):
-        # Configure directory map
-        self.dir = {}
-        self.dir['home'] = str(pathlib.Path.home()) 
-        self.dir['user_powerline_config'] = '.config/powerline'
-        self.dir['system_powerline_config'] = '/usr/local/lib/python3.7/site-packages/powerline/config_files/'
-        self.git_username = 'vilst3r'    
+        self.git_username = 'vilst3r'
         self.step = 0
 
+        # Configure directory map
+        self.dir = {}
+        self.dir['home'] = str(pathlib.Path.home())
+        self.dir['user_powerline_config'] = '.config/powerline'
+        self.dir['system_powerline_config'] = '/usr/local/lib/python3.7/site-packages/powerline/config_files/'
+
     def __str__(self):
-        str_vals = {} + self.dir.items()
+        str_vals = dict(self.dir.items())
         str_vals['git_username'] = 'vilst3r'
         str_vals['step'] = 0
-        return str_vals
+        return str(str_vals)
 
     def increment_step(self):
         '''
@@ -33,14 +33,14 @@ class SetupWrapper():
         '''
         self.step += 1
 
-COUNTER = SetupWrapper()
+SETUP = SetupWrapper()
 
 def print_process_step(message: str):
     '''
     Prints each step of the setup in a pretty format
     '''
-    COUNTER.increment_step()
-    step_str = f'| {COUNTER.step}. {message} |'
+    SETUP.increment_step()
+    step_str = f'| {SETUP.step}. {message} |'
     row_len = len(step_str)
 
     top = ''.join(['-' for _ in range(row_len)])
@@ -121,27 +121,33 @@ def install_homebrew():
     subprocess.call(command.split())
     print_process_step('Installation of homebrew is complete')
 
-def initialise_git_keychain() -> int:
+def configure_git_ssh():
     '''
-    Initialise keychain for git in usr level
+    Configure git ssh key to user ssh agent
     '''
-    return 0
+    return 
 
-def install_vim_configs():
+def configure_vim_and_bash():
     '''
-    Configure vim settings including allocated theme
+    Configure vim & bash settings
     '''
-    command = 'cp .vimrc ~/.vimrc'
+    home_dir = SETUP.dir['home']
+
+    command = 'cp .vimrc {home_dir}/.vimrc'
     subprocess.call(command.split(), cwd=home_dir)
 
+    command = 'cp .bashrc {home_dir}/.bashrc'
+    subprocess.call(command.split(), cwd=home_dir)
+
+def install_powerline():
     '''
     Install powerline & configure it to bash & vim
     '''
-    home_dir = str(pathlib.Path.home())
-    user_config_dir = '.config/powerline'
-    system_config_dir = '/usr/local/lib/python3.7/site-packages/powerline/config_files/'
-    git_username = 'vilst3r'
-
+    home_dir = SETUP.dir['home']
+    user_config_dir = SETUP.dir['user_powerline_config']
+    system_config_dir = SETUP.dir['system_powerline_config']
+    git_username = SETUP.git_username
+#
     command = 'pip3 install powerline-status'
     subprocess.check_call(command.split())
 
@@ -162,8 +168,10 @@ def install_vim_configs():
     subprocess.check_call(command.split())
 
 if __name__ == '__main__':
-    install_homebrew()
-    install_brew_packages()
+    print(SETUP)
+#    install_homebrew()
+#    install_brew_packages()
 #    install_cask_packages()
-#    install_vim_configs()
+#    configure_vim_and_bash()
+#    configure_git_ssh()
 #    install_powerline()
