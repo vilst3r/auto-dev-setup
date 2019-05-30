@@ -12,7 +12,6 @@ Python scripts to replicate personal development environment across any machine 
 ...
 
 # Todo
-- Set up git credentials to ssh-agent (quite difficult - may require git api)
 - Consolidate the powerline configurations with the fonts and styling applied
 - Configure styling of vim gruvbox theme into setup
 - Configure iterm2 profile somehow...

@@ -6,14 +6,28 @@ Script to automate setup of unix environment with personal configurations and to
 
 import subprocess
 import pathlib
+import pprint
 
 class SetupWrapper():
     '''
     Wrapper object to track state of counter
     '''
     def __init__(self):
-        self.git_username = 'vilst3r'
         self.step = 0
+        self.git = {}
+
+        # Read from config for git credentials
+        with open('./config/git-credentials.txt') as text_file:
+            lines = text_file.readlines()
+
+            for line in lines:
+                key, val = line.split(':')
+
+                if not key or not val:
+                    raise Exception('Git credentials are not configured properly')
+
+                key, val = key.strip(), val.strip()
+                self.git[key] = val
 
         # Configure directory map
         self.dir = {}
@@ -22,10 +36,9 @@ class SetupWrapper():
         self.dir['system_powerline_config'] = '/usr/local/lib/python3.7/site-packages/powerline/config_files/'
 
     def __str__(self):
-        str_vals = dict(self.dir.items())
-        str_vals['git_username'] = 'vilst3r'
-        str_vals['step'] = 0
-        return str(str_vals)
+        str_vals = {**self.git, **self.dir, 'step': self.step}
+        pretty_str = pprint.pformat(str_vals)
+        return pretty_str
 
     def increment_step(self):
         '''
@@ -125,7 +138,7 @@ def configure_git_ssh():
     '''
     Configure git ssh key to user ssh agent
     '''
-    return 
+    home_dir = SETUP.dir['home']
 
 def configure_vim_and_bash():
     '''
