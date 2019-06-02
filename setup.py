@@ -139,6 +139,8 @@ def configure_git_ssh():
     Configure git ssh key to user ssh agent
     '''
     home_dir = SETUP.dir['home']
+    command = f'ssh-keygen -t rsa -b 4096 -C \"{SETUP.git["email"]}\"'
+    print(command)
 
 def configure_vim_and_bash():
     '''
@@ -152,6 +154,22 @@ def configure_vim_and_bash():
     command = 'cp .bashrc {home_dir}/.bashrc'
     subprocess.call(command.split(), cwd=home_dir)
 
+    # Configure vim color themes in directory
+    vim_color_dir = f'{SETUP.dir["home"]}/.vim/colors'
+    command = f'mkdir {vim_color_dir}'
+    subprocess.call(command.split())
+
+    command_list = []
+    command_list.append('sh')
+    command_list.append('-c')
+    command_list.append(f'cp config/color_themes/*.vim {vim_color_dir}')
+    copy_rc = subprocess.call(command_list)
+
+    if copy_rc == 0:
+        print('Vim color themes copied to ~/.vim/colors')
+    else:
+        raise Exception('Error copying vim color themes in config')
+
 def install_powerline():
     '''
     Install powerline & configure it to bash & vim
@@ -159,7 +177,7 @@ def install_powerline():
     home_dir = SETUP.dir['home']
     user_config_dir = SETUP.dir['user_powerline_config']
     system_config_dir = SETUP.dir['system_powerline_config']
-    git_username = SETUP.git_username
+    git_username = SETUP.git['username']
 #
     command = 'pip3 install powerline-status'
     subprocess.check_call(command.split())
@@ -181,10 +199,9 @@ def install_powerline():
     subprocess.check_call(command.split())
 
 if __name__ == '__main__':
-    print(SETUP)
 #    install_homebrew()
 #    install_brew_packages()
 #    install_cask_packages()
-#    configure_vim_and_bash()
+    configure_vim_and_bash()
 #    configure_git_ssh()
 #    install_powerline()
