@@ -139,7 +139,7 @@ def configure_git_ssh():
     Configure git ssh key to user ssh agent
     '''
     home_dir = SETUP.dir['home']
-    command = f'ssh-keygen -t rsa -b 4096 -C \"{SETUP.git["email"]}\" -N ""'
+    command = f'ssh-keygen -t rsa -b 4096 -C \"{SETUP.git["email"]}\" -N foobar'
 
     # Generate ssh key and overwrite if exists
     with subprocess.Popen(command.split(), stdin=subprocess.PIPE) as proc:
