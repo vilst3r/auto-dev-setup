@@ -139,8 +139,51 @@ def configure_git_ssh():
     Configure git ssh key to user ssh agent
     '''
     home_dir = SETUP.dir['home']
-    command = f'ssh-keygen -t rsa -b 4096 -C \"{SETUP.git["email"]}\"'
-    print(command)
+    command = f'ssh-keygen -t rsa -b 4096 -C \"{SETUP.git["email"]}\" -N ""'
+
+    # Generate ssh key and overwrite if exists
+    with subprocess.Popen(command.split(), stdin=subprocess.PIPE) as proc:
+        proc.communicate(input=b'\ny\n')
+
+    # Start ssh-agent
+    command_list = []
+    command_list.append('sh')
+    command_list.append('-c')
+    command_list.append(f'eval \"$(ssh-agent -s)\"')
+    subprocess.call(command_list)
+    print(' '.join(command_list))
+
+    # Modify config
+    buff = []
+    with open(f'{SETUP.dir["home"]}/.ssh/config') as text_file:
+        lines = text_file.readlines()
+
+        for line in lines:
+            key, val = line.strip().split()
+            buff.append(f'{key} {val}\n')
+
+    identity_key_exists = False
+    identity_val = f'{SETUP.dir["home"]}/.ssh/id_rsa'
+    for i, line in enumerate(buff):
+        key, val = line.split()
+        
+        if key == 'IdentityFile':
+            identity_key_exists = True
+            buff[i] = f'{key} {identity_val}'
+            break
+
+    if not identity_key_exists:
+        buff.append(f'IdentityFile {identity_val}')
+   
+    # Rewrite config
+    with open(f'{SETUP.dir["home"]}/.ssh/config', 'w+') as text_file:
+        for line in buff:
+            print(line.strip())
+            text_file.write(line)
+
+    # Add ssh private key to ssh-agent
+    command = f'ssh-add -K {home_dir}/.ssh/id_rsa'
+    subprocess.call(command.split())
 
 def configure_vim_and_bash():
     '''
@@ -202,6 +245,6 @@ if __name__ == '__main__':
 #    install_homebrew()
 #    install_brew_packages()
 #    install_cask_packages()
-    configure_vim_and_bash()
-#    configure_git_ssh()
+#    configure_vim_and_bash()
+    configure_git_ssh()
 #    install_powerline()

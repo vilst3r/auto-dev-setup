@@ -12,6 +12,7 @@ Python scripts to replicate personal development environment across any machine 
 ...
 
 # Todo
+- Refactor complicated logic into helper functions
 - Consolidate the powerline configurations with the fonts and styling applied
 - Configure styling of vim gruvbox theme into setup
 - Configure iterm2 profile somehow...
