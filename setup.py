@@ -4,9 +4,13 @@
 Script to automate setup of unix environment with personal configurations and tools
 '''
 
+# System/Third-Party modules
 import subprocess
 import pathlib
 import pprint
+
+# Custom modules
+from utils.io import *
 
 class SetupWrapper():
     '''
@@ -26,17 +30,26 @@ class SetupWrapper():
         return pretty_str
 
     def read_git_credentials(self) -> dict:
+        '''
+        Read credentials from file into wrapper object
+        '''
         res = {}
 
-        lines = read_file('./config/git-credentials.txt')
-        for line in lines:
-            key, val = line.split(':')
+        a = read_file('./config/git-credentials.txt')
+        for line in a:
+            print(line)
 
-            if not key or not val:
-                raise Exception('Git credentials are not configured properly')
+        with open('./config/git-credentials.txt') as text_file:
+            lines = text_file.readlines()
 
-            key, val = key.strip(), val.strip()
-            res[key] = val
+            for line in lines:
+                key, val = line.split(':')
+
+                if not key or not val:
+                    raise Exception('Git credentials are not configured properly')
+
+                key, val = key.strip(), val.strip()
+                res[key] = val
         return res
 
     def increment_step(self) -> int:
@@ -51,8 +64,8 @@ def install_brew_packages():
     '''
     Reads brew.txt file in child config directory to install all brew packages
     '''
-    packages  = read_file('config/brew-cask.txt')
-    for package in packages:
+    buff = read_file('config/brew-cask.txt')
+    for package in buff:
         command = f'brew install {package}'
         install_rc = subprocess.call(command.split())
 
@@ -72,8 +85,8 @@ def install_cask_packages():
     '''
     Reads brew-cask.txt file in child config directory to install all software applications
     '''
-    packages = read_file('config/brew-cask.txt')
-    for package in packages:
+    buff = read_file('config/brew-cask.txt')
+    for package in buff:
         command = f'brew cask install {package}'
         install_rc = subprocess.call(command.split())
 
@@ -144,7 +157,7 @@ def configure_git_ssh():
     identity_val = f'{SETUP.dir["home"]}/.ssh/id_rsa'
     for i, line in enumerate(buff):
         key, val = line.split()
-        
+
         if key == 'IdentityFile':
             identity_key_exists = True
             buff[i] = f'{key} {identity_val}'
@@ -152,13 +165,15 @@ def configure_git_ssh():
 
     if not identity_key_exists:
         buff.append(f'IdentityFile {identity_val}')
-   
+
     # Rewrite config
     write_file(f'{SETUP.dir["home"]}/.ssh/config', buff)
 
     # Add ssh private key to ssh-agent
     command = f'ssh-add -K {home_dir}/.ssh/id_rsa'
     subprocess.call(command.split())
+
+    print_process_step('SSH key for Git is configured')
 
 def configure_vim_and_bash():
     '''
@@ -187,6 +202,7 @@ def configure_vim_and_bash():
         print('Vim color themes copied to ~/.vim/colors')
     else:
         raise Exception('Error copying vim color themes in config')
+    print_process_step('Vim & Bash are configured')
 
 def install_powerline():
     '''
@@ -216,6 +232,8 @@ def install_powerline():
     command = 'pip3 install --user powerline-gitstatus'
     subprocess.check_call(command.split())
 
+    print_process_step('Powerline is installed & configured')
+
 if __name__ == '__main__':
 #    install_homebrew()
 #    install_brew_packages()
@@ -224,24 +242,6 @@ if __name__ == '__main__':
 #    configure_git_ssh()
     print(SETUP)
 #    install_powerline()
-
-'''
-Helper functions
-'''
-def read_file(filepath: str):
-    '''
-    Reads each line of file and returns a list of strings
-    '''
-    res = []
-    with open(filepath) as text_file:
-        res.append(text_file.readlines())
-    return res
-
-def write_file(path: str, buff: list):
-    with open(f'{SETUP.dir["home"]}/.ssh/config', 'w+') as text_file:
-        for line in buff:
-            print(line.strip())
-            text_file.write(line)
 
 def print_process_step(message: str):
     '''
@@ -257,4 +257,3 @@ def print_process_step(message: str):
     print(top)
     print(step_str)
     print(bottom)
-

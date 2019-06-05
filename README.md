@@ -12,7 +12,7 @@ Python scripts to replicate personal development environment across any machine 
 ...
 
 # Todo
-- Refactor complicated logic into helper functions
+- Move helper functions into a seperate module
 - Make API call to GitHub to add SSH Key for local machine
 - Consolidate the powerline configurations with the fonts and styling applied
 - Configure styling of vim gruvbox theme into setup
