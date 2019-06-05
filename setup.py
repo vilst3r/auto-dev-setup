@@ -14,22 +14,7 @@ class SetupWrapper():
     '''
     def __init__(self):
         self.step = 0
-        self.git = {}
-
-        # Read from config for git credentials
-        with open('./config/git-credentials.txt') as text_file:
-            lines = text_file.readlines()
-
-            for line in lines:
-                key, val = line.split(':')
-
-                if not key or not val:
-                    raise Exception('Git credentials are not configured properly')
-
-                key, val = key.strip(), val.strip()
-                self.git[key] = val
-
-        # Configure directory map
+        self.git = self.read_git_credentials()
         self.dir = {}
         self.dir['home'] = str(pathlib.Path.home())
         self.dir['user_powerline_config'] = '.config/powerline'
@@ -40,7 +25,21 @@ class SetupWrapper():
         pretty_str = pprint.pformat(str_vals)
         return pretty_str
 
-    def increment_step(self):
+    def read_git_credentials(self) -> dict:
+        res = {}
+
+        lines = read_file('./config/git-credentials.txt')
+        for line in lines:
+            key, val = line.split(':')
+
+            if not key or not val:
+                raise Exception('Git credentials are not configured properly')
+
+            key, val = key.strip(), val.strip()
+            res[key] = val
+        return res
+
+    def increment_step(self) -> int:
         '''
         Increment counter
         '''
@@ -48,66 +47,47 @@ class SetupWrapper():
 
 SETUP = SetupWrapper()
 
-def print_process_step(message: str):
-    '''
-    Prints each step of the setup in a pretty format
-    '''
-    SETUP.increment_step()
-    step_str = f'| {SETUP.step}. {message} |'
-    row_len = len(step_str)
-
-    top = ''.join(['-' for _ in range(row_len)])
-    bottom = ''.join(['-' for _ in range(row_len)] + ['\n'])
-
-    print(top)
-    print(step_str)
-    print(bottom)
-
 def install_brew_packages():
     '''
     Reads brew.txt file in child config directory to install all brew packages
     '''
-    with open('config/brew.txt') as text_file:
-        lines = text_file.readlines()
+    packages  = read_file('config/brew-cask.txt')
+    for package in packages:
+        command = f'brew install {package}'
+        install_rc = subprocess.call(command.split())
 
-        for line in lines:
-            command = 'brew install ' + line
-            install_rc = subprocess.call(command.split())
+        # Try updating if package is not up to date
+        if install_rc != 0:
+            command = f'brew upgrade {package}'
+            upgrade_rc = subprocess.call(command.split())
 
-            # Try updating if package is not up to date
-            if install_rc != 0:
-                command = 'brew upgrade ' + line
-                upgrade_rc = subprocess.call(command.split())
+            if upgrade_rc != 0:
+                print(f'Error with this package in brew.txt - {package}')
 
-                if upgrade_rc != 0:
-                    print(f'Error with this package in brew.txt - {line}')
-
-        # Use brew python over system
-        subprocess.call('brew link --overwrite python'.split())
-        print_process_step('Installation of brew packages are complete!')
+    # Use brew python over system
+    subprocess.call('brew link --overwrite python'.split())
+    print_process_step('Installation of brew packages are complete!')
 
 def install_cask_packages():
     '''
     Reads brew-cask.txt file in child config directory to install all software applications
     '''
-    with open('config/brew-cask.txt') as text_file:
-        lines = text_file.readlines()
+    packages = read_file('config/brew-cask.txt')
+    for package in packages:
+        command = f'brew cask install {package}'
+        install_rc = subprocess.call(command.split())
 
-        for line in lines:
-            command = 'brew cask install ' + line
-            install_rc = subprocess.call(command.split())
+        # Try updating if package is not up to date
+        if install_rc != 0:
+            command = f'brew upgrade {package}'
+            upgrade_rc = subprocess.call(command.split())
 
-            # Try updating if package is not up to date
-            if install_rc != 0:
-                command = 'brew upgrade ' + line
-                upgrade_rc = subprocess.call(command.split())
+            if upgrade_rc != 0:
+                print(f'Error with this package in brew.txt - {package}')
 
-                if upgrade_rc != 0:
-                    print(f'Error with this package in brew.txt - {line}')
-
-        # Use brew python over system
-        subprocess.call('brew link --overwrite python'.split())
-        print_process_step('Installation of brew cask packages are complete!')
+    # Use brew python over system
+    subprocess.call('brew link --overwrite python'.split())
+    print_process_step('Installation of brew cask packages are complete!')
 
 def install_homebrew():
     '''
@@ -155,12 +135,10 @@ def configure_git_ssh():
 
     # Modify config
     buff = []
-    with open(f'{SETUP.dir["home"]}/.ssh/config') as text_file:
-        lines = text_file.readlines()
-
-        for line in lines:
-            key, val = line.strip().split()
-            buff.append(f'{key} {val}\n')
+    config = read_file(f'{SETUP.dir["home"]}/.ssh/config')
+    for line in config:
+        key, val = line.strip().split()
+        buff.append(f'{key} {val}\n')
 
     identity_key_exists = False
     identity_val = f'{SETUP.dir["home"]}/.ssh/id_rsa'
@@ -176,10 +154,7 @@ def configure_git_ssh():
         buff.append(f'IdentityFile {identity_val}')
    
     # Rewrite config
-    with open(f'{SETUP.dir["home"]}/.ssh/config', 'w+') as text_file:
-        for line in buff:
-            print(line.strip())
-            text_file.write(line)
+    write_file(f'{SETUP.dir["home"]}/.ssh/config', buff)
 
     # Add ssh private key to ssh-agent
     command = f'ssh-add -K {home_dir}/.ssh/id_rsa'
@@ -246,5 +221,40 @@ if __name__ == '__main__':
 #    install_brew_packages()
 #    install_cask_packages()
 #    configure_vim_and_bash()
-    configure_git_ssh()
+#    configure_git_ssh()
+    print(SETUP)
 #    install_powerline()
+
+'''
+Helper functions
+'''
+def read_file(filepath: str):
+    '''
+    Reads each line of file and returns a list of strings
+    '''
+    res = []
+    with open(filepath) as text_file:
+        res.append(text_file.readlines())
+    return res
+
+def write_file(path: str, buff: list):
+    with open(f'{SETUP.dir["home"]}/.ssh/config', 'w+') as text_file:
+        for line in buff:
+            print(line.strip())
+            text_file.write(line)
+
+def print_process_step(message: str):
+    '''
+    Prints each step of the setup in a pretty format
+    '''
+    SETUP.increment_step()
+    step_str = f'| {SETUP.step}. {message} |'
+    row_len = len(step_str)
+
+    top = ''.join(['-' for _ in range(row_len)])
+    bottom = ''.join(['-' for _ in range(row_len)] + ['\n'])
+
+    print(top)
+    print(step_str)
+    print(bottom)
+
