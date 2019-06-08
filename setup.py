@@ -8,78 +8,39 @@ Script to automate setup of unix environment with personal configurations and to
 import subprocess
 import pathlib
 import pprint
+import time
 
 # Custom modules
-from utils.io import *
-
-class SetupWrapper():
-    '''
-    Wrapper object to track state of counter
-    '''
-    def __init__(self):
-        self.step = 0
-        self.git = self.read_git_credentials()
-        self.dir = {}
-        self.dir['home'] = str(pathlib.Path.home())
-        self.dir['user_powerline_config'] = '.config/powerline'
-        self.dir['system_powerline_config'] = '/usr/local/lib/python3.7/site-packages/powerline/config_files/'
-
-    def __str__(self):
-        str_vals = {**self.git, **self.dir, 'step': self.step}
-        pretty_str = pprint.pformat(str_vals)
-        return pretty_str
-
-    def read_git_credentials(self) -> dict:
-        '''
-        Read credentials from file into wrapper object
-        '''
-        res = {}
-
-        a = read_file('./config/git-credentials.txt')
-        for line in a:
-            print(line)
-
-        with open('./config/git-credentials.txt') as text_file:
-            lines = text_file.readlines()
-
-            for line in lines:
-                key, val = line.split(':')
-
-                if not key or not val:
-                    raise Exception('Git credentials are not configured properly')
-
-                key, val = key.strip(), val.strip()
-                res[key] = val
-        return res
-
-    def increment_step(self) -> int:
-        '''
-        Increment counter
-        '''
-        self.step += 1
+from utils.setup_wrapper import *
 
 SETUP = SetupWrapper()
 
 def install_brew_packages():
     '''
-    Reads brew.txt file in child config directory to install all brew packages
+    Reads brew.txt file in child config directory to install all brew packages and uses brew python over system
     '''
-    buff = read_file('config/brew-cask.txt')
+    buff = [line.strip() for line in read_file('config/brew.txt')]
+
+    command = 'brew list'
+    brew_list = subprocess.check_output(command.split()).decode('utf-8').split('\n')
+
     for package in buff:
+        if package in brew_list:
+            continue
+
+        # Check that package is valid and exists in brew registry
+        command = f'brew info {package}'
+        check_rc = subprocess.call(command.split())
+
+        if check_rc != 0:
+            print(f'This package does not exist in registry - {package}')
+
         command = f'brew install {package}'
         install_rc = subprocess.call(command.split())
 
-        # Try updating if package is not up to date
-        if install_rc != 0:
-            command = f'brew upgrade {package}'
-            upgrade_rc = subprocess.call(command.split())
-
-            if upgrade_rc != 0:
-                print(f'Error with this package in brew.txt - {package}')
-
-    # Use brew python over system
+    ## Use brew python over system
     subprocess.call('brew link --overwrite python'.split())
-    print_process_step('Installation of brew packages are complete!')
+    SETUP.print_process_step('Installation of brew packages are complete!')
 
 def install_cask_packages():
     '''
@@ -100,18 +61,19 @@ def install_cask_packages():
 
     # Use brew python over system
     subprocess.call('brew link --overwrite python'.split())
-    print_process_step('Installation of brew cask packages are complete!')
+    SETUP.print_process_step('Installation of brew cask packages are complete!')
 
 def install_homebrew():
     '''
-    Install homebrew if it doesn't exist in *nix environment and requires password input
+    Install homebrew & cask if it doesn't exist in *nix environment and requires password input
     '''
-    # Check if homebrew is installed already curl command
-    command = 'ls /usr/local/Cellar'
-    ls_rc = subprocess.call(command.split(), stdout=subprocess.DEVNULL)
-    if ls_rc == 0:
-        print_process_step('Homebrew is already installed!')
-        return
+    # Brew is installed if and only if cask is installed
+    command = 'find /usr/local/Caskroom'
+    return_code = subprocess.call(command.split(), stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+    if return_code == 0:
+        SETUP.print_process_step('Homebrew is already installed!')
+        return 
 
     ruby_bin = '/usr/bin/ruby'
     brew_url = 'https://raw.githubusercontent.com/Homebrew/install/master/install'
@@ -125,55 +87,64 @@ def install_homebrew():
 
     command = 'brew tap caskroom/cask'
     subprocess.call(command.split())
-    print_process_step('Installation of homebrew is complete')
+
+    SETUP.print_process_step('Installation of homebrew is complete')
 
 def configure_git_ssh():
     '''
     Configure git ssh key to user ssh agent
     '''
-    home_dir = SETUP.dir['home']
-    command = f'ssh-keygen -t rsa -b 4096 -C \"{SETUP.git["email"]}\" -N foobar'
+    command = f'find {SETUP.dir["home"]}/.ssh/id_rsa.pub'
+    return_code = subprocess.call(command.split(), stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
-    # Generate ssh key and overwrite if exists
-    with subprocess.Popen(command.split(), stdin=subprocess.PIPE) as proc:
-        proc.communicate(input=b'\ny\n')
+    if return_code == 0:
+        SETUP.print_process_step('Git SSH is already configured')
+#    else:
+#        home_dir = SETUP.dir['home']
+#        command = f'ssh-keygen -t rsa -b 4096 -C \"{SETUP.git["email"]}\" -N foobar'
+#
+#        # Generate ssh key and overwrite if exists
+#        with subprocess.Popen(command.split(), stdin=subprocess.PIPE) as proc:
+#            proc.communicate(input=b'\ny\n')
+#
+#        # Start ssh-agent
+#        command_list = []
+#        command_list.append('sh')
+#        command_list.append('-c')
+#        command_list.append(f'eval \"$(ssh-agent -s)\"')
+#        subprocess.call(command_list)
+#        print(' '.join(command_list))
+#
+#        # Modify config
+#        buff = []
+#        config = read_file(f'{SETUP.dir["home"]}/.ssh/config')
+#        for line in config:
+#            key, val = line.strip().split()
+#            buff.append(f'{key} {val}\n')
+#
+#        identity_key_exists = False
+#        identity_val = f'{SETUP.dir["home"]}/.ssh/id_rsa'
+#        for i, line in enumerate(buff):
+#            key, val = line.split()
+#
+#            if key == 'IdentityFile':
+#                identity_key_exists = True
+#                buff[i] = f'{key} {identity_val}'
+#                break
+#
+#        if not identity_key_exists:
+#            buff.append(f'IdentityFile {identity_val}')
+#
+#        # Rewrite config
+#        write_file(f'{SETUP.dir["home"]}/.ssh/config', buff)
+#
+#        # Add ssh private key to ssh-agent
+#        command = f'ssh-add -K {home_dir}/.ssh/id_rsa'
+#        subprocess.call(command.split())
+#
+#        SETUP.print_process_step('SSH key for Git is configured')
 
-    # Start ssh-agent
-    command_list = []
-    command_list.append('sh')
-    command_list.append('-c')
-    command_list.append(f'eval \"$(ssh-agent -s)\"')
-    subprocess.call(command_list)
-    print(' '.join(command_list))
-
-    # Modify config
-    buff = []
-    config = read_file(f'{SETUP.dir["home"]}/.ssh/config')
-    for line in config:
-        key, val = line.strip().split()
-        buff.append(f'{key} {val}\n')
-
-    identity_key_exists = False
-    identity_val = f'{SETUP.dir["home"]}/.ssh/id_rsa'
-    for i, line in enumerate(buff):
-        key, val = line.split()
-
-        if key == 'IdentityFile':
-            identity_key_exists = True
-            buff[i] = f'{key} {identity_val}'
-            break
-
-    if not identity_key_exists:
-        buff.append(f'IdentityFile {identity_val}')
-
-    # Rewrite config
-    write_file(f'{SETUP.dir["home"]}/.ssh/config', buff)
-
-    # Add ssh private key to ssh-agent
-    command = f'ssh-add -K {home_dir}/.ssh/id_rsa'
-    subprocess.call(command.split())
-
-    print_process_step('SSH key for Git is configured')
+        # Need to pbcopy and send this to GitAPI
 
 def configure_vim_and_bash():
     '''
@@ -202,7 +173,7 @@ def configure_vim_and_bash():
         print('Vim color themes copied to ~/.vim/colors')
     else:
         raise Exception('Error copying vim color themes in config')
-    print_process_step('Vim & Bash are configured')
+    SETUP.print_process_step('Vim & Bash are configured')
 
 def install_powerline():
     '''
@@ -232,28 +203,17 @@ def install_powerline():
     command = 'pip3 install --user powerline-gitstatus'
     subprocess.check_call(command.split())
 
-    print_process_step('Powerline is installed & configured')
+    SETUP.print_process_step('Powerline is installed & configured')
 
 if __name__ == '__main__':
-#    install_homebrew()
-#    install_brew_packages()
+    start = time.time()
+
+    configure_git_ssh()
+    install_homebrew()
+    install_brew_packages()
 #    install_cask_packages()
 #    configure_vim_and_bash()
-#    configure_git_ssh()
-    print(SETUP)
 #    install_powerline()
 
-def print_process_step(message: str):
-    '''
-    Prints each step of the setup in a pretty format
-    '''
-    SETUP.increment_step()
-    step_str = f'| {SETUP.step}. {message} |'
-    row_len = len(step_str)
-
-    top = ''.join(['-' for _ in range(row_len)])
-    bottom = ''.join(['-' for _ in range(row_len)] + ['\n'])
-
-    print(top)
-    print(step_str)
-    print(bottom)
+    end = time.time()
+    print(f'Setup time - {end - start} seconds')

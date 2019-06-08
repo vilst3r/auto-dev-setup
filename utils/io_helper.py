@@ -1,14 +1,16 @@
 '''
 Module delegated to file io
 '''
- 
+
 def read_file(path: str) -> list:
     '''
     Reads each line of file and returns a list of strings
     '''
     res = []
     with open(path) as text_file:
-        res.append(text_file.readlines())
+        lines = text_file.readlines()
+        for line in lines:
+            res.append(line)
     return res
 
 def write_file(path: str, buff: list):
@@ -17,4 +19,4 @@ def write_file(path: str, buff: list):
     '''
     with open(path, 'w+') as text_file:
         for line in buff:
-            print(line.strip())
+            text_file.write(line)

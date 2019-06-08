@@ -12,6 +12,8 @@ Python scripts to replicate personal development environment across any machine 
 ...
 
 # Todo
+- Remove vim scripts locally and just pull from git to remove percentage of my vim script lol
+- Fucked up my project name in regards to package importing, might need to change it all
 - Move helper functions into a seperate module
 - Make API call to GitHub to add SSH Key for local machine
 - Consolidate the powerline configurations with the fonts and styling applied
