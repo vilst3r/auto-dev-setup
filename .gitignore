@@ -1,6 +1,3 @@
-# Sensitive files
-/config/git-credentials.txt
-
 # Git directories
 /config/vim-settings/
 /config/bash-settings/
