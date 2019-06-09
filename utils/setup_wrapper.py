@@ -22,7 +22,7 @@ class SetupWrapper():
 
         self.dir = {}
         self.dir['home'] = home
-        self.dir['user_powerline_config'] = f'.config/powerline'
+        self.dir['user_powerline_config'] = f'{home}/.config/powerline'
         self.dir['system_powerline_config'] = f'{python}/site-packages/powerline/config_files'
 
     def __str__(self):
@@ -39,11 +39,13 @@ class SetupWrapper():
         row_len = len(step_str)
 
         top = ''.join(['-' for _ in range(row_len)])
-        bottom = ''.join(['-' for _ in range(row_len)] + ['\n'])
+        bottom = ''.join(['-' for _ in range(row_len)])
 
+        print()
         print(top)
         print(step_str)
         print(bottom)
+        print()
 
 def read_git_credentials() -> dict:
     '''

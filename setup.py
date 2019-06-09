@@ -151,13 +151,20 @@ def configure_vim():
     Configure vim settings
     '''
     home_dir = SETUP.dir['home']
+    git_username = SETUP.git['username']
 
     # Pull vim settings remotely
-    command = f'git clone git@github.com:vilst3r/vim-settings.git config/vim-settings'
-    return_code = subprocess.check_call(command.split())
+    command = 'find config/vim-settings'
+    return_code = subprocess.call(command.split(), stdout=subprocess.DEVNULL)
+
+    if return_code == 0:
+        print('Vim settings already pulled from git')
+    else:
+        command = f'git clone git@github.com:{git_username}/vim-settings.git config/vim-settings'
+        subprocess.check_call(command.split())
 
     command = f'cp config/vim-settings/.vimrc {home_dir}/.vimrc'
-    return_code = subprocess.check_call(command.split())
+    subprocess.check_call(command.split())
 
     # Configure vim color themes in directory
     vim_color_dir = f'{home_dir}/.vim/colors'
@@ -182,10 +189,17 @@ def configure_bash():
     Configure bash settings
     '''
     home_dir = SETUP.dir['home']
+    git_username = SETUP.git['username']
 
     # Pull bash settings remotely
-    command = f'git clone git@github.com:vilst3r/bash-settings.git config/bash-settings'
-    return_code = subprocess.call(command.split())
+    command = 'find config/bash-settings'
+    return_code = subprocess.call(command.split(), stdout=subprocess.DEVNULL)
+
+    if return_code == 0:
+        print('Bash settings already pulled from git')
+    else:
+        command = 'git clone git@github.com:{git_username}/bash-settings.git config/bash-settings'
+        subprocess.check_call(command.split())
 
     command = f'cp config/bash-settings/.bash_profile {home_dir}/.bash_profile'
     subprocess.call(command.split())
@@ -197,24 +211,27 @@ def install_powerline():
     Install powerline & configure it to bash & vim
     '''
     home_dir = SETUP.dir['home']
+    git_username = SETUP.git['username']
     user_config_dir = SETUP.dir['user_powerline_config']
     system_config_dir = SETUP.dir['system_powerline_config']
-    git_username = SETUP.git['username']
-#
+
+    # Install powerline from pip
     command = 'pip3 install powerline-status'
     subprocess.check_call(command.split())
 
     # Copy powerline system config to user config
-    command = f'mkdir {home_dir}/{user_config_dir}'
+    command = f'mkdir {user_config_dir}'
     subprocess.call(command.split())
-    command = f'cp -r {system_config_dir} {home_dir}/{user_config_dir}'
+
+    command = f'cp -r {system_config_dir} {user_config_dir}'
     subprocess.call(command.split())
 
     # Download & install fonts
     command = f'git clone git@github.com:{git_username}/fonts.git'
-    subprocess.call(command.split(), cwd=f'{home_dir}/{user_config_dir}')
+    subprocess.call(command.split(), cwd=f'{user_config_dir}')
+
     command = '/bin/bash ./install.sh'
-    subprocess.call(command.split(), cwd=f'{home_dir}/{user_config_dir}/fonts')
+    subprocess.call(command.split(), cwd=f'{user_config_dir}/fonts')
 
     # Install forked powerline-gitstatus & configure it
     command = 'pip3 install --user powerline-gitstatus'
@@ -224,6 +241,7 @@ def install_powerline():
 
 if __name__ == '__main__':
     start = time.time()
+    print(SETUP)
 
     configure_git_ssh()
     install_homebrew()
@@ -231,7 +249,7 @@ if __name__ == '__main__':
 #    install_cask_packages()
     configure_vim()
     configure_bash()
-#    install_powerline()
+    install_powerline()
 
     end = time.time()
-    print(f'Setup time - {end - start} seconds')
+    print(f'\nSetup time - {end - start} seconds\n')
