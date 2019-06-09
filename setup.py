@@ -198,7 +198,7 @@ def configure_bash():
     if return_code == 0:
         print('Bash settings already pulled from git')
     else:
-        command = 'git clone git@github.com:{git_username}/bash-settings.git config/bash-settings'
+        command = f'git clone git@github.com:{git_username}/bash-settings.git config/bash-settings'
         subprocess.check_call(command.split())
 
     command = f'cp config/bash-settings/.bash_profile {home_dir}/.bash_profile'
@@ -241,7 +241,7 @@ def install_powerline():
 
 if __name__ == '__main__':
     start = time.time()
-    print(SETUP)
+    print(f'\n{SETUP}')
 
     configure_git_ssh()
     install_homebrew()
