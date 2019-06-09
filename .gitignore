@@ -1,7 +1,11 @@
-# sensitive files
+# Sensitive files
 /config/git-credentials.txt
 
-# redundant files
+# Git directories
+/config/vim-settings/
+/config/bash-settings/
+
+# Vim files
 *.swp
 
 # Byte-compiled / optimized / DLL files

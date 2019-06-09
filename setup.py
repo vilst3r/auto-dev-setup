@@ -146,27 +146,28 @@ def configure_git_ssh():
 
         # Need to pbcopy and send this to GitAPI
 
-def configure_vim_and_bash():
+def configure_vim():
     '''
-    Configure vim & bash settings
+    Configure vim settings
     '''
     home_dir = SETUP.dir['home']
 
     # Pull vim settings remotely
-    command = 'git clone git@github.com:vilst3r/vim-settings.git test'
-    return_code = subprocess.call(command.split())
-    
-    print(return_code)
+    command = f'git clone git@github.com:vilst3r/vim-settings.git config/vim-settings'
+    return_code = subprocess.check_call(command.split())
+
+    command = f'cp config/vim-settings/.vimrc {home_dir}/.vimrc'
+    return_code = subprocess.check_call(command.split())
 
     # Configure vim color themes in directory
-    vim_color_dir = f'{SETUP.dir["home"]}/.vim/colors'
+    vim_color_dir = f'{home_dir}/.vim/colors'
     command = f'mkdir {vim_color_dir}'
     subprocess.call(command.split())
 
     command_list = []
     command_list.append('sh')
     command_list.append('-c')
-    command_list.append(f'cp config/color_themes/*.vim {vim_color_dir}')
+    command_list.append(f'cp config/vim-settings/color_themes/*.vim {vim_color_dir}')
     copy_rc = subprocess.call(command_list)
 
     if copy_rc == 0:
@@ -174,11 +175,22 @@ def configure_vim_and_bash():
     else:
         raise Exception('Error copying vim color themes in config')
 
-    # Configure bash
-    command = f'cp config/.bash_profile {home_dir}/.bash_profile'
+    SETUP.print_process_step('Vim is now configured')
+
+def configure_bash():
+    '''
+    Configure bash settings
+    '''
+    home_dir = SETUP.dir['home']
+
+    # Pull bash settings remotely
+    command = f'git clone git@github.com:vilst3r/bash-settings.git config/bash-settings'
+    return_code = subprocess.call(command.split())
+
+    command = f'cp config/bash-settings/.bash_profile {home_dir}/.bash_profile'
     subprocess.call(command.split())
 
-    SETUP.print_process_step('Vim & Bash are configured')
+    SETUP.print_process_step('Bash is now configured')
 
 def install_powerline():
     '''
@@ -217,7 +229,8 @@ if __name__ == '__main__':
     install_homebrew()
     install_brew_packages()
 #    install_cask_packages()
-    configure_vim_and_bash()
+    configure_vim()
+    configure_bash()
 #    install_powerline()
 
     end = time.time()

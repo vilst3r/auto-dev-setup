@@ -3,15 +3,17 @@
 Python scripts to replicate personal development environment across any machine with proper packaging and editor profiles and settings. Linux machine environment only.
 
 # Process
-1. Configure git ssh key
-2. Installs homebrew
+1. Configure git ssh key (requires passcode)
+2. Installs homebrew (requires passcode)
 3. Installs brew packages from './config/brew.txt'
 4. Installs brew cask software from './config/brew-cask.txt'
-5. Configures vim & bash from project directory
-6. Install powerline
+5. Install & Configure vim
+6. Install & Configure bash
+7. Install powerline
 ...
 
 # Todo
+- Use absolute paths for variables to store only, it's confusing....
 - Remove vim scripts locally and just pull from git to remove percentage of my vim script lol
 - Fucked up my project name in regards to package importing, might need to change it all
 - Move helper functions into a seperate module
