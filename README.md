@@ -3,11 +3,11 @@
 Python scripts to replicate personal development environment across any machine with proper packaging and editor profiles and settings. Linux machine environment only.
 
 # Process
-1. Installs homebrew
-2. Installs brew packages from './config/brew.txt'
-3. Installs brew cask software from './config/brew-cask.txt'
-4. Configures vim & bash from project directory
-5. Configure git ssh key
+1. Configure git ssh key
+2. Installs homebrew
+3. Installs brew packages from './config/brew.txt'
+4. Installs brew cask software from './config/brew-cask.txt'
+5. Configures vim & bash from project directory
 6. Install powerline
 ...
 

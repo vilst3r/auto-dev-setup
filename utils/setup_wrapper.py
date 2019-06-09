@@ -22,7 +22,7 @@ class SetupWrapper():
 
         self.dir = {}
         self.dir['home'] = home
-        self.dir['user_powerline_config'] = f'{home}/.config/powerline'
+        self.dir['user_powerline_config'] = f'.config/powerline'
         self.dir['system_powerline_config'] = f'{python}/site-packages/powerline/config_files'
 
     def __str__(self):

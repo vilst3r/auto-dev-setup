@@ -99,50 +99,50 @@ def configure_git_ssh():
 
     if return_code == 0:
         SETUP.print_process_step('Git SSH is already configured')
-#    else:
-#        home_dir = SETUP.dir['home']
-#        command = f'ssh-keygen -t rsa -b 4096 -C \"{SETUP.git["email"]}\" -N foobar'
-#
-#        # Generate ssh key and overwrite if exists
-#        with subprocess.Popen(command.split(), stdin=subprocess.PIPE) as proc:
-#            proc.communicate(input=b'\ny\n')
-#
-#        # Start ssh-agent
-#        command_list = []
-#        command_list.append('sh')
-#        command_list.append('-c')
-#        command_list.append(f'eval \"$(ssh-agent -s)\"')
-#        subprocess.call(command_list)
-#        print(' '.join(command_list))
-#
-#        # Modify config
-#        buff = []
-#        config = read_file(f'{SETUP.dir["home"]}/.ssh/config')
-#        for line in config:
-#            key, val = line.strip().split()
-#            buff.append(f'{key} {val}\n')
-#
-#        identity_key_exists = False
-#        identity_val = f'{SETUP.dir["home"]}/.ssh/id_rsa'
-#        for i, line in enumerate(buff):
-#            key, val = line.split()
-#
-#            if key == 'IdentityFile':
-#                identity_key_exists = True
-#                buff[i] = f'{key} {identity_val}'
-#                break
-#
-#        if not identity_key_exists:
-#            buff.append(f'IdentityFile {identity_val}')
-#
-#        # Rewrite config
-#        write_file(f'{SETUP.dir["home"]}/.ssh/config', buff)
-#
-#        # Add ssh private key to ssh-agent
-#        command = f'ssh-add -K {home_dir}/.ssh/id_rsa'
-#        subprocess.call(command.split())
-#
-#        SETUP.print_process_step('SSH key for Git is configured')
+    else:
+        home_dir = SETUP.dir['home']
+        command = f'ssh-keygen -t rsa -b 4096 -C \"{SETUP.git["email"]}\" -N foobar'
+
+        # Generate ssh key and overwrite if exists
+        with subprocess.Popen(command.split(), stdin=subprocess.PIPE) as proc:
+            proc.communicate(input=b'\ny\n')
+
+        # Start ssh-agent
+        command_list = []
+        command_list.append('sh')
+        command_list.append('-c')
+        command_list.append(f'eval \"$(ssh-agent -s)\"')
+        subprocess.call(command_list)
+        print(' '.join(command_list))
+
+        # Modify config
+        buff = []
+        config = read_file(f'{SETUP.dir["home"]}/.ssh/config')
+        for line in config:
+            key, val = line.strip().split()
+            buff.append(f'{key} {val}\n')
+
+        identity_key_exists = False
+        identity_val = f'{SETUP.dir["home"]}/.ssh/id_rsa'
+        for i, line in enumerate(buff):
+            key, val = line.split()
+
+            if key == 'IdentityFile':
+                identity_key_exists = True
+                buff[i] = f'{key} {identity_val}'
+                break
+
+        if not identity_key_exists:
+            buff.append(f'IdentityFile {identity_val}')
+
+        # Rewrite config
+        write_file(f'{SETUP.dir["home"]}/.ssh/config', buff)
+
+        # Add ssh private key to ssh-agent
+        command = f'ssh-add -K {home_dir}/.ssh/id_rsa'
+        subprocess.call(command.split())
+
+        SETUP.print_process_step('SSH key for Git is configured')
 
         # Need to pbcopy and send this to GitAPI
 
@@ -152,11 +152,11 @@ def configure_vim_and_bash():
     '''
     home_dir = SETUP.dir['home']
 
-    command = 'cp .vimrc {home_dir}/.vimrc'
-    subprocess.call(command.split(), cwd=home_dir)
-
-    command = 'cp .bashrc {home_dir}/.bashrc'
-    subprocess.call(command.split(), cwd=home_dir)
+    # Pull vim settings remotely
+    command = 'git clone git@github.com:vilst3r/vim-settings.git test'
+    return_code = subprocess.call(command.split())
+    
+    print(return_code)
 
     # Configure vim color themes in directory
     vim_color_dir = f'{SETUP.dir["home"]}/.vim/colors'
@@ -173,6 +173,11 @@ def configure_vim_and_bash():
         print('Vim color themes copied to ~/.vim/colors')
     else:
         raise Exception('Error copying vim color themes in config')
+
+    # Configure bash
+    command = f'cp config/.bash_profile {home_dir}/.bash_profile'
+    subprocess.call(command.split())
+
     SETUP.print_process_step('Vim & Bash are configured')
 
 def install_powerline():
@@ -212,7 +217,7 @@ if __name__ == '__main__':
     install_homebrew()
     install_brew_packages()
 #    install_cask_packages()
-#    configure_vim_and_bash()
+    configure_vim_and_bash()
 #    install_powerline()
 
     end = time.time()
