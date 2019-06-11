@@ -7,7 +7,7 @@ import requests
 
 class GithubWrapper():
     '''
-    Wrapper object to handle GitHub API http resuest/responses only
+    Wrapper object to handle GitHub API http request/responses only
     '''
 
     def __init__(self, git: dict):

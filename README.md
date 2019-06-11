@@ -2,6 +2,11 @@
 
 Python scripts to replicate personal development environment across any machine with proper packaging and editor profiles and settings. Linux machine environment only.
 
+# Requirements
+- Python 3 system binary installed to run the script
+- Requests library for the script to interact with GitHub API (pip3 install requests)
+- Configure 'git-credentials.txt' with username, email & oath token properties delimited by a colon
+
 # Process
 1. Configure git ssh key (requires passcode)
 2. Installs homebrew (requires passcode)
@@ -13,7 +18,6 @@ Python scripts to replicate personal development environment across any machine 
 ...
 
 # Todo
-- Need to install requests somehow during the setup...
 - Configure github wrapper to finish config  of git ssh
 - Consolidate the powerline configurations with the fonts and styling applied
 - Configure iterm2 profile somehow...
