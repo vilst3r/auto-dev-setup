@@ -4,6 +4,7 @@ Wrapper object for setup script
 
 ## System/Third-Party modules
 import requests
+import pprint
 
 class GithubWrapper():
     '''
@@ -23,6 +24,16 @@ class GithubWrapper():
 
         self.common_headers = {}
         self.common_headers['Authorization'] = f'token {self.token}'
+
+    def __str__(self):
+        str_vals = {}
+        str_vals['api_url'] = self.api
+        str_vals['username'] = self.username
+        str_vals['email'] = self.email
+        str_vals['token'] = self.token
+        str_vals['common_headers'] = self.common_headers
+        pretty_str = pprint.pformat(str_vals)
+        return pretty_str
 
     def get_public_keys(self) -> dict:
         '''
