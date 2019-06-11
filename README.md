@@ -13,7 +13,7 @@ Python scripts to replicate personal development environment across any machine 
 ...
 
 # Todo
-- Setup OAuth for authorization instead of authentication to integrate this script applicaiton for GitHub
-- Make API call to GitHub to add SSH Key for local machine
+- Need to install requests somehow during the setup...
+- Configure github wrapper to finish config  of git ssh
 - Consolidate the powerline configurations with the fonts and styling applied
 - Configure iterm2 profile somehow...

@@ -246,6 +246,7 @@ if __name__ == '__main__':
     configure_git_ssh()
     install_homebrew()
     install_brew_packages()
+    check_config()
 #    install_cask_packages()
     configure_vim()
     configure_bash()
