@@ -12,8 +12,10 @@ import time
 
 # Custom modules
 from utils.setup_wrapper import *
+from utils.github_wrapper import *
 
 SETUP = SetupWrapper()
+GITHUB = GithubWrapper()
 
 def install_brew_packages():
     '''
@@ -101,7 +103,7 @@ def configure_git_ssh():
         SETUP.print_process_step('Git SSH is already configured')
     else:
         home_dir = SETUP.dir['home']
-        command = f'ssh-keygen -t rsa -b 4096 -C \"{SETUP.git["email"]}\" -N foobar'
+        command = f'ssh-keygen -t rsa -b 4096 -C \"{GITHUB.email}\" -N foobar'
 
         # Generate ssh key and overwrite if exists
         with subprocess.Popen(command.split(), stdin=subprocess.PIPE) as proc:
@@ -151,7 +153,7 @@ def configure_vim():
     Configure vim settings
     '''
     home_dir = SETUP.dir['home']
-    git_username = SETUP.git['username']
+    git_username = GITHUB.username
 
     # Pull vim settings remotely
     command = 'find config/vim-settings'
@@ -189,7 +191,7 @@ def configure_bash():
     Configure bash settings
     '''
     home_dir = SETUP.dir['home']
-    git_username = SETUP.git['username']
+    git_username = GITHUB.username
 
     # Pull bash settings remotely
     command = 'find config/bash-settings'
@@ -211,7 +213,7 @@ def install_powerline():
     Install powerline & configure it to bash & vim
     '''
     home_dir = SETUP.dir['home']
-    git_username = SETUP.git['username']
+    git_username = GITHUB.username
     user_config_dir = SETUP.dir['user_powerline_config']
     system_config_dir = SETUP.dir['system_powerline_config']
 
@@ -239,14 +241,21 @@ def install_powerline():
 
     SETUP.print_process_step('Powerline is installed & configured')
 
+def pretty_print_wrapper(wrapper: object, title: str):
+    '''
+    Function to pretty print wrapper in beginning of setup
+    '''
+    print(f'###### {title} #####')
+    print(f'\n{wrapper}\n')
+
 if __name__ == '__main__':
     start = time.time()
-    print(f'\n{SETUP}')
+    pretty_print_wrapper(SETUP, 'SetupWrapper')
+    pretty_print_wrapper(GITHUB, 'GithubWrapper')
 
     configure_git_ssh()
     install_homebrew()
     install_brew_packages()
-    check_config()
 #    install_cask_packages()
     configure_vim()
     configure_bash()

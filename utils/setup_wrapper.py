@@ -15,7 +15,6 @@ class SetupWrapper():
     '''
     def __init__(self):
         self.step = 0
-        self.git = read_git_credentials()
 
         python = '/usr/local/lib/python3.7'
         home = str(pathlib.Path.home())
@@ -26,7 +25,7 @@ class SetupWrapper():
         self.dir['system_powerline_config'] = f'{python}/site-packages/powerline/config_files'
 
     def __str__(self):
-        str_vals = {**self.git, **self.dir, 'step': self.step}
+        str_vals = {**self.dir, 'step': self.step}
         pretty_str = pprint.pformat(str_vals)
         return pretty_str
 
@@ -46,20 +45,3 @@ class SetupWrapper():
         print(step_str)
         print(bottom)
         print()
-
-def read_git_credentials() -> dict:
-    '''
-    Read credentials from file into wrapper object from project directory
-    '''
-    res = {}
-
-    buff = read_file('config/git-credentials.txt')
-    for line in buff:
-        key, val = line.split(':')
-
-        if not key or not val:
-            raise Exception('Git credentials are not configured properly')
-
-        key, val = key.strip(), val.strip()
-        res[key] = val
-    return res

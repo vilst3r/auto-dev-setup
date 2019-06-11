@@ -6,18 +6,18 @@ Wrapper object for setup script
 import requests
 import pprint
 
+# Custom modules
+from utils.io_helper import *
+
 class GithubWrapper():
     '''
     Wrapper object to handle GitHub API http request/responses only
     '''
 
-    def __init__(self, git: dict):
+    def __init__(self):
+        git = read_git_credentials()
+
         self.api = 'https://api.github.com'
-
-        valid_properties = ['username', 'email', 'token']
-        if not all([key in valid_properties for key in git]):
-            raise Exception('Git object passed in GithubWrapper isn\'t valid')
-
         self.username = git['username']
         self.email = git['email']
         self.token = git['token']
@@ -82,3 +82,23 @@ class GithubWrapper():
             print(f'Other error occurred: {err}')
         else:
             return res
+
+def read_git_credentials() -> dict:
+    '''
+    Read credentials from file into wrapper object from project directory
+    '''
+    res = {}
+    valid_properties = ['username', 'email', 'token']
+
+    buff = read_file('config/git-credentials.txt')
+    for line in buff:
+        key, val = line.split(':')
+
+        if not key or not val:
+            raise Exception('Git credentials are not configured properly')
+        if key not in valid_properties:
+            raise Exception('Git property is invalid')
+
+        key, val = key.strip(), val.strip()
+        res[key] = val
+    return res
