@@ -19,7 +19,7 @@ GITHUB = GithubWrapper()
 
 def install_brew_packages():
     '''
-    Reads brew.txt file in child config directory to install all brew packages and uses brew python over system
+    Install brew packages and uses brew python over system by replacing symlink
     '''
     buff = [line.strip() for line in read_file('config/brew.txt')]
 
@@ -38,7 +38,7 @@ def install_brew_packages():
             print(f'This package does not exist in registry - {package}')
 
         command = f'brew install {package}'
-        install_rc = subprocess.call(command.split())
+        subprocess.call(command.split())
 
     ## Use brew python over system
     subprocess.call('brew link --overwrite python'.split())
@@ -75,7 +75,7 @@ def install_homebrew():
 
     if return_code == 0:
         SETUP.print_process_step('Homebrew is already installed!')
-        return 
+        return
 
     ruby_bin = '/usr/bin/ruby'
     brew_url = 'https://raw.githubusercontent.com/Homebrew/install/master/install'
@@ -212,7 +212,6 @@ def install_powerline():
     '''
     Install powerline & configure it to bash & vim
     '''
-    home_dir = SETUP.dir['home']
     git_username = GITHUB.username
     user_config_dir = SETUP.dir['user_powerline_config']
     system_config_dir = SETUP.dir['system_powerline_config']
