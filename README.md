@@ -14,10 +14,13 @@ Python scripts to replicate personal development environment across any machine 
 4. Installs brew cask software from './config/brew-cask.txt'
 5. Install & Configure vim
 6. Install & Configure bash
-7. Install powerline
+7. Install & Configure powerline
 ...
 
 # Todo
-- Configure github wrapper to finish config  of git ssh
+- Write e2e/integration tests or test it manually?
+- Fix up pathing & imports in project
+- Add requirements.txt
+- Isolate to virtualenv
 - Consolidate the powerline configurations with the fonts and styling applied
 - Configure iterm2 profile somehow...

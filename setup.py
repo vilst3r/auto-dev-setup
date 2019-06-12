@@ -6,14 +6,14 @@ Script to automate setup of unix environment with personal configurations and to
 
 # System/Third-Party modules
 import subprocess
-import pathlib
-import pprint
+from subprocess import PIPE, DEVNULL
 import time
 import re
 
 # Custom modules
-from utils.setup_wrapper import *
-from utils.github_wrapper import *
+from utils.setup_wrapper import SetupWrapper
+from utils.github_wrapper import GithubWrapper
+from utils.io_helper import read_file, write_file
 
 SETUP = SetupWrapper()
 GITHUB = GithubWrapper()
@@ -72,7 +72,7 @@ def install_homebrew():
     '''
     # Brew is installed if and only if cask is installed
     command = 'find /usr/local/Caskroom'
-    return_code = subprocess.call(command.split(), stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    return_code = subprocess.call(command.split(), stdout=DEVNULL, stderr=DEVNULL)
 
     if return_code == 0:
         SETUP.print_process_step('Homebrew is already installed!')
@@ -85,7 +85,7 @@ def install_homebrew():
     command_list.append('sh')
     command_list.append('-c')
     command_list.append(f'{ruby_bin} -e \"$(curl -fsSL {brew_url})\"')
-    process = subprocess.Popen(command_list, stdin=subprocess.PIPE)
+    process = subprocess.Popen(command_list, stdin=PIPE)
     process.communicate()
 
     command = 'brew tap caskroom/cask'
@@ -98,9 +98,9 @@ def configure_git_ssh():
     Configure git ssh key to user ssh agent
     '''
     home_dir = SETUP.dir['home']
-    
-    command = f'find {SETUP.dir["home"]}/.ssh/id_rsa.pub'
-    return_code = subprocess.call(command.split(), stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+    command = f'find {home_dir}/.ssh/id_rsa.pub'
+    return_code = subprocess.call(command.split(), stdout=DEVNULL, stderr=DEVNULL)
 
     if return_code == 0:
         SETUP.print_process_step('Git SSH is already configured')
@@ -110,7 +110,7 @@ def configure_git_ssh():
     command = f'ssh-keygen -t rsa -b 4096 -C \"{GITHUB.email}\" -N foobar'
 
     # Generate ssh key and overwrite if exists
-    with subprocess.Popen(command.split(), stdin=subprocess.PIPE) as proc:
+    with subprocess.Popen(command.split(), stdin=PIPE) as proc:
         proc.communicate(input=b'\ny\n')
 
     # Start ssh-agent
@@ -150,23 +150,24 @@ def configure_git_ssh():
 
     # Need to pbcopy and send this to GitAPI
     command = f'cat {home_dir}/.ssh/id_rsa.pub'
-    key_type, curr_pub_key, email = subprocess.check_output(command.split()).decode('utf-8').split()
+    output = subprocess.check_output(command.split()).decode('utf-8').split()
+    key_type, curr_pub_key, email = output
     curr_pub_key = f'{key_type} {curr_pub_key}'
 
     public_keys = GITHUB.get_public_keys().json()
-    
+
     # Search if key already exists
     pattern = re.compile(re.escape(curr_pub_key))
     for key in public_keys:
         if re.match(pattern, key['key']):
             SETUP.print_process_step('Git SSH is already configured')
             return
-    
+
     # Add new public key to Git API
     payload = {}
     payload['title'] = 'script-env-pub-key'
     payload['key'] = curr_pub_key
-    status_code = GITHUB.create_public_key(payload).status_code
+    GITHUB.create_public_key(payload)
 
     SETUP.print_process_step('SSH key for Git is configured')
 
@@ -179,7 +180,7 @@ def configure_vim():
 
     # Pull vim settings remotely
     command = 'find config/vim-settings'
-    return_code = subprocess.call(command.split(), stdout=subprocess.DEVNULL)
+    return_code = subprocess.call(command.split(), stdout=DEVNULL)
 
     if return_code == 0:
         print('Vim settings already pulled from git')
@@ -217,7 +218,7 @@ def configure_bash():
 
     # Pull bash settings remotely
     command = 'find config/bash-settings'
-    return_code = subprocess.call(command.split(), stdout=subprocess.DEVNULL)
+    return_code = subprocess.call(command.split(), stdout=DEVNULL)
 
     if return_code == 0:
         print('Bash settings already pulled from git')
@@ -270,7 +271,7 @@ def pretty_print_wrapper(wrapper: object, title: str):
     print(f'\n{wrapper}\n')
 
 if __name__ == '__main__':
-    start = time.time()
+    START = time.time()
     pretty_print_wrapper(SETUP, 'SetupWrapper')
     pretty_print_wrapper(GITHUB, 'GithubWrapper')
 
@@ -282,5 +283,5 @@ if __name__ == '__main__':
     configure_bash()
     install_powerline()
 
-    end = time.time()
-    print(f'\nSetup time - {end - start} seconds\n')
+    END = time.time()
+    print(f'\nSetup time - {END - START} seconds\n')
