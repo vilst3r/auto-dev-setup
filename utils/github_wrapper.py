@@ -45,9 +45,9 @@ class GithubWrapper():
             res = requests.get(url, timeout=3)
             res.raise_for_status()
         except requests.HTTPError as http_err:
-            print(f'HTTP error occurred: {http_err}')
+            print(f'HTTP error occurred: {http_err}\n{res.json()}')
         except Exception as err:
-            print(f'Other error occurred: {err}')
+            print(f'Other error occurred: {err}\n{res.json()}')
         else:
             return res
 
@@ -61,9 +61,9 @@ class GithubWrapper():
             res = requests.post(url, json=payload, headers=self.common_headers, timeout=3)
             res.raise_for_status()
         except requests.HTTPError as http_err:
-            print(f'HTTP error occurred: {http_err}')
+            print(f'HTTP error occurred: {http_err}\n{res.json()}')
         except Exception as err:
-            print(f'Other error occurred: {err}')
+            print(f'Other error occurred: {err}\n{res.json()}')
         else:
             return res
 
@@ -77,9 +77,9 @@ class GithubWrapper():
             res = requests.delete(url, headers=self.common_headers, timeout=3)
             res.raise_for_status()
         except requests.HTTPError as http_err:
-            print(f'HTTP error occurred: {http_err}')
+            print(f'HTTP error occurred: {http_err}\n{res.json()}')
         except Exception as err:
-            print(f'Other error occurred: {err}')
+            print(f'Other error occurred: {err}\n{res.json()}')
         else:
             return res
 

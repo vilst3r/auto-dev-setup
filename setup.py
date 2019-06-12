@@ -9,6 +9,7 @@ import subprocess
 import pathlib
 import pprint
 import time
+import re
 
 # Custom modules
 from utils.setup_wrapper import *
@@ -96,57 +97,78 @@ def configure_git_ssh():
     '''
     Configure git ssh key to user ssh agent
     '''
+    home_dir = SETUP.dir['home']
+    
     command = f'find {SETUP.dir["home"]}/.ssh/id_rsa.pub'
     return_code = subprocess.call(command.split(), stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
     if return_code == 0:
         SETUP.print_process_step('Git SSH is already configured')
-    else:
-        home_dir = SETUP.dir['home']
-        command = f'ssh-keygen -t rsa -b 4096 -C \"{GITHUB.email}\" -N foobar'
+        return
 
-        # Generate ssh key and overwrite if exists
-        with subprocess.Popen(command.split(), stdin=subprocess.PIPE) as proc:
-            proc.communicate(input=b'\ny\n')
+    home_dir = SETUP.dir['home']
+    command = f'ssh-keygen -t rsa -b 4096 -C \"{GITHUB.email}\" -N foobar'
 
-        # Start ssh-agent
-        command_list = []
-        command_list.append('sh')
-        command_list.append('-c')
-        command_list.append(f'eval \"$(ssh-agent -s)\"')
-        subprocess.call(command_list)
-        print(' '.join(command_list))
+    # Generate ssh key and overwrite if exists
+    with subprocess.Popen(command.split(), stdin=subprocess.PIPE) as proc:
+        proc.communicate(input=b'\ny\n')
 
-        # Modify config
-        buff = []
-        config = read_file(f'{SETUP.dir["home"]}/.ssh/config')
-        for line in config:
-            key, val = line.strip().split()
-            buff.append(f'{key} {val}\n')
+    # Start ssh-agent
+    command_list = []
+    command_list.append('sh')
+    command_list.append('-c')
+    command_list.append(f'eval \"$(ssh-agent -s)\"')
+    subprocess.call(command_list)
+    print(' '.join(command_list))
 
-        identity_key_exists = False
-        identity_val = f'{SETUP.dir["home"]}/.ssh/id_rsa'
-        for i, line in enumerate(buff):
-            key, val = line.split()
+    # Modify config
+    buff = []
+    config = read_file(f'{home_dir}/.ssh/config')
+    for line in config:
+        key, val = line.strip().split()
+        buff.append(f'{key} {val}\n')
 
-            if key == 'IdentityFile':
-                identity_key_exists = True
-                buff[i] = f'{key} {identity_val}'
-                break
+    identity_key_exists = False
+    identity_val = f'{home_dir}/.ssh/id_rsa'
+    for i, line in enumerate(buff):
+        key, val = line.split()
 
-        if not identity_key_exists:
-            buff.append(f'IdentityFile {identity_val}')
+        if key == 'IdentityFile':
+            identity_key_exists = True
+            buff[i] = f'{key} {identity_val}'
+            break
 
-        # Rewrite config
-        write_file(f'{SETUP.dir["home"]}/.ssh/config', buff)
+    if not identity_key_exists:
+        buff.append(f'IdentityFile {identity_val}')
 
-        # Add ssh private key to ssh-agent
-        command = f'ssh-add -K {home_dir}/.ssh/id_rsa'
-        subprocess.call(command.split())
+    # Rewrite config
+    write_file(f'{home_dir}/.ssh/config', buff)
 
-        SETUP.print_process_step('SSH key for Git is configured')
+    # Add ssh private key to ssh-agent
+    command = f'ssh-add -K {home_dir}/.ssh/id_rsa'
+    subprocess.call(command.split())
 
-        # Need to pbcopy and send this to GitAPI
+    # Need to pbcopy and send this to GitAPI
+    command = f'cat {home_dir}/.ssh/id_rsa.pub'
+    key_type, curr_pub_key, email = subprocess.check_output(command.split()).decode('utf-8').split()
+    curr_pub_key = f'{key_type} {curr_pub_key}'
+
+    public_keys = GITHUB.get_public_keys().json()
+    
+    # Search if key already exists
+    pattern = re.compile(re.escape(curr_pub_key))
+    for key in public_keys:
+        if re.match(pattern, key['key']):
+            SETUP.print_process_step('Git SSH is already configured')
+            return
+    
+    # Add new public key to Git API
+    payload = {}
+    payload['title'] = 'script-env-pub-key'
+    payload['key'] = curr_pub_key
+    status_code = GITHUB.create_public_key(payload).status_code
+
+    SETUP.print_process_step('SSH key for Git is configured')
 
 def configure_vim():
     '''
