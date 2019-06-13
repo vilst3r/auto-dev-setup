@@ -18,8 +18,6 @@ Python scripts to replicate personal development environment across any machine 
 ...
 
 # Todo
-- Write e2e/integration tests or test it manually?
-- Fix up pathing & imports in project
 - Add requirements.txt
 - Isolate to virtualenv
 - Consolidate the powerline configurations with the fonts and styling applied

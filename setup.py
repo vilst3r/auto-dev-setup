@@ -49,22 +49,25 @@ def install_cask_packages():
     '''
     Reads brew-cask.txt file in child config directory to install all software applications
     '''
-    buff = read_file('config/brew-cask.txt')
+    # buff = [line.strip() for line in read_file('config/brew-cask.txt')]
+    buff = [line.strip() for line in read_file('config/brew-cask.txt')]
+
+    command = 'brew cask list'
+    cask_list = subprocess.check_output(command.split()).decode('utf-8').split('\n')
+
     for package in buff:
+        if package in cask_list:
+            continue
+
+        # Check that package is valid and exists in brew registry
+        command = f'brew cask info {package}'
+        check_rc = subprocess.call(command.split())
+
+        if check_rc != 0:
+            print(f'This package does not exist in registry - {package}')
+
         command = f'brew cask install {package}'
-        install_rc = subprocess.call(command.split())
-
-        # Try updating if package is not up to date
-        if install_rc != 0:
-            command = f'brew upgrade {package}'
-            upgrade_rc = subprocess.call(command.split())
-
-            if upgrade_rc != 0:
-                print(f'Error with this package in brew.txt - {package}')
-
-    # Use brew python over system
-    subprocess.call('brew link --overwrite python'.split())
-    SETUP.print_process_step('Installation of brew cask packages are complete!')
+        subprocess.call(command.split())
 
 def install_homebrew():
     '''
@@ -85,8 +88,7 @@ def install_homebrew():
     command_list.append('sh')
     command_list.append('-c')
     command_list.append(f'{ruby_bin} -e \"$(curl -fsSL {brew_url})\"')
-    process = subprocess.Popen(command_list, stdin=PIPE)
-    process.communicate()
+    subprocess.call(command_list, stdin=PIPE)
 
     command = 'brew tap caskroom/cask'
     subprocess.call(command.split())
@@ -98,6 +100,7 @@ def configure_git_ssh():
     Configure git ssh key to user ssh agent
     '''
     home_dir = SETUP.dir['home']
+    git_email = GITHUB.email
 
     command = f'find {home_dir}/.ssh/id_rsa.pub'
     return_code = subprocess.call(command.split(), stdout=DEVNULL, stderr=DEVNULL)
@@ -106,10 +109,8 @@ def configure_git_ssh():
         SETUP.print_process_step('Git SSH is already configured')
         return
 
-    home_dir = SETUP.dir['home']
-    command = f'ssh-keygen -t rsa -b 4096 -C \"{GITHUB.email}\" -N foobar'
-
     # Generate ssh key and overwrite if exists
+    command = f'ssh-keygen -t rsa -b 4096 -C \"{git_email}\" -N foobar'
     with subprocess.Popen(command.split(), stdin=PIPE) as proc:
         proc.communicate(input=b'\ny\n')
 
@@ -149,9 +150,7 @@ def configure_git_ssh():
 
     # Need to pbcopy and send this to GitAPI
     command = f'cat {home_dir}/.ssh/id_rsa.pub'
-    output = subprocess.check_output(command.split()).decode('utf-8').split()
-    key_type = output[0]
-    curr_pub_key = output[1]
+    key_type, curr_pub_key = subprocess.check_output(command.split()).decode('utf-8').split()[:2]
     curr_pub_key = f'{key_type} {curr_pub_key}'
 
     public_keys = GITHUB.get_public_keys().json()
@@ -284,4 +283,4 @@ if __name__ == '__main__':
     install_powerline()
 
     END = time.time()
-    print(f'\nSetup time - {END - START} seconds\n')
+    print(f'\nSetup time: {END - START} seconds\n')
