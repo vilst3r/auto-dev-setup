@@ -6,9 +6,6 @@ Wrapper object for setup script
 import pathlib
 import pprint
 
-# Custom modules
-from utils.io_helper import *
-
 class SetupWrapper():
     '''
     Wrapper object to track state of counter

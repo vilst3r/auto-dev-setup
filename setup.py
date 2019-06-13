@@ -119,7 +119,6 @@ def configure_git_ssh():
     command_list.append('-c')
     command_list.append(f'eval \"$(ssh-agent -s)\"')
     subprocess.call(command_list)
-    print(' '.join(command_list))
 
     # Modify config
     buff = []
@@ -151,7 +150,8 @@ def configure_git_ssh():
     # Need to pbcopy and send this to GitAPI
     command = f'cat {home_dir}/.ssh/id_rsa.pub'
     output = subprocess.check_output(command.split()).decode('utf-8').split()
-    key_type, curr_pub_key, email = output
+    key_type = output[0]
+    curr_pub_key = output[1]
     curr_pub_key = f'{key_type} {curr_pub_key}'
 
     public_keys = GITHUB.get_public_keys().json()

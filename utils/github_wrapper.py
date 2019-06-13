@@ -3,11 +3,11 @@ Wrapper object for setup script
 '''
 
 ## System/Third-Party modules
-import requests
 import pprint
+import requests
 
 # Custom modules
-from utils.io_helper import *
+from utils.io_helper import read_file
 
 class GithubWrapper():
     '''
@@ -44,10 +44,8 @@ class GithubWrapper():
         try:
             res = requests.get(url, timeout=3)
             res.raise_for_status()
-        except requests.HTTPError as http_err:
-            print(f'HTTP error occurred: {http_err}\n{res.json()}')
-        except Exception as err:
-            print(f'Other error occurred: {err}\n{res.json()}')
+        except requests.RequestException as req_err:
+            print(f'Request Error occurred: {req_err}\n{res.json()}')
         else:
             return res
 
@@ -60,10 +58,8 @@ class GithubWrapper():
         try:
             res = requests.post(url, json=payload, headers=self.common_headers, timeout=3)
             res.raise_for_status()
-        except requests.HTTPError as http_err:
-            print(f'HTTP error occurred: {http_err}\n{res.json()}')
-        except Exception as err:
-            print(f'Other error occurred: {err}\n{res.json()}')
+        except requests.RequestException as req_err:
+            print(f'Request Error occurred: {req_err}\n{res.json()}')
         else:
             return res
 
@@ -76,10 +72,8 @@ class GithubWrapper():
         try:
             res = requests.delete(url, headers=self.common_headers, timeout=3)
             res.raise_for_status()
-        except requests.HTTPError as http_err:
-            print(f'HTTP error occurred: {http_err}\n{res.json()}')
-        except Exception as err:
-            print(f'Other error occurred: {err}\n{res.json()}')
+        except requests.RequestException as req_err:
+            print(f'Request Error occurred: {req_err}\n{res.json()}')
         else:
             return res
 
