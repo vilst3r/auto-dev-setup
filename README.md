@@ -4,7 +4,7 @@ Python scripts to replicate personal development environment across any machine 
 
 # Requirements
 - Python 3 system binary installed to run the script
-- Requests library for the script to interact with GitHub API (pip3 install requests)
+- Run 'pip3 install -r requirements' to fetch all script dependencies
 - Configure 'git-credentials.txt' with username, email & oath token properties delimited by a colon
 
 # Process
@@ -18,7 +18,5 @@ Python scripts to replicate personal development environment across any machine 
 ...
 
 # Todo
-- Add requirements.txt
-- Isolate to virtualenv
 - Consolidate the powerline configurations with the fonts and styling applied
 - Configure iterm2 profile somehow...
