@@ -3,6 +3,7 @@ Wrapper object for setup script
 '''
 
 # System/Third-Party modules
+import subprocess
 import pathlib
 import pprint
 
@@ -13,13 +14,16 @@ class SetupWrapper():
     def __init__(self):
         self.step = 0
 
-        python = '/usr/local/lib/python3.7'
         home = str(pathlib.Path.home())
 
         self.dir = {}
         self.dir['home'] = home
-        self.dir['user_powerline_config'] = f'{home}/.config/powerline'
-        self.dir['system_powerline_config'] = f'{python}/site-packages/powerline/config_files'
+
+        command = 'python3 -m site --user-site'
+        python_site = subprocess.check_output(command.split()).decode('utf-8').strip()
+
+        self.dir['python_site'] = python_site
+        self.dir['powerline_config'] = f'{home}/.config/powerline'
 
     def __str__(self):
         str_vals = {**self.dir, 'step': self.step}

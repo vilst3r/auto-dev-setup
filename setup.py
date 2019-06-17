@@ -14,6 +14,7 @@ import re
 from utils.setup_wrapper import SetupWrapper
 from utils.github_wrapper import GithubWrapper
 from utils.io_helper import read_file, write_file
+import utils.powerline_status_helper as powerline_status_helper
 
 SETUP = SetupWrapper()
 GITHUB = GithubWrapper()
@@ -235,26 +236,40 @@ def install_powerline():
     Install powerline & configure it to bash & vim
     '''
     git_username = GITHUB.username
-    user_config_dir = SETUP.dir['user_powerline_config']
-    system_config_dir = SETUP.dir['system_powerline_config']
+    home_dir = SETUP.dir['home']
+    python_site = SETUP.dir['python_site']
+    powerline_config = SETUP.dir['powerline_config']
+
+#    user_config_dir = SETUP.dir['user_powerline_config']
+#    system_config_dir = SETUP.dir['system_powerline_config']
 
     # Install powerline from pip
-    command = 'pip3 install powerline-status'
+    command = 'pip3 install --user powerline-status'
     subprocess.check_call(command.split())
 
+    powerline_status_helper.write_bash_daemon()
+
+    command = f'find {home_dir}/.config'
+    find_rc = subprocess.call(command.split())
+
+    if find_rc != 0:
+        command = f'mkdir {home_dir}/.config'
+        subprocess.call(command.split())
+    
     # Copy powerline system config to user config
-    command = f'mkdir {user_config_dir}'
+    command = f'mkdir {powerline_config}'
     subprocess.call(command.split())
 
-    command = f'cp -r {system_config_dir} {user_config_dir}'
+    system_config_dir = f'{python_site}/powerline/config_files/'
+    command = f'cp -r {system_config_dir} {powerline_config}'
     subprocess.call(command.split())
 
     # Download & install fonts
     command = f'git clone git@github.com:{git_username}/fonts.git'
-    subprocess.call(command.split(), cwd=f'{user_config_dir}')
+    subprocess.call(command.split(), cwd=f'{powerline_config}')
 
     command = '/bin/bash ./install.sh'
-    subprocess.call(command.split(), cwd=f'{user_config_dir}/fonts')
+    subprocess.call(command.split(), cwd=f'{powerline_config}/fonts')
 
     # Install forked powerline-gitstatus & configure it
     command = 'pip3 install --user powerline-gitstatus'
@@ -274,12 +289,12 @@ if __name__ == '__main__':
     pretty_print_wrapper(SETUP, 'SetupWrapper')
     pretty_print_wrapper(GITHUB, 'GithubWrapper')
 
-    configure_git_ssh()
-    install_homebrew()
-    install_brew_packages()
+#    configure_git_ssh()
+#    install_homebrew()
+#    install_brew_packages()
 #    install_cask_packages()
-    configure_vim()
-    configure_bash()
+#    configure_vim()
+#    configure_bash()
     install_powerline()
 
     END = time.time()

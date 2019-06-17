@@ -15,8 +15,10 @@ Python scripts to replicate personal development environment across any machine 
 5. Install & Configure vim
 6. Install & Configure bash
 7. Install & Configure powerline
-...
 
 # Todo
-- Consolidate the powerline configurations with the fonts and styling applied
+- Finish configuring that powerline config (currently doing)
+- Add regex to file processing for more efficient code style
 - Configure iterm2 profile somehow...
+- Automate generation of git-credential file if not found in project
+- All done after that
