@@ -13,8 +13,9 @@ import re
 # Custom modules
 from utils.setup_wrapper import SetupWrapper
 from utils.github_wrapper import GithubWrapper
-from utils.io_helper import read_file, write_file
+from utils.io_helper import read_file
 import utils.powerline_helper as powerline_helper
+import utils.git_helper as git_helper
 
 SETUP = SetupWrapper()
 GITHUB = GithubWrapper()
@@ -122,28 +123,7 @@ def configure_git_ssh():
     command_list.append(f'eval \"$(ssh-agent -s)\"')
     subprocess.call(command_list)
 
-    # Modify config
-    buff = []
-    config = read_file(f'{home_dir}/.ssh/config')
-    for line in config:
-        key, val = line.strip().split()
-        buff.append(f'{key} {val}\n')
-
-    identity_key_exists = False
-    identity_val = f'{home_dir}/.ssh/id_rsa'
-    for i, line in enumerate(buff):
-        key, val = line.split()
-
-        if key == 'IdentityFile':
-            identity_key_exists = True
-            buff[i] = f'{key} {identity_val}'
-            break
-
-    if not identity_key_exists:
-        buff.append(f'IdentityFile {identity_val}')
-
-    # Rewrite config
-    write_file(f'{home_dir}/.ssh/config', buff)
+    git_helper.update_ssh_config()
 
     # Add ssh private key to ssh-agent
     command = f'ssh-add -K {home_dir}/.ssh/id_rsa'
@@ -252,7 +232,7 @@ def install_powerline():
     if find_rc != 0:
         command = f'mkdir {home_dir}/.config'
         subprocess.call(command.split())
-    
+
     # Copy powerline system config to user config
     command = f'mkdir {powerline_config}'
     subprocess.call(command.split())

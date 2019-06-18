@@ -7,8 +7,8 @@ import re
 import json
 
 # Custom modules
-from setup_wrapper import SetupWrapper
-from io_helper import read_file
+from utils.setup_wrapper import SetupWrapper
+from utils.io_helper import read_file
 
 SETUP = SetupWrapper()
 

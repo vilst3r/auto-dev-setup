@@ -7,7 +7,7 @@ import pprint
 import requests
 
 # Custom modules
-from utils.io_helper import read_file
+from utils.git_helper import read_git_credentials
 
 class GithubWrapper():
     '''
@@ -76,23 +76,3 @@ class GithubWrapper():
             print(f'Request Error occurred: {req_err}\n{res.json()}')
         else:
             return res
-
-def read_git_credentials() -> dict:
-    '''
-    Read credentials from file into wrapper object from project directory
-    '''
-    res = {}
-    valid_properties = ['username', 'email', 'token']
-
-    buff = read_file('config/git-credentials.txt')
-    for line in buff:
-        key, val = line.split(':')
-
-        if not key or not val:
-            raise Exception('Git credentials are not configured properly')
-        if key not in valid_properties:
-            raise Exception('Git property is invalid')
-
-        key, val = key.strip(), val.strip()
-        res[key] = val
-    return res
