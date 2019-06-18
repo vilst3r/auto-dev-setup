@@ -14,7 +14,7 @@ import re
 from utils.setup_wrapper import SetupWrapper
 from utils.github_wrapper import GithubWrapper
 from utils.io_helper import read_file, write_file
-import utils.powerline_status_helper as powerline_status_helper
+import utils.powerline_helper as powerline_helper
 
 SETUP = SetupWrapper()
 GITHUB = GithubWrapper()
@@ -240,14 +240,11 @@ def install_powerline():
     python_site = SETUP.dir['python_site']
     powerline_config = SETUP.dir['powerline_config']
 
-#    user_config_dir = SETUP.dir['user_powerline_config']
-#    system_config_dir = SETUP.dir['system_powerline_config']
-
     # Install powerline from pip
     command = 'pip3 install --user powerline-status'
     subprocess.check_call(command.split())
 
-    powerline_status_helper.write_bash_daemon()
+    powerline_helper.write_bash_daemon()
 
     command = f'find {home_dir}/.config'
     find_rc = subprocess.call(command.split())
@@ -274,6 +271,9 @@ def install_powerline():
     # Install forked powerline-gitstatus & configure it
     command = 'pip3 install --user powerline-gitstatus'
     subprocess.check_call(command.split())
+
+    powerline_helper.config_git_colorscheme()
+    powerline_helper.config_git_shell()
 
     SETUP.print_process_step('Powerline is installed & configured')
 
