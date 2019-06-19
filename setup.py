@@ -13,7 +13,6 @@ import re
 # Custom modules
 from utils.setup_wrapper import SetupWrapper
 from utils.github_wrapper import GithubWrapper
-from utils.io_helper import read_file
 import utils.powerline_helper as powerline_helper
 import utils.git_helper as git_helper
 
@@ -24,7 +23,9 @@ def install_brew_packages():
     '''
     Install brew packages and uses brew python over system by replacing symlink
     '''
-    buff = [line.strip() for line in read_file('config/brew.txt')]
+    buff = []
+    with open('config/brew.txt') as text_file:
+        buff = [line.strip() for line in text_file.readlines()]
 
     command = 'brew list'
     brew_list = subprocess.check_output(command.split()).decode('utf-8').split('\n')
@@ -51,8 +52,9 @@ def install_cask_packages():
     '''
     Reads brew-cask.txt file in child config directory to install all software applications
     '''
-    # buff = [line.strip() for line in read_file('config/brew-cask.txt')]
-    buff = [line.strip() for line in read_file('config/brew-cask.txt')]
+    buff = []
+    with open('config/brew-cask.txt') as text_file:
+        buff = [line.strip() for line in text_file.readlines()]
 
     command = 'brew cask list'
     cask_list = subprocess.check_output(command.split()).decode('utf-8').split('\n')

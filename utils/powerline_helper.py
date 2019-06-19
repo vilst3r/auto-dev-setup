@@ -8,7 +8,6 @@ import json
 
 # Custom modules
 from utils.setup_wrapper import SetupWrapper
-from utils.io_helper import read_file
 
 SETUP = SetupWrapper()
 
@@ -27,7 +26,9 @@ def write_bash_daemon():
     daemon_config.append(f'source {python_site}/powerline/bindings/bash/powerline.sh')
 
     daemon_config = '\n'.join(daemon_config)
-    content = ''.join(read_file(bash_profile))
+    content = None
+    with open(bash_profile) as text_file:
+        content = ''.join([line for line in text_file.readlines()]
 
     if re.search(daemon_config, content):
         print('Powerline already configured in bash profile')
@@ -48,7 +49,7 @@ def config_git_colorscheme():
     with open(default_block) as default_json, open(config_block) as config_json:
         default_data, config_data = json.load(default_json), json.load(config_json)
         default_group, config_group = default_data['groups'], config_data['groups']
-        
+
         if all([group in default_group for group in config_group]):
             print('Color scheme for git status for powerline is already configured')
             return
@@ -77,7 +78,7 @@ def config_git_shell():
             if function == config_data:
                 print('Shell for git stats for powerline is already configured')
                 return
-        
+
         function_list.append(config_data)
         data = default_data
         data['segments']['left'] = function_list

@@ -8,7 +8,6 @@ import json
 
 # Custom modules
 from utils.setup_wrapper import SetupWrapper
-from utils.io_helper import read_file, write_file
 
 def read_git_credentials() -> dict:
     '''
@@ -17,7 +16,10 @@ def read_git_credentials() -> dict:
     res = {}
     valid_properties = ['username', 'email', 'token']
 
-    buff = read_file('config/git-credentials.txt')
+    buff = None
+    with open('config/git-credentials.txt') as text_file:
+        buff = [line for line in text_file.readlines()]
+
     for line in buff:
         key, val = line.split(':')
 
@@ -31,10 +33,17 @@ def read_git_credentials() -> dict:
     return res
 
 def update_ssh_config():
+    '''
+    Update config file in .ssh directory
+    '''
     home_dir = SETUP.dir['home']
-    
+
     buff = []
-    config = read_file(f'{home_dir}/.ssh/config')
+    config = None
+
+    with open(f'{home_dir}/.ssh/config') as text_file:
+        config = [line for line in text_file.readlines()] 
+
     for line in config:
         key, val = line.strip().split()
         buff.append(f'{key} {val}\n')
@@ -52,4 +61,6 @@ def update_ssh_config():
     if not identity_key_exists:
         buff.append(f'IdentityFile {identity_val}')
 
-    write_file(f'{home_dir}/.ssh/config', buff)
+    with open(f'{home_dir}/.ssh/config', 'w+') as text_file:
+        for line in buff:
+            text_file.write(line)
