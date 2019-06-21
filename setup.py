@@ -16,6 +16,7 @@ import utils.powerline_helper as powerline_helper
 import utils.git_helper as git_helper
 import utils.ssh_helper as ssh_helper
 import utils.brew_helper as brew_helper
+import utils.vim_helper as vim_helper
 
 SETUP = SetupWrapper()
 GITHUB = GithubWrapper()
@@ -89,34 +90,9 @@ def configure_vim():
     home_dir = SETUP.dir['home']
     git_username = GITHUB.username
 
-    # Pull vim settings remotely
-    command = 'find config/vim-settings'
-    return_code = subprocess.call(command.split(), stdout=DEVNULL)
-
-    if return_code == 0:
-        print('Vim settings already pulled from git')
-    else:
-        command = f'git clone git@github.com:{git_username}/vim-settings.git config/vim-settings'
-        subprocess.check_call(command.split())
-
-    command = f'cp config/vim-settings/.vimrc {home_dir}/.vimrc'
-    subprocess.check_call(command.split())
-
-    # Configure vim color themes in directory
-    vim_color_dir = f'{home_dir}/.vim/colors'
-    command = f'mkdir {vim_color_dir}'
-    subprocess.call(command.split())
-
-    command_list = []
-    command_list.append('sh')
-    command_list.append('-c')
-    command_list.append(f'cp config/vim-settings/color_themes/*.vim {vim_color_dir}')
-    copy_rc = subprocess.call(command_list)
-
-    if copy_rc == 0:
-        print('Vim color themes copied to ~/.vim/colors')
-    else:
-        raise Exception('Error copying vim color themes in config')
+    vim_helper.pull_vim_settings()
+    vim_helper.configure_vimrc()
+    vim_helper.configure_color_themes()
 
     SETUP.print_process_step('Vim is now configured')
 

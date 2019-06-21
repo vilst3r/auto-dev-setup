@@ -1,16 +1,11 @@
 '''
-Module delegated to handling ssh logic
+Module delegated to handling brew logic
 '''
 
 # System/Third-Party modules
 from subprocess import call, check_output, PIPE, DEVNULL
 
 # Custom modules
-from utils.setup_wrapper import SetupWrapper
-from utils.github_wrapper import GithubWrapper
-
-SETUP = SetupWrapper()
-GITHUB = GithubWrapper()
 
 def brew_exists() -> bool:
     '''
