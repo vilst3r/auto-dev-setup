@@ -5,7 +5,6 @@ Script to automate setup of unix environment with personal configurations and to
 '''
 
 # System/Third-Party modules
-import subprocess
 import time
 
 # Custom modules
@@ -60,16 +59,16 @@ def configure_git_ssh():
     '''
     Configure git ssh key to user ssh agent
     '''
-    if ssh_helper.ssh_public_key_exists():
+    if ssh_helper.public_key_exists():
         SETUP.print_process_step('Git SSH is already configured')
         return
 
-    ssh_helper.generate_rsa_ssh_keypair()
+    ssh_helper.generate_rsa_keypair()
     ssh_helper.start_ssh_agent()
     git_helper.update_ssh_config()
     ssh_helper.register_private_key_to_ssh_agent()
 
-    current_public_key = ssh_helper.get_ssh_public_key()
+    current_public_key = ssh_helper.get_public_key()
     public_keys = GITHUB.get_public_keys().json()
 
     if git_helper.github_public_key_exists(current_public_key, public_keys):
@@ -106,43 +105,12 @@ def install_powerline():
     '''
     Install powerline & configure it to bash & vim
     '''
-    git_username = GITHUB.username
-    home_dir = SETUP.dir['home']
-    python_site = SETUP.dir['python_site']
-    powerline_config = SETUP.dir['powerline_config']
-
-    # Install powerline from pip
-    command = 'pip3 install --user powerline-status'
-    subprocess.check_call(command.split())
-
+    powerline_helper.install_powerline_at_user()
     powerline_helper.write_bash_daemon()
+    powerline_helper.configure_user_config_directory()
+    powerline_helper.install_fonts()
 
-    command = f'find {home_dir}/.config'
-    find_rc = subprocess.call(command.split())
-
-    if find_rc != 0:
-        command = f'mkdir {home_dir}/.config'
-        subprocess.call(command.split())
-
-    # Copy powerline system config to user config
-    command = f'mkdir {powerline_config}'
-    subprocess.call(command.split())
-
-    system_config_dir = f'{python_site}/powerline/config_files/'
-    command = f'cp -r {system_config_dir} {powerline_config}'
-    subprocess.call(command.split())
-
-    # Download & install fonts
-    command = f'git clone git@github.com:{git_username}/fonts.git'
-    subprocess.call(command.split(), cwd=f'{powerline_config}')
-
-    command = '/bin/bash ./install.sh'
-    subprocess.call(command.split(), cwd=f'{powerline_config}/fonts')
-
-    # Install forked powerline-gitstatus & configure it
-    command = 'pip3 install --user powerline-gitstatus'
-    subprocess.check_call(command.split())
-
+    powerline_helper.install_gitstatus_at_user()
     powerline_helper.config_git_colorscheme()
     powerline_helper.config_git_shell()
 

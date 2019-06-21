@@ -5,11 +5,21 @@ Module delegated to handling powerline status logic
 # System/Third-Party modules
 import re
 import json
+from subprocess import call, check_call
 
 # Custom modules
 from utils.setup_wrapper import SetupWrapper
+from utils.github_wrapper import GithubWrapper
 
 SETUP = SetupWrapper()
+GITHUB = GithubWrapper()
+
+def install_powerline_at_user():
+    '''
+    Installs the powerline tool at the user level of the system
+    '''
+    command = 'pip3 install --user powerline-status'
+    check_call(command.split())
 
 def write_bash_daemon():
     '''
@@ -36,6 +46,49 @@ def write_bash_daemon():
 
     with open(bash_profile, 'a') as text_file:
         text_file.write(f'\n{daemon_config}\n')
+
+def configure_user_config_directory() -> bool:
+    '''
+    Checks & creates proper directory for the powerline configs to go
+    '''
+    home_dir = SETUP.dir['home']
+    user_config_dir = SETUP.dir['powerline_config']
+    system_config_dir = f'{SETUP.dir["python_site"]}/powerline/config_files/'
+
+    command = f'find {home_dir}/.config'
+    directory_found = call(command.split())
+
+    if directory_found != 0:
+        command = f'mkdir {home_dir}/.config'
+        call(command.split())
+
+    command = f'mkdir {user_config_dir}'
+    call(command.split())
+
+    command = f'cp -r {system_config_dir} {user_config_dir}'
+    call(command.split())
+
+def install_fonts():
+    '''
+    Downloads & installs all font files to proper location
+    '''
+    git_username = GITHUB.username
+    user_config_dir = SETUP.dir['powerline_config']
+
+    # Download & install fonts
+    source = f'git@github.com:{git_username}/fonts.git'
+    command = f'git clone {source}'
+    call(command.split(), cwd=f'{user_config_dir}')
+
+    command = '/bin/bash ./install.sh'
+    call(command.split(), cwd=f'{user_config_dir}/fonts')
+
+def install_gitstatus_at_user():
+    '''
+    Installs powerline-gitstatus at user level of system
+    '''
+    command = 'pip3 install --user powerline-gitstatus'
+    check_call(command.split())
 
 def config_git_colorscheme():
     '''

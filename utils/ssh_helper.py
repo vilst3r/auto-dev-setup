@@ -12,7 +12,7 @@ from utils.github_wrapper import GithubWrapper
 SETUP = SetupWrapper()
 GITHUB = GithubWrapper()
 
-def ssh_public_key_exists() -> bool:
+def public_key_exists() -> bool:
     '''
     Check if public key exists to confirm whether ssh is already configured
     '''
@@ -23,7 +23,7 @@ def ssh_public_key_exists() -> bool:
 
     return file_found == 0
 
-def generate_rsa_ssh_keypair():
+def generate_rsa_keypair():
     '''
     Generate asymmetric public/private keypair for ssh use
     '''
@@ -53,7 +53,7 @@ def register_private_key_to_ssh_agent():
     command = f'ssh-add -K {home_dir}/.ssh/id_rsa'
     call(command.split())
 
-def get_ssh_public_key() -> str:
+def get_public_key() -> str:
     '''
     Return utf-8 string of ssh public key
     '''
