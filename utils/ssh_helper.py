@@ -19,9 +19,9 @@ def ssh_public_key_exists() -> bool:
     home_dir = SETUP.dir['home']
 
     command = f'find {home_dir}/.ssh/id_rsa.pub'
-    file_exists = call(command.split(), stdout=DEVNULL, stderr=DEVNULL)
+    file_found = call(command.split(), stdout=DEVNULL, stderr=DEVNULL)
 
-    return file_exists == 0
+    return file_found == 0
 
 def generate_rsa_ssh_keypair():
     '''

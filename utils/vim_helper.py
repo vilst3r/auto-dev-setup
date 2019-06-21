@@ -19,9 +19,9 @@ def pull_vim_settings():
     git_username = GITHUB.username
 
     command = 'find config/vim-settings'
-    directory_exists = call(command.split(), stdout=DEVNULL)
+    directory_found = call(command.split(), stdout=DEVNULL)
 
-    if directory_exists == 0:
+    if directory_found == 0:
         print('Vim settings already pulled from git')
         return
 

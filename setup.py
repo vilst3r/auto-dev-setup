@@ -6,7 +6,6 @@ Script to automate setup of unix environment with personal configurations and to
 
 # System/Third-Party modules
 import subprocess
-from subprocess import PIPE, DEVNULL
 import time
 
 # Custom modules
@@ -17,6 +16,7 @@ import utils.git_helper as git_helper
 import utils.ssh_helper as ssh_helper
 import utils.brew_helper as brew_helper
 import utils.vim_helper as vim_helper
+import utils.bash_helper as bash_helper
 
 SETUP = SetupWrapper()
 GITHUB = GithubWrapper()
@@ -87,9 +87,6 @@ def configure_vim():
     '''
     Configure vim settings
     '''
-    home_dir = SETUP.dir['home']
-    git_username = GITHUB.username
-
     vim_helper.pull_vim_settings()
     vim_helper.configure_vimrc()
     vim_helper.configure_color_themes()
@@ -100,21 +97,8 @@ def configure_bash():
     '''
     Configure bash settings
     '''
-    home_dir = SETUP.dir['home']
-    git_username = GITHUB.username
-
-    # Pull bash settings remotely
-    command = 'find config/bash-settings'
-    return_code = subprocess.call(command.split(), stdout=DEVNULL)
-
-    if return_code == 0:
-        print('Bash settings already pulled from git')
-    else:
-        command = f'git clone git@github.com:{git_username}/bash-settings.git config/bash-settings'
-        subprocess.check_call(command.split())
-
-    command = f'cp config/bash-settings/.bash_profile {home_dir}/.bash_profile'
-    subprocess.call(command.split())
+    bash_helper.pull_bash_settings()
+    bash_helper.configure_bash_profile()
 
     SETUP.print_process_step('Bash is now configured')
 
