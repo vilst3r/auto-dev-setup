@@ -15,6 +15,7 @@ from utils.github_wrapper import GithubWrapper
 import utils.powerline_helper as powerline_helper
 import utils.git_helper as git_helper
 import utils.ssh_helper as ssh_helper
+import utils.brew_helper as brew_helper
 
 SETUP = SetupWrapper()
 GITHUB = GithubWrapper()
@@ -23,79 +24,34 @@ def install_brew_packages():
     '''
     Install brew packages and uses brew python over system by replacing symlink
     '''
-    buff = []
-    with open('config/brew.txt') as text_file:
-        buff = [line.strip() for line in text_file.readlines()]
+    packages = brew_helper.get_uninstalled_brew_packages()
 
-    command = 'brew list'
-    brew_list = subprocess.check_output(command.split()).decode('utf-8').split('\n')
+    for package in packages:
+        brew_helper.install_that_brew(package)
 
-    for package in buff:
-        if package in brew_list:
-            continue
+    brew_helper.use_brew_python()
 
-        # Check that package is valid and exists in brew registry
-        command = f'brew info {package}'
-        check_rc = subprocess.call(command.split())
-
-        if check_rc != 0:
-            print(f'This package does not exist in registry - {package}')
-
-        command = f'brew install {package}'
-        subprocess.call(command.split())
-
-    ## Use brew python over system
-    subprocess.call('brew link --overwrite python'.split())
     SETUP.print_process_step('Installation of brew packages are complete!')
 
 def install_cask_packages():
     '''
     Reads brew-cask.txt file in child config directory to install all software applications
     '''
-    buff = []
-    with open('config/brew-cask.txt') as text_file:
-        buff = [line.strip() for line in text_file.readlines()]
+    packages = brew_helper.get_uninstalled_cask_packages()
 
-    command = 'brew cask list'
-    cask_list = subprocess.check_output(command.split()).decode('utf-8').split('\n')
-
-    for package in buff:
-        if package in cask_list:
-            continue
-
-        # Check that package is valid and exists in brew registry
-        command = f'brew cask info {package}'
-        check_rc = subprocess.call(command.split())
-
-        if check_rc != 0:
-            print(f'This package does not exist in registry - {package}')
-
-        command = f'brew cask install {package}'
-        subprocess.call(command.split())
+    for package in packages:
+        brew_helper.install_that_cask(package)
 
 def install_homebrew():
     '''
     Install homebrew & cask if it doesn't exist in *nix environment and requires password input
     '''
-    # Brew is installed if and only if cask is installed
-    command = 'find /usr/local/Caskroom'
-    return_code = subprocess.call(command.split(), stdout=DEVNULL, stderr=DEVNULL)
-
-    if return_code == 0:
+    if brew_helper.brew_exists():
         SETUP.print_process_step('Homebrew is already installed!')
         return
 
-    ruby_bin = '/usr/bin/ruby'
-    brew_url = 'https://raw.githubusercontent.com/Homebrew/install/master/install'
-
-    command_list = []
-    command_list.append('sh')
-    command_list.append('-c')
-    command_list.append(f'{ruby_bin} -e \"$(curl -fsSL {brew_url})\"')
-    subprocess.call(command_list, stdin=PIPE)
-
-    command = 'brew tap caskroom/cask'
-    subprocess.call(command.split())
+    brew_helper.install_brew()
+    brew_helper.tap_brew_cask()
 
     SETUP.print_process_step('Installation of homebrew is complete')
 

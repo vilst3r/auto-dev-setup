@@ -1,9 +1,9 @@
 '''
-Module delegated to handling git logic
+Module delegated to handling ssh logic
 '''
 
 # System/Third-Party modules
-from subprocess import call, Popen, communicate, check_output, PIPE, DEVNULL
+from subprocess import call, Popen, check_output, PIPE, DEVNULL
 
 # Custom modules
 from utils.setup_wrapper import SetupWrapper
@@ -19,9 +19,9 @@ def ssh_public_key_exists() -> bool:
     home_dir = SETUP.dir['home']
 
     command = f'find {home_dir}/.ssh/id_rsa.pub'
-    return_code = call(command.split(), stdout=DEVNULL, stderr=DEVNULL)
+    file_exists = call(command.split(), stdout=DEVNULL, stderr=DEVNULL)
 
-    return return_code == 0
+    return file_exists == 0
 
 def generate_rsa_ssh_keypair():
     '''
