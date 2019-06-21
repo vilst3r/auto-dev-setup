@@ -4,10 +4,11 @@ Module delegated to handling git logic
 
 # System/Third-Party modules
 import re
-import json
 
 # Custom modules
 from utils.setup_wrapper import SetupWrapper
+
+SETUP = SetupWrapper()
 
 def read_git_credentials() -> dict:
     '''
@@ -42,7 +43,7 @@ def update_ssh_config():
     config = None
 
     with open(f'{home_dir}/.ssh/config') as text_file:
-        config = [line for line in text_file.readlines()] 
+        config = [line for line in text_file.readlines()]
 
     for line in config:
         key, val = line.strip().split()
@@ -64,3 +65,14 @@ def update_ssh_config():
     with open(f'{home_dir}/.ssh/config', 'w+') as text_file:
         for line in buff:
             text_file.write(line)
+
+def github_public_key_exists(current_key: str, public_keys: list) -> bool:
+    '''
+    Check if current public key passed in exists on github
+    '''
+    pattern = re.compile(re.escape(current_key))
+
+    for key in public_keys:
+        if re.match(pattern, key['key']):
+            return True
+    return False

@@ -8,13 +8,13 @@ Script to automate setup of unix environment with personal configurations and to
 import subprocess
 from subprocess import PIPE, DEVNULL
 import time
-import re
 
 # Custom modules
 from utils.setup_wrapper import SetupWrapper
 from utils.github_wrapper import GithubWrapper
 import utils.powerline_helper as powerline_helper
 import utils.git_helper as git_helper
+import utils.ssh_helper as ssh_helper
 
 SETUP = SetupWrapper()
 GITHUB = GithubWrapper()
@@ -103,52 +103,25 @@ def configure_git_ssh():
     '''
     Configure git ssh key to user ssh agent
     '''
-    home_dir = SETUP.dir['home']
-    git_email = GITHUB.email
-
-    command = f'find {home_dir}/.ssh/id_rsa.pub'
-    return_code = subprocess.call(command.split(), stdout=DEVNULL, stderr=DEVNULL)
-
-    if return_code == 0:
+    if ssh_helper.ssh_public_key_exists():
         SETUP.print_process_step('Git SSH is already configured')
         return
 
-    # Generate ssh key and overwrite if exists
-    command = f'ssh-keygen -t rsa -b 4096 -C \"{git_email}\" -N foobar'
-    with subprocess.Popen(command.split(), stdin=PIPE) as proc:
-        proc.communicate(input=b'\ny\n')
-
-    # Start ssh-agent
-    command_list = []
-    command_list.append('sh')
-    command_list.append('-c')
-    command_list.append(f'eval \"$(ssh-agent -s)\"')
-    subprocess.call(command_list)
-
+    ssh_helper.generate_rsa_ssh_keypair()
+    ssh_helper.start_ssh_agent()
     git_helper.update_ssh_config()
+    ssh_helper.register_private_key_to_ssh_agent()
 
-    # Add ssh private key to ssh-agent
-    command = f'ssh-add -K {home_dir}/.ssh/id_rsa'
-    subprocess.call(command.split())
-
-    # Need to pbcopy and send this to GitAPI
-    command = f'cat {home_dir}/.ssh/id_rsa.pub'
-    key_type, curr_pub_key = subprocess.check_output(command.split()).decode('utf-8').split()[:2]
-    curr_pub_key = f'{key_type} {curr_pub_key}'
-
+    current_public_key = ssh_helper.get_ssh_public_key()
     public_keys = GITHUB.get_public_keys().json()
 
-    # Search if key already exists
-    pattern = re.compile(re.escape(curr_pub_key))
-    for key in public_keys:
-        if re.match(pattern, key['key']):
-            SETUP.print_process_step('Git SSH is already configured')
-            return
+    if git_helper.github_public_key_exists(current_public_key, public_keys):
+        SETUP.print_process_step('Git SSH is already configured')
+        return
 
-    # Add new public key to Git API
     payload = {}
     payload['title'] = 'script-env-pub-key'
-    payload['key'] = curr_pub_key
+    payload['key'] = current_public_key
     GITHUB.create_public_key(payload)
 
     SETUP.print_process_step('SSH key for Git is configured')

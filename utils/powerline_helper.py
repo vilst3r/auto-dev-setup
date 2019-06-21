@@ -28,7 +28,7 @@ def write_bash_daemon():
     daemon_config = '\n'.join(daemon_config)
     content = None
     with open(bash_profile) as text_file:
-        content = ''.join([line for line in text_file.readlines()]
+        content = ''.join([line for line in text_file.readlines()])
 
     if re.search(daemon_config, content):
         print('Powerline already configured in bash profile')
