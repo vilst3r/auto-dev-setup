@@ -18,7 +18,7 @@ def pull_bash_settings():
     '''
     git_username = GITHUB.username
 
-    command = 'find config/bash-settings'
+    command = 'find config/bash/bash-settings'
     directory_found = call(command.split(), stdout=DEVNULL)
 
     if directory_found == 0:
@@ -26,7 +26,7 @@ def pull_bash_settings():
         return
 
     source = f'git@github.com:{git_username}/bash-settings.git'
-    destination = f'config/bash-settings'
+    destination = f'config/bash/bash-settings'
     command = f'git clone {source} {destination}'
     check_call(command.split())
 
@@ -36,5 +36,5 @@ def configure_bash_profile():
     '''
     home_dir = SETUP.dir['home']
 
-    command = f'cp config/bash-settings/.bash_profile {home_dir}/.bash_profile'
+    command = f'cp config/bash/bash-settings/.bash_profile {home_dir}/.bash_profile'
     call(command.split())

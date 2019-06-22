@@ -18,7 +18,7 @@ def pull_vim_settings():
     '''
     git_username = GITHUB.username
 
-    command = 'find config/vim-settings'
+    command = 'find config/vim/vim-settings'
     directory_found = call(command.split(), stdout=DEVNULL)
 
     if directory_found == 0:
@@ -26,7 +26,7 @@ def pull_vim_settings():
         return
 
     source = f'git@github.com:{git_username}/vim-settings.git'
-    destination = f'config/vim-settings'
+    destination = f'config/vim/vim-settings'
     command = f'git clone {source} {destination}'
     check_call(command.split())
 
@@ -36,7 +36,7 @@ def configure_vimrc():
     '''
     home_dir = SETUP.dir['home']
 
-    command = f'cp config/vim-settings/.vimrc {home_dir}/.vimrc'
+    command = f'cp config/vim/vim-settings/.vimrc {home_dir}/.vimrc'
     check_call(command.split())
 
 def configure_color_themes():
@@ -52,7 +52,7 @@ def configure_color_themes():
     command_list = []
     command_list.append('sh')
     command_list.append('-c')
-    command_list.append(f'cp config/vim-settings/color_themes/*.vim {vim_color_dir}')
+    command_list.append(f'cp config/vim/vim-settings/color_themes/*.vim {vim_color_dir}')
     copy_result = call(command_list)
 
     if copy_result == 0:

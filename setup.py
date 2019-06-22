@@ -105,14 +105,15 @@ def install_powerline():
     '''
     Install powerline & configure it to bash & vim
     '''
-    powerline_helper.install_powerline_at_user()
-    powerline_helper.write_bash_daemon()
-    powerline_helper.configure_user_config_directory()
-    powerline_helper.install_fonts()
-
-    powerline_helper.install_gitstatus_at_user()
-    powerline_helper.config_git_colorscheme()
-    powerline_helper.config_git_shell()
+#    powerline_helper.install_powerline_at_user()
+#    powerline_helper.write_bash_daemon()
+#    powerline_helper.write_vim_config()
+#    powerline_helper.configure_user_config_directory()
+#    powerline_helper.install_fonts()
+#
+#    powerline_helper.install_gitstatus_at_user()
+#    powerline_helper.config_git_colorscheme()
+#    powerline_helper.config_git_shell()
 
     SETUP.print_process_step('Powerline is installed & configured')
 

@@ -47,6 +47,32 @@ def write_bash_daemon():
     with open(bash_profile, 'a') as text_file:
         text_file.write(f'\n{daemon_config}\n')
 
+def write_vim_config():
+    '''
+    Append powerline configuration to vimrc
+    '''
+    home_dir = SETUP.dir['home']
+    python_site = SETUP.dir['python_site']
+    vimrc = f'{home_dir}/.vimrc'
+
+    config = []
+    config.append('\" Powerline')
+    config.append(f'set rtp+={python_site}/powerline/bindings/vim')
+    config.append('set laststatus=2')
+    config.append('set t_Co=256')
+    
+    config = '\n'.join(config)
+    content = None
+    with open(vimrc) as text_file:
+        content = ''.join([line for line in text_file.readlines()])
+
+    if re.search(re.escape(config), content):
+        print('Powerline already configured in vimrc')
+        return
+
+    with open(vimrc, 'a') as text_file:
+        text_file.write(f'\n{config}\n')
+
 def configure_user_config_directory() -> bool:
     '''
     Checks & creates proper directory for the powerline configs to go
@@ -96,7 +122,7 @@ def config_git_colorscheme():
     '''
     powerline_config = SETUP.dir['powerline_config']
     default_block = f'{powerline_config}/colorschemes/default.json'
-    config_block = 'config/powerline_git_color.json'
+    config_block = 'config/powerline/powerline_git_color.json'
 
     data = None
     with open(default_block) as default_json, open(config_block) as config_json:
@@ -120,7 +146,7 @@ def config_git_shell():
     '''
     powerline_config = SETUP.dir['powerline_config']
     default_block = f'{powerline_config}/themes/shell/default.json'
-    config_block = 'config/powerline_git_shell.json'
+    config_block = 'config/powerline/powerline_git_shell.json'
 
     data = None
     with open(default_block) as default_json, open(config_block) as config_json:
