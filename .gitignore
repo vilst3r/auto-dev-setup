@@ -2,8 +2,8 @@
 /config/git-credentials.txt
 
 # Git directories
-/config/vim-settings/
-/config/bash-settings/
+/config/vim/vim-settings/
+/config/bash/bash-settings/
 
 # Vim files
 *.swp

@@ -3,13 +3,13 @@ Wrapper object for setup script
 '''
 
 # System/Third-Party modules
-import subprocess
+from subprocess import check_output
 import pathlib
 import pprint
 
 class SetupWrapper():
     '''
-    Wrapper object to track state of counter
+    Wrapper object to track state of setup
     '''
     def __init__(self):
         self.step = 0
@@ -20,7 +20,7 @@ class SetupWrapper():
         self.dir['home'] = home
 
         command = 'python3 -m site --user-site'
-        python_site = subprocess.check_output(command.split()).decode('utf-8').strip()
+        python_site = check_output(command.split()).decode('utf-8').strip()
 
         self.dir['python_site'] = python_site
         self.dir['powerline_config'] = f'{home}/.config/powerline'

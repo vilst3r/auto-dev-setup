@@ -29,23 +29,46 @@ def write_bash_daemon():
     python_site = SETUP.dir['python_site']
     bash_profile = f'{home_dir}/.bash_profile'
 
+    source_version = f'source {python_site}/powerline/bindings/bash/powerline.sh'
+
     daemon_config = []
+    daemon_config.append('# Powerline user config')
     daemon_config.append('powerline-daemon -q')
     daemon_config.append('POWERLINE_BASH_CONTINUATION=1')
     daemon_config.append('POWERLINE_BASH_SELECT=1')
-    daemon_config.append(f'source {python_site}/powerline/bindings/bash/powerline.sh')
+    daemon_config.append(source_version)
+
+    pattern = daemon_config[:-1]
+    pattern.append('source [\w(\-)/.]+.sh')
 
     daemon_config = '\n'.join(daemon_config)
+    pattern = '\n'.join(pattern)
+
     content = None
     with open(bash_profile) as text_file:
         content = ''.join([line for line in text_file.readlines()])
 
-    if re.search(daemon_config, content):
+    pattern = re.compile(pattern)
+    config_match = re.search(pattern, content)
+
+    if not config_match:
+        print('Appended powerline configuration in bash profile')
+        with open(bash_profile, 'a') as text_file:
+            text_file.write(f'\n{daemon_config}\n')
+        return
+
+    current_config = config_match[0]
+
+    if current_config == daemon_config:
         print('Powerline already configured in bash profile')
         return
 
-    with open(bash_profile, 'a') as text_file:
-        text_file.write(f'\n{daemon_config}\n')
+    start, end = config_match.span() 
+    content = content[:start] + daemon_config + content[end:]
+
+    with open(bash_profile, 'w') as text_file:
+        text_file.write(content)
+    print('Powerline configuration updated in bash profile')
 
 def write_vim_config():
     '''
