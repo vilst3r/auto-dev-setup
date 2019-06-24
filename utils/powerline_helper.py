@@ -78,23 +78,45 @@ def write_vim_config():
     python_site = SETUP.dir['python_site']
     vimrc = f'{home_dir}/.vimrc'
 
+    rtp_version = f'set rtp+={python_site}/powerline/bindings/vim'
+
     config = []
     config.append('\" Powerline')
-    config.append(f'set rtp+={python_site}/powerline/bindings/vim')
+    config.append(rtp_version)
     config.append('set laststatus=2')
     config.append('set t_Co=256')
+
+    pattern = config[::]
+    pattern[1] = 'set rtp\+\=[\w(\-)/.]+/vim'
     
     config = '\n'.join(config)
+    pattern = '\n'.join(pattern)
+
     content = None
     with open(vimrc) as text_file:
         content = ''.join([line for line in text_file.readlines()])
 
-    if re.search(re.escape(config), content):
+    pattern = re.compile(pattern)
+    config_match = re.search(pattern, content)
+
+    if not config_match:
+        print('Appended powerline configuration in vimrc')
+        with open(vimrc, 'a') as text_file:
+            text_file.write(f'\n{config}\n')
+        return
+
+    current_config = config_match[0]
+
+    if current_config == config:
         print('Powerline already configured in vimrc')
         return
 
-    with open(vimrc, 'a') as text_file:
-        text_file.write(f'\n{config}\n')
+    start, end = config_match.span()
+    content = content[:start] + config + content[end:]
+
+    with open(vimrc, 'w') as text_file:
+        text_file.write(content)
+    print('Powerline configuration updated in vimrc')
 
 def configure_user_config_directory() -> bool:
     '''
