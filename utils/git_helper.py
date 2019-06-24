@@ -23,13 +23,13 @@ def read_git_credentials() -> dict:
 
     for line in buff:
         key, val = line.split(':')
+        key, val = key.strip(), val.strip()
 
         if not key or not val:
             raise Exception('Git credentials are not configured properly')
         if key not in valid_properties:
             raise Exception('Git property is invalid')
 
-        key, val = key.strip(), val.strip()
         res[key] = val
     return res
 
@@ -38,33 +38,39 @@ def update_ssh_config():
     Update config file in .ssh directory
     '''
     home_dir = SETUP.dir['home']
+    ssh_config = f'{home_dir}/.ssh/config'
 
     buff = []
     config = None
 
-    with open(f'{home_dir}/.ssh/config') as text_file:
+    with open(ssh_config) as text_file:
         config = [line for line in text_file.readlines()]
 
-    for line in config:
-        key, val = line.strip().split()
-        buff.append(f'{key} {val}\n')
+    content = ''.join(config)
 
-    identity_key_exists = False
-    identity_val = f'{home_dir}/.ssh/id_rsa'
-    for i, line in enumerate(buff):
-        key, val = line.split()
+    pattern = re.compile(r'IdentityFile .*')
+    key_match = re.search(pattern, content)
 
-        if key == 'IdentityFile':
-            identity_key_exists = True
-            buff[i] = f'{key} {identity_val}'
-            break
+    identity_val = f'IdentityFile {home_dir}/.ssh/id_rsa'
 
-    if not identity_key_exists:
-        buff.append(f'IdentityFile {identity_val}')
+    if not key_match:
+        with open(ssh_config, 'a') as text_file:
+            text_file.write(identity_val)
+        print('IdentityFile key value appended to ssh config file')
+        return
 
-    with open(f'{home_dir}/.ssh/config', 'w+') as text_file:
-        for line in buff:
-            text_file.write(line)
+    start, end = key_match.span()
+    current_config = content[start:end]
+
+    if current_config == identity_val:
+        print('IdentityFile key value already configured in ssh config file')
+        return
+
+    content = content[:start] + identity_val + content[end:]
+    with open(ssh_config, 'w') as text_file:
+        text_file.write(content)
+
+    print('IdentityFile key value updated in ssh config file')
 
 def github_public_key_exists(current_key: str, public_keys: list) -> bool:
     '''
