@@ -76,3 +76,5 @@ class GithubWrapper():
             print(f'Request Error occurred: {req_err}\n{res.json()}')
         else:
             return res
+
+GITHUB = GithubWrapper()

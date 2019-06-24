@@ -46,3 +46,6 @@ class SetupWrapper():
         print(step_str)
         print(bottom)
         print()
+
+# Singleton
+SETUP = SetupWrapper()

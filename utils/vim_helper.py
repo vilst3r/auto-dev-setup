@@ -6,11 +6,8 @@ Module delegated to handling vim logic
 from subprocess import call, check_call, DEVNULL
 
 # Custom modules
-from utils.setup_wrapper import SetupWrapper
-from utils.github_wrapper import GithubWrapper
-
-SETUP = SetupWrapper()
-GITHUB = GithubWrapper()
+from utils.setup_wrapper import SETUP
+from utils.github_wrapper import GITHUB
 
 def pull_vim_settings():
     '''

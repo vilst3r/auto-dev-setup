@@ -8,17 +8,14 @@ Script to automate setup of unix environment with personal configurations and to
 import time
 
 # Custom modules
-from utils.setup_wrapper import SetupWrapper
-from utils.github_wrapper import GithubWrapper
+from utils.setup_wrapper import SETUP
+from utils.github_wrapper import GITHUB
 import utils.powerline_helper as powerline_helper
 import utils.git_helper as git_helper
 import utils.ssh_helper as ssh_helper
 import utils.brew_helper as brew_helper
 import utils.vim_helper as vim_helper
 import utils.bash_helper as bash_helper
-
-SETUP = SetupWrapper()
-GITHUB = GithubWrapper()
 
 def install_brew_packages():
     '''
@@ -105,15 +102,15 @@ def install_powerline():
     '''
     Install powerline & configure it to bash & vim
     '''
-#    powerline_helper.install_powerline_at_user()
-#    powerline_helper.write_bash_daemon()
-#    powerline_helper.write_vim_config()
-#    powerline_helper.configure_user_config_directory()
-#    powerline_helper.install_fonts()
-#
-#    powerline_helper.install_gitstatus_at_user()
-#    powerline_helper.config_git_colorscheme()
-#    powerline_helper.config_git_shell()
+    powerline_helper.install_powerline_at_user()
+    powerline_helper.write_bash_daemon()
+    powerline_helper.write_vim_config()
+    powerline_helper.configure_user_config_directory()
+    powerline_helper.install_fonts()
+
+    powerline_helper.install_gitstatus_at_user()
+    powerline_helper.config_git_colorscheme()
+    powerline_helper.config_git_shell()
 
     SETUP.print_process_step('Powerline is installed & configured')
 
@@ -129,12 +126,12 @@ if __name__ == '__main__':
     pretty_print_wrapper(SETUP, 'SetupWrapper')
     pretty_print_wrapper(GITHUB, 'GithubWrapper')
 
-#    configure_git_ssh()
-#    install_homebrew()
+    configure_git_ssh()
+    install_homebrew()
 #    install_brew_packages()
 #    install_cask_packages()
-#    configure_vim()
-#    configure_bash()
+    configure_vim()
+    configure_bash()
     install_powerline()
 
     END = time.time()

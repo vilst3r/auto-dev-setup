@@ -8,11 +8,8 @@ import json
 from subprocess import call, check_call
 
 # Custom modules
-from utils.setup_wrapper import SetupWrapper
-from utils.github_wrapper import GithubWrapper
-
-SETUP = SetupWrapper()
-GITHUB = GithubWrapper()
+from utils.setup_wrapper import SETUP
+from utils.github_wrapper import GITHUB
 
 def install_powerline_at_user():
     '''

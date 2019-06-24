@@ -6,9 +6,7 @@ Module delegated to handling git logic
 import re
 
 # Custom modules
-from utils.setup_wrapper import SetupWrapper
-
-SETUP = SetupWrapper()
+from utils.setup_wrapper import SETUP
 
 def read_git_credentials() -> dict:
     '''
