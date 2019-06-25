@@ -4,6 +4,7 @@ Module delegated to handling git logic
 
 # System/Third-Party modules
 import re
+import sys
 
 # Custom modules
 from utils.setup_wrapper import SETUP
@@ -13,11 +14,21 @@ def read_git_credentials() -> dict:
     Read credentials from file into wrapper object from project directory
     '''
     res = {}
+    git_credentials = 'config/git-credentials.txt'
     valid_properties = ['username', 'email', 'token']
 
     buff = None
-    with open('config/git-credentials.txt') as text_file:
-        buff = [line for line in text_file.readlines()]
+    try:
+        with open(git_credentials) as text_file:
+            buff = [line for line in text_file.readlines()]
+    except IOError as ierr:
+        # Generate git credential template
+        with open(git_credentials, 'w') as text_file:
+            for prop in valid_properties:
+                text_file.write(f'{prop}: <INSERT OWN VALUE>\n')
+        print(ierr)
+        print(f'Git credential file does not exist - file now generated in {git_credentials}')
+        sys.exit()
 
     for line in buff:
         key, val = line.split(':')
@@ -27,6 +38,8 @@ def read_git_credentials() -> dict:
             raise Exception('Git credentials are not configured properly')
         if key not in valid_properties:
             raise Exception('Git property is invalid')
+        if val[0] == '<' or val[-1] == '>':
+            raise Exception('Git value of property is unset or invalid')
 
         res[key] = val
     return res

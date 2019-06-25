@@ -17,7 +17,7 @@ Python scripts to replicate personal development environment across any machine 
 7. Install & Configure powerline
 
 # Todo
-- Add regex to file processing for more efficient code style
 - Configure iterm2 profile somehow...
-- Automate generation of git-credential file if not found in project
+- Write test script to clean everything
+- Run test after that
 - All done after that
