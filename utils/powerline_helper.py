@@ -207,3 +207,107 @@ def config_git_shell():
     with open(default_block, 'w+', encoding='utf-8') as default_json:
         json.dump(data, default_json, ensure_ascii=False, indent=4)
     print('Finish configuring shell for git status in powerline!')
+
+def uninstall_gitstatus():
+    '''
+    Uninstalls git powerline status at user level of system
+    '''
+    command = 'pip3 uninstall powerline-gitstatus'
+    check_call(command.split())
+    return
+
+def delete_fonts():
+    '''
+    Deletes all font files assosciated with powerline from installation
+    '''
+    user_config_dir = SETUP.dir['powerline_config']
+
+    command = '/bin/bash ./uninstall.sh'
+    call(command.split(), cwd=f'{user_config_dir}/fonts')
+
+    command = f'rm -r -f /fonts')
+    call(command.split(), cwd=f'{user_config_dir}')
+
+def delete_config():
+    '''
+    Deletes the entire powerline folder in user config
+    '''
+    user_config_dir = SETUP.dir['powerline_config']
+
+    command = f'rm -r -f {user_config_dir}')
+    call(command.split())
+
+def remove_bash_daemon():
+    '''
+    Remove powerline config block in bash profile
+    '''
+    home_dir = SETUP.dir['home']
+    bash_profile = f'{home_dir}/.bash_profile'
+
+    pattern = []
+    pattern.append('# Powerline user config')
+    pattern.append('powerline-daemon -q')
+    pattern.append('POWERLINE_BASH_CONTINUATION=1')
+    pattern.append('POWERLINE_BASH_SELECT=1')
+    pattern.append('source [\w(\-)/.]+.sh')
+
+    pattern = '\n'.join(pattern)
+
+    content = None
+    with open(bash_profile) as text_file:
+        content = ''.join([line for line in text_file.readlines()])
+
+    pattern = re.compile(pattern)
+    config_match = re.search(pattern, content)
+
+    if not config_match:
+        print('Powerline configuration in bash profile already removed')
+        return
+
+    start, end = config_match.span()
+    content = content[:start] + content[end:]
+
+    with open(bash_profile, 'w') as text_file:
+        text_file.write(content)
+    print('Powerline configuration removed in bash profile')
+
+def remove_vim_config():
+    '''
+    Remove powerline config block in vimrc
+    '''
+    home_dir = SETUP.dir['home']
+    vimrc = f'{home_dir}/.vimrc'
+
+    pattern = []
+    pattern.append('\" Powerline')
+    pattern.append('set rtp\+\=[\w(\-)/.]+/vim')
+    pattern.append('set laststatus=2')
+    pattern.append('set t_Co=256')
+
+    pattern = '\n'.join(pattern)
+
+    content = None
+    with open(vimrc) as text_file:
+        content = ''.join([line for line in text_file.readlines()])
+
+    pattern = re.compile(pattern)
+    config_match = re.search(pattern, content)
+
+    if not config_match:
+        print('Powerline configuration in vimrc already removed')
+        return
+
+    start, end = config_match.span()
+    content = content[:start] + content[end:]
+
+    with open(vimrc, 'w') as text_file:
+        text_file.write(content)
+    print('Powerline configuration removed  in vimrc')
+
+def uninstall_powerline():
+    '''
+    Uninstalls the powerline tool
+    '''
+    command = 'pip3 uninstall powerline-status'
+    check_call(command.split())
+

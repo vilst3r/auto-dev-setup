@@ -6,12 +6,12 @@ Script to automate setup of unix environment with personal configurations and to
 
 '''
 Process outline (rollback flow from setup)
-1. Pip uninstall powerline-gitstatus
-2. Remove the git cloned font folder in the config folder
-3. Delete user config of powerline in '~/.config/powerline'
-4. Remove powerline config block in bash_profile
-5. Remove the powerline config block in vimrc
-6. Pip uninstall powerline-status
+1. Pip uninstall powerline-gitstatus(done)
+2. Remove the git cloned font folder in the config folder(done)
+3. Delete user config of powerline in '~/.config/powerline'(done)
+4. Remove powerline config block in bash_profile(done)
+5. Remove the powerline config block in vimrc(done)
+6. Pip uninstall powerline-status(done)
 7. Remove the git cloned bash-settings folder in the config folder
 8. Delete all the color themes in '~/.vim.colors'
 9. Remove the git cloned vim-settings folder in the config folder
@@ -31,24 +31,39 @@ import time
 import re
 
 # Custom modules
-from utils.setup_wrapper import SetupWrapper
-from utils.github_wrapper import GithubWrapper
+from utils.setup_wrapper import SETUP
+from utils.github_wrapper import GITHUB
 import utils.powerline_helper as powerline_helper
 import utils.git_helper as git_helper
+import utils.ssh_helper as ssh_helper
+import utils.brew_helper as brew_helper
+import utils.vim_helper as vim_helper
+import utils.bash_helper as bash_helper
 
-
-def remove_powerline():
+def uninstall_powerline():
     '''
     Remove existing powerline configurations
     '''
-    home_dir = SETUP.dir['home']
-    python_site = SETUP.dir['python_site']
-    powerline_config = SETUP.dir['powerline_config']
+    powerline_helper.uninstall_gitstatus()
+    powerline_helper.delete_fonts()
+    powerline_helper.delete_config()
+    powerline_helper.remove_bash_daemon()
+    powerline_helper.remove_vim_config()
 
-    # blah
+def pretty_print_wrapper(wrapper: object, title: str):
+    '''
+    Function to pretty print wrapper in beginning of cleanup
+    '''
+    print(f'###### {title} #####')
+    print(f'\n{wrapper}\n')
+
 
 if __name__ == '__main__':
-#    remove_powerline()
+    START = time.time()
+    pretty_print_wrapper(SETUP, 'SetupWrapper')
+    pretty_print_wrapper(GITHUB, 'GithubWrapper')
+
+    uninstall_powerline()
 #    configure_git_ssh()
 #    install_homebrew()
 #    install_brew_packages()
@@ -56,4 +71,5 @@ if __name__ == '__main__':
 #    configure_vim()
 #    configure_bash()
 #    install_powerline()
-
+    END = time.time()
+    print(f'\nSetup time: {END - START} seconds\n')
