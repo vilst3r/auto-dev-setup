@@ -12,9 +12,9 @@ Process outline (rollback flow from setup)
 4. Remove powerline config block in bash_profile(done)
 5. Remove the powerline config block in vimrc(done)
 6. Pip uninstall powerline-status(done)
-7. Remove the git cloned bash-settings folder in the config folder
-8. Delete all the color themes in '~/.vim.colors'
-9. Remove the git cloned vim-settings folder in the config folder
+7. Remove the git cloned bash-settings folder in the config folder(done)
+8. Delete all the color themes in '~/.vim.colors' (done)
+9. Remove the git cloned vim-settings folder in the config folder(done)
 10. Uninstall homebrew to uninstall all the cask & brew packages
 11. Delete public key from GitHub
 12. Delete local ssh public key and private key
@@ -49,6 +49,7 @@ def uninstall_powerline():
     powerline_helper.delete_config()
     powerline_helper.remove_bash_daemon()
     powerline_helper.remove_vim_config()
+    powerline_helper.uninstall_powerline()
 
 def pretty_print_wrapper(wrapper: object, title: str):
     '''

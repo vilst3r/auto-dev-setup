@@ -225,7 +225,7 @@ def delete_fonts():
     command = '/bin/bash ./uninstall.sh'
     call(command.split(), cwd=f'{user_config_dir}/fonts')
 
-    command = f'rm -r -f /fonts')
+    command = f'rm -rf /fonts'
     call(command.split(), cwd=f'{user_config_dir}')
 
 def delete_config():
@@ -234,7 +234,7 @@ def delete_config():
     '''
     user_config_dir = SETUP.dir['powerline_config']
 
-    command = f'rm -r -f {user_config_dir}')
+    command = f'rm -rf {user_config_dir}'
     call(command.split())
 
 def remove_bash_daemon():

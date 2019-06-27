@@ -56,3 +56,27 @@ def configure_color_themes():
         print('Vim color themes copied to ~/.vim/colors')
     else:
         raise Exception('Error copying vim color themes in config')
+
+def remove_color_themes():
+    '''
+    Remove all color themes in the vim config folder of user
+    '''
+    home_dir = SETUP.dir['home']
+    vim_color_dir = f'{home_dir}/.vim/colors'
+
+    command =f'rm {vim_color_dir}/*.vim')
+    call(command.split())
+
+def remove_vim_settings():
+    '''
+    Remove vim setting repository cloned from github
+    '''
+    command = 'find config/vim/vim-settings'
+    directory_found = call(command.split(), stdout=DEVNULL)
+
+    if directory_found != 0:
+        print('Vim settings already removed')
+        return
+
+    command = 'rm -rf config/vim/vim-settings'
+    check_call(command.split())

@@ -35,3 +35,17 @@ def configure_bash_profile():
 
     command = f'cp config/bash/bash-settings/.bash_profile {home_dir}/.bash_profile'
     call(command.split())
+
+def remove_bash_settings():
+    '''
+    Remove bash setting repository cloned from github
+    '''
+    command = 'find config/bash/bash-settings'
+    directory_found = call(command.split(), stdout=DEVNULL)
+
+    if directory_found != 0:
+        print('Bash settings already removed')
+        return
+
+    command = 'rm -rf config/bash/bash-settings'
+    check_call(command.split())
