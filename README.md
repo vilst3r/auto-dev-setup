@@ -4,7 +4,7 @@ Python scripts to replicate personal development environment across any machine 
 
 # Requirements
 - Python 3 system binary installed to run the script
-- Run 'pip3 install -r requirements' to fetch all script dependencies
+- Run `pip3 install -r requirements` to fetch all script dependencies
 - Configure 'git-credentials.txt' with username, email & oath token properties delimited by a colon
 
 # Process
@@ -18,6 +18,5 @@ Python scripts to replicate personal development environment across any machine 
 
 # Todo
 - Configure iterm2 profile somehow...
-- Write test script to clean everything
 - Run test after that
 - All done after that
