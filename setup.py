@@ -132,7 +132,7 @@ if __name__ == '__main__':
 #    install_cask_packages()
 #    configure_vim()
 #    configure_bash()
-    install_powerline()
+#    install_powerline()
 
     END = time.time()
     print(f'\nSetup time: {END - START} seconds\n')

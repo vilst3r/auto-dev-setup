@@ -102,3 +102,16 @@ def install_that_cask(package: str):
     else:
         command = f'brew cask install {package}'
         call(command.split())
+
+def uninstall_brew():
+    '''
+    Uninstalls brew from the web via git
+    '''
+    ruby_bin = '/usr/bin/ruby'
+    brew_url = 'https://raw.githubusercontent.com/Homebrew/install/master/uninstall'
+
+    command_list = []
+    command_list.append('sh')
+    command_list.append('-c')
+    command_list.append(f'{ruby_bin} -e \"$(curl -fsSL {brew_url})\"')
+    call(command_list, stdin=PIPE)

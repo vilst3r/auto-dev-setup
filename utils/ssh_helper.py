@@ -64,3 +64,33 @@ def get_public_key() -> str:
 
     public_key = f'{key_type} {key_data}'
     return public_key
+
+def delete_ssh_rsa_keypair():
+    '''
+    Delete both public and private key configured for ssh
+    '''
+    home_dir = SETUP.dir['home']
+
+    command_list = []
+    command_list.append('sh')
+    command_list.append('-c')
+    command_list.append('rm {home_dir}/.ssh/id_rsa*')
+    call(command.split())
+
+def stop_ssh_agent():
+    '''
+    Stop process responsible for ssh connections
+    '''
+    command = 'ps aux'
+    ps_process = Popen(command.split(), stdout=PIPE)
+
+    command = 'egrep /usr/bin/ssh-agent'
+    egrep_process = Popen(command.split(), stdin=ps_process.stdout, stdout=PIPE)
+
+    out, err = egrep_process.communicate()
+    ps_process.communicate()
+
+    pid = out.decode('utf-8').split()[1]
+
+    command = f'kill {pid}'
+    call(command.split())
