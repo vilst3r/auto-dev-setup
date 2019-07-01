@@ -45,7 +45,7 @@ def get_uninstalled_brew_packages() -> list:
     brew_list = output.decode('utf-8').split('\n')
 
     buff = []
-    with open('config/brew/brew.txt') as text_file:
+    with open('config/brew/test-brew.txt') as text_file:
         for line in text_file.readlines():
             package = line.strip()
 
@@ -82,7 +82,7 @@ def get_uninstalled_cask_packages() -> list:
     cask_list = output.decode('utf-8').split('\n')
 
     buff = []
-    with open('config/brew/brew-cask.txt') as text_file:
+    with open('config/brew/test-brew-cask.txt') as text_file:
         for line in text_file.readlines():
             package = line.strip()
 
