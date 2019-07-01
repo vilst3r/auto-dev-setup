@@ -102,15 +102,15 @@ def install_powerline():
     '''
     Install powerline & configure it to bash & vim
     '''
-#    powerline_helper.install_powerline_at_user()
-#    powerline_helper.write_bash_daemon()
+    powerline_helper.install_powerline_at_user()
+    powerline_helper.write_bash_daemon()
     powerline_helper.write_vim_config()
-#    powerline_helper.configure_user_config_directory()
-#    powerline_helper.install_fonts()
-#
-#    powerline_helper.install_gitstatus_at_user()
-#    powerline_helper.config_git_colorscheme()
-#    powerline_helper.config_git_shell()
+    powerline_helper.configure_user_config_directory()
+    powerline_helper.install_fonts()
+
+    powerline_helper.install_gitstatus_at_user()
+    powerline_helper.config_git_colorscheme()
+    powerline_helper.config_git_shell()
 
     SETUP.print_process_step('Powerline is installed & configured')
 
@@ -126,12 +126,12 @@ if __name__ == '__main__':
     pretty_print_wrapper(SETUP, 'SetupWrapper')
     pretty_print_wrapper(GITHUB, 'GithubWrapper')
 
-#    configure_git_ssh()
-#    install_homebrew()
-#    install_brew_packages()
-#    install_cask_packages()
-#    configure_vim()
-#    configure_bash()
+    configure_git_ssh()
+    install_homebrew()
+    install_brew_packages()
+    install_cask_packages()
+    configure_vim()
+    configure_bash()
     install_powerline()
 
     END = time.time()
