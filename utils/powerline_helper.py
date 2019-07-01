@@ -36,7 +36,7 @@ def write_bash_daemon():
     daemon_config.append(source_version)
 
     pattern = daemon_config[:-1]
-    pattern.append('source [\w(\-)/.]+.sh')
+    pattern.append(r'source [\w(\-)/.]+.sh')
 
     daemon_config = '\n'.join(daemon_config)
     pattern = '\n'.join(pattern)
@@ -60,7 +60,7 @@ def write_bash_daemon():
         print('Powerline already configured in bash profile')
         return
 
-    start, end = config_match.span() 
+    start, end = config_match.span()
     content = content[:start] + daemon_config + content[end:]
 
     with open(bash_profile, 'w') as text_file:
@@ -84,8 +84,8 @@ def write_vim_config():
     config.append('set t_Co=256')
 
     pattern = config[::]
-    pattern[1] = 'set rtp\+\=[\w(\-)/.]+/vim'
-    
+    pattern[1] = r'set rtp\+\=[\w(\-)/.]+/vim'
+
     config = '\n'.join(config)
     pattern = '\n'.join(pattern)
 
@@ -214,7 +214,6 @@ def uninstall_gitstatus():
     '''
     command = 'pip3 uninstall powerline-gitstatus'
     check_call(command.split())
-    return
 
 def delete_fonts():
     '''
@@ -249,7 +248,7 @@ def remove_bash_daemon():
     pattern.append('powerline-daemon -q')
     pattern.append('POWERLINE_BASH_CONTINUATION=1')
     pattern.append('POWERLINE_BASH_SELECT=1')
-    pattern.append('source [\w(\-)/.]+.sh')
+    pattern.append(r'source [\w(\-)/.]+.sh')
 
     pattern = '\n'.join(pattern)
 
@@ -280,7 +279,7 @@ def remove_vim_config():
 
     pattern = []
     pattern.append('\" Powerline')
-    pattern.append('set rtp\+\=[\w(\-)/.]+/vim')
+    pattern.append(r'set rtp\+\=[\w(\-)/.]+/vim')
     pattern.append('set laststatus=2')
     pattern.append('set t_Co=256')
 
@@ -310,4 +309,3 @@ def uninstall_powerline():
     '''
     command = 'pip3 uninstall powerline-status'
     check_call(command.split())
-

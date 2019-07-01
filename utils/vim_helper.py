@@ -64,7 +64,7 @@ def remove_color_themes():
     home_dir = SETUP.dir['home']
     vim_color_dir = f'{home_dir}/.vim/colors'
 
-    command =f'rm {vim_color_dir}/*.vim'
+    command = f'rm {vim_color_dir}/*.vim'
     call(command.split())
 
 def remove_vim_settings():

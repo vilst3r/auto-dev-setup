@@ -5,10 +5,7 @@ Script to automate setup of unix environment with personal configurations and to
 '''
 
 # System/Third-Party modules
-import subprocess
-from subprocess import PIPE, DEVNULL
 import time
-import re
 
 # Custom modules
 from utils.setup_wrapper import SETUP
@@ -58,7 +55,7 @@ def uninstall_git_ssh():
     public_keys = GITHUB.get_public_keys().json()
 
     git_helper.delete_github_pub_key(current_public_key, public_keys)
-    git_helper.delete_ssh_rsa_keypair()
+    ssh_helper.delete_ssh_rsa_keypair()
     ssh_helper.stop_ssh_agent()
     git_helper.remove_ssh_config()
     git_helper.remove_ssh_github_host()

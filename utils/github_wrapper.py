@@ -4,6 +4,7 @@ Wrapper object for setup script
 
 ## System/Third-Party modules
 import pprint
+import sys
 import requests
 
 class GithubWrapper():

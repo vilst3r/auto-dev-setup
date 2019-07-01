@@ -99,7 +99,7 @@ def delete_github_pub_key(current_key: str, public_keys: list):
     Removes current public key in host machine stored on github
     '''
     pattern = re.compile(re.escape(current_key))
-    
+
     for key in public_keys:
         if re.match(pattern, key['key']):
             GITHUB.delete_public_key(key['id'])
@@ -128,7 +128,6 @@ def remove_ssh_config():
         return
 
     start, end = key_match.span()
-    current_config = content[start:end]
 
     content = content[:start] + content[end:]
     with open(ssh_config, 'w') as text_file:
@@ -144,7 +143,7 @@ def remove_ssh_github_host():
     known_hosts = f'{home_dir}/.ssh/config'
 
     config = None
-    with open(ssh_config) as text_file:
+    with open(known_hosts) as text_file:
         config = [line for line in text_file.readlines()]
 
     content = ''.join(config)
@@ -157,11 +156,9 @@ def remove_ssh_github_host():
         return
 
     start, end = key_match.span()
-    current_config = content[start:end]
 
     content = content[:start] + content[end:]
-    with open(ssh_config, 'w') as text_file:
+    with open(known_hosts, 'w') as text_file:
         text_file.write(content)
 
     print('Github host value is now removed from known_host file')
-

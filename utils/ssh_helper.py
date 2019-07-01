@@ -74,8 +74,8 @@ def delete_ssh_rsa_keypair():
     command_list = []
     command_list.append('sh')
     command_list.append('-c')
-    command_list.append('rm {home_dir}/.ssh/id_rsa*')
-    call(command.split())
+    command_list.append(f'rm {home_dir}/.ssh/id_rsa*')
+    call(command_list)
 
 def stop_ssh_agent():
     '''
@@ -87,7 +87,7 @@ def stop_ssh_agent():
     command = 'egrep /usr/bin/ssh-agent'
     egrep_process = Popen(command.split(), stdin=ps_process.stdout, stdout=PIPE)
 
-    out, err = egrep_process.communicate()
+    out = egrep_process.communicate()[0]
     ps_process.communicate()
 
     pid = out.decode('utf-8').split()[1]

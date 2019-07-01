@@ -102,9 +102,9 @@ def install_powerline():
     '''
     Install powerline & configure it to bash & vim
     '''
-    powerline_helper.install_powerline_at_user()
+#    powerline_helper.install_powerline_at_user()
 #    powerline_helper.write_bash_daemon()
-#    powerline_helper.write_vim_config()
+    powerline_helper.write_vim_config()
 #    powerline_helper.configure_user_config_directory()
 #    powerline_helper.install_fonts()
 #
@@ -132,7 +132,7 @@ if __name__ == '__main__':
 #    install_cask_packages()
 #    configure_vim()
 #    configure_bash()
-#    install_powerline()
+    install_powerline()
 
     END = time.time()
     print(f'\nSetup time: {END - START} seconds\n')
