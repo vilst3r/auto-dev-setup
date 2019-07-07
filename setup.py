@@ -5,7 +5,9 @@ Script to automate setup of unix environment with personal configurations and to
 '''
 
 # System/Third-Party modules
+import logging
 import time
+import sys
 
 # Custom modules
 from utils.setup_wrapper import SETUP
@@ -16,6 +18,8 @@ import utils.ssh_helper as ssh_helper
 import utils.brew_helper as brew_helper
 import utils.vim_helper as vim_helper
 import utils.bash_helper as bash_helper
+
+logger = None
 
 def install_brew_packages():
     '''
@@ -121,7 +125,37 @@ def pretty_print_wrapper(wrapper: object, title: str):
     print(f'###### {title} #####')
     print(f'\n{wrapper}\n')
 
+def initialise_logger():
+    '''
+    Set up handlers for logger object
+    '''
+    global logger
+    logger = logging.getLogger()
+    logger.setLevel(logging.DEBUG)
+
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
+    out_path = 'logs/setup_stdout.log'
+    err_path = 'logs/setup_stderr.log'
+
+    stream_handler = logging.StreamHandler()
+    stream_handler.setLevel(logging.INFO)
+    stream_handler.setFormatter(formatter)
+
+
+    out_handler = logging.FileHandler(f'{out_path}')
+    out_handler.setLevel(logging.INFO)
+    out_handler.setFormatter(formatter)
+
+    err_handler = logging.FileHandler(f'{err_path}')
+    err_handler.setLevel(logging.ERROR)
+    err_handler.setFormatter(formatter)
+
+    logger.addHandler(out_handler)
+    logger.addHandler(err_handler)
+
 if __name__ == '__main__':
+    initialise_logger()
     START = time.time()
     pretty_print_wrapper(SETUP, 'SetupWrapper')
     pretty_print_wrapper(GITHUB, 'GithubWrapper')
@@ -129,10 +163,12 @@ if __name__ == '__main__':
     configure_git_ssh()
     install_homebrew()
     install_brew_packages()
-    install_cask_packages()
+#    install_cask_packages()
     configure_vim()
     configure_bash()
     install_powerline()
+    logger.info('info message')
+    logger.error('error message')
 
     END = time.time()
     print(f'\nSetup time: {END - START} seconds\n')
