@@ -65,7 +65,6 @@ def install_that_brew(package: str):
 
     if package_found != 0:
         LOGGER.info(f'This package does not exist in registry - {package}')
-        print(f'This package does not exist in registry - {package}')
     else:
         command = f'brew install {package}'
         call(command.split())
@@ -103,7 +102,6 @@ def install_that_cask(package: str):
 
     if package_found != 0:
         LOGGER.info(f'This package does not exist in registry - {package}')
-        print(f'This package does not exist in registry - {package}')
     else:
         command = f'brew cask install {package}'
         call(command.split())

@@ -23,7 +23,6 @@ def pull_vim_settings():
 
     if directory_found == 0:
         LOGGER.info('Vim settings already pulled from git')
-        print('Vim settings already pulled from git')
         return
 
     source = f'git@github.com:{git_username}/vim-settings.git'
@@ -58,7 +57,6 @@ def configure_color_themes():
 
     if copy_result == 0:
         LOGGER.info('Vim settings already pulled from git')
-        print('Vim color themes copied to ~/.vim/colors')
     else:
         LOGGER.error('Vim settings already pulled from git')
         raise Exception('Error copying vim color themes in config')
@@ -82,7 +80,6 @@ def remove_vim_settings():
 
     if directory_found != 0:
         LOGGER.info('Vim settings already removed')
-        print('Vim settings already removed')
         return
 
     command = 'rm -rf config/vim/vim-settings'

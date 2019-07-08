@@ -23,7 +23,6 @@ def pull_bash_settings():
 
     if directory_found == 0:
         LOGGER.info('Bash settings already pulled from git')
-        print('Bash settings already pulled from git')
         return
 
     source = f'git@github.com:{git_username}/bash-settings.git'
@@ -49,7 +48,6 @@ def remove_bash_settings():
 
     if directory_found != 0:
         LOGGER.info('Bash settings already removed')
-        print('Bash settings already removed')
         return
 
     command = 'rm -rf config/bash/bash-settings'

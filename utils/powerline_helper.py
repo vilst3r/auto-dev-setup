@@ -53,7 +53,6 @@ def write_bash_daemon():
 
     if not config_match:
         LOGGER.info('Appended powerline configuration in bash profile')
-        print('Appended powerline configuration in bash profile')
 
         with open(bash_profile, 'a') as text_file:
             text_file.write(f'\n{daemon_config}\n')
@@ -63,7 +62,6 @@ def write_bash_daemon():
 
     if current_config == daemon_config:
         LOGGER.info('Powerline already configured in bash profile')
-        print('Powerline already configured in bash profile')
         return
 
     start, end = config_match.span()
@@ -73,7 +71,6 @@ def write_bash_daemon():
         text_file.write(content)
 
     LOGGER.info('Powerline configuration updated in bash profile')
-    print('Powerline configuration updated in bash profile')
 
 def write_vim_config():
     '''
@@ -106,7 +103,6 @@ def write_vim_config():
 
     if not config_match:
         LOGGER.info('Appended powerline configuration in vimrc')
-        print('Appended powerline configuration in vimrc')
 
         with open(vimrc, 'a') as text_file:
             text_file.write(f'\n{config}\n')
@@ -116,7 +112,6 @@ def write_vim_config():
 
     if current_config == config:
         LOGGER.info('Powerline already configured in vimrc')
-        print('Powerline already configured in vimrc')
         return
 
     start, end = config_match.span()
@@ -126,7 +121,6 @@ def write_vim_config():
         text_file.write(content)
 
     LOGGER.info('Powerline configuration updated in vimrc')
-    print('Powerline configuration updated in vimrc')
 
 def configure_user_config_directory() -> bool:
     '''
@@ -186,7 +180,6 @@ def config_git_colorscheme():
 
         if all([group in default_group for group in config_group]):
             LOGGER.info('Color scheme for git status for powerline is already configured')
-            print('Color scheme for git status for powerline is already configured')
             return
 
         data = default_data
@@ -196,7 +189,6 @@ def config_git_colorscheme():
         json.dump(data, default_json, ensure_ascii=False, indent=4)
 
     LOGGER.info('Finish configuring color scheme for git status in powerline!')
-    print('Finish configuring color scheme for git status in powerline!')
 
 def config_git_shell():
     '''
@@ -214,7 +206,6 @@ def config_git_shell():
         for function in function_list:
             if function == config_data:
                 LOGGER.info('Shell for git stats for powerline is already configured')
-                print('Shell for git stats for powerline is already configured')
                 return
 
         function_list.append(config_data)
@@ -225,7 +216,6 @@ def config_git_shell():
         json.dump(data, default_json, ensure_ascii=False, indent=4)
 
     LOGGER.info('Finish configuring shell for git status in powerline!')
-    print('Finish configuring shell for git status in powerline!')
 
 def uninstall_gitstatus():
     '''
@@ -280,7 +270,6 @@ def remove_bash_daemon():
 
     if not config_match:
         LOGGER.info('Powerline configuration in bash profile already removed')
-        print('Powerline configuration in bash profile already removed')
         return
 
     start, end = config_match.span()
@@ -290,7 +279,6 @@ def remove_bash_daemon():
         text_file.write(content)
 
     LOGGER.info('Powerline configuration removed in bash profile')
-    print('Powerline configuration removed in bash profile')
 
 def remove_vim_config():
     '''
@@ -316,7 +304,6 @@ def remove_vim_config():
 
     if not config_match:
         LOGGER.info('Powerline configuration in vimrc already removed')
-        print('Powerline configuration in vimrc already removed')
         return
 
     start, end = config_match.span()
@@ -325,8 +312,7 @@ def remove_vim_config():
     with open(vimrc, 'w') as text_file:
         text_file.write(content)
 
-    LOGGER.info('Powerline configuration removed  in vimrc')
-    print('Powerline configuration removed  in vimrc')
+    LOGGER.info('Powerline configuration removed in vimrc')
 
 def uninstall_powerline():
     '''

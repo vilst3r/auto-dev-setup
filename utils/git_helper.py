@@ -33,8 +33,6 @@ def read_git_credentials() -> dict:
 
         LOGGER.error(ierr)
         LOGGER.error(f'Git credential file does not exist - file now generated in {git_credentials}')
-        print(ierr)
-        print(f'Git credential file does not exist - file now generated in {git_credentials}')
         sys.exit()
 
     for line in buff:
@@ -77,7 +75,6 @@ def update_ssh_config():
         with open(ssh_config, 'a') as text_file:
             text_file.write(identity_val)
         LOGGER.info('IdentityFile key value appended to ssh config file')
-        print('IdentityFile key value appended to ssh config file')
         return
 
     start, end = key_match.span()
@@ -85,7 +82,6 @@ def update_ssh_config():
 
     if current_config == identity_val:
         LOGGER.info('IdentityFile key value already configured in ssh config file')
-        print('IdentityFile key value already configured in ssh config file')
         return
 
     content = content[:start] + identity_val + content[end:]
@@ -93,7 +89,6 @@ def update_ssh_config():
         text_file.write(content)
 
     LOGGER.info('IdentityFile key value updated in ssh config file')
-    print('IdentityFile key value updated in ssh config file')
 
 def github_public_key_exists(current_key: str, public_keys: list) -> bool:
     '''
@@ -116,7 +111,6 @@ def delete_github_pub_key(current_key: str, public_keys: list):
         if re.match(pattern, key['key']):
             GITHUB.delete_public_key(key['id'])
             LOGGER.info('Provided public key now deleted from github account')
-            print('Provided public key now deleted from github account')
             return
 
 def remove_ssh_config():
@@ -138,7 +132,6 @@ def remove_ssh_config():
 
     if not key_match:
         LOGGER.info('IdentityFile key value already deleted from ssh config file')
-        print('IdentityFile key value already deleted from ssh config file')
         return
 
     start, end = key_match.span()
@@ -148,7 +141,6 @@ def remove_ssh_config():
         text_file.write(content)
 
     LOGGER.info('IdentityFile key value is now removed from ssh config file')
-    print('IdentityFile key value is now removed from ssh config file')
 
 def remove_ssh_github_host():
     '''
@@ -168,7 +160,6 @@ def remove_ssh_github_host():
 
     if not key_match:
         LOGGER.info('Github host value already deleted from known_host file')
-        print('Github host value already deleted from known_host file')
         return
 
     start, end = key_match.span()
@@ -178,4 +169,3 @@ def remove_ssh_github_host():
         text_file.write(content)
 
     LOGGER.info('Github host value is now removed from known_host file')
-    print('Github host value is now removed from known_host file')

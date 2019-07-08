@@ -132,8 +132,8 @@ def initialise_logger():
 
     formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
 
-    out_path = 'logs/out_setup.log'
-    err_path = 'logs/err_setup.log'
+    out_path = 'logs/setup_out.log'
+    err_path = 'logs/setup_err.log'
 
     stream_handler = logging.StreamHandler()
     stream_handler.setLevel(logging.INFO)
