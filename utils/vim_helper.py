@@ -4,6 +4,7 @@ Module delegated to handling vim logic
 
 # System/Third-Party modules
 import logging
+import sys
 from subprocess import call, check_call, DEVNULL
 
 # Custom modules
@@ -59,7 +60,7 @@ def configure_color_themes():
         LOGGER.info('Vim settings already pulled from git')
     else:
         LOGGER.error('Vim settings already pulled from git')
-        raise Exception('Error copying vim color themes in config')
+        sys.exit()
 
 def remove_color_themes():
     '''

@@ -48,6 +48,7 @@ class GithubWrapper():
         except requests.RequestException as req_err:
             LOGGER.error(f'Request Error occurred: {req_err}')
             LOGGER.error(f'Returned response: {res.json()}')
+            sys.exit()
         else:
             return res
 
@@ -63,6 +64,7 @@ class GithubWrapper():
         except requests.RequestException as req_err:
             LOGGER.error(f'Request Error occurred: {req_err}')
             LOGGER.error(f'Returned response: {res.json()}')
+            sys.exit()
         else:
             return res
 
@@ -78,6 +80,7 @@ class GithubWrapper():
         except requests.RequestException as req_err:
             LOGGER.error(f'Request Error occurred: {req_err}')
             LOGGER.error(f'Returned response: {res.json()}')
+            sys.exit()
         else:
             return res
 
@@ -109,13 +112,13 @@ def read_git_credentials() -> dict:
 
         if not key or not val:
             LOGGER.error('Git credentials are not configured properly')
-            raise Exception('Git credentials are not configured properly')
+            sys.exit()
         if key not in valid_properties:
             LOGGER.error('Git property is invalid')
-            raise Exception('Git property is invalid')
+            sys.exit()
         if val[0] == '<' or val[-1] == '>':
             LOGGER.error('Git value of property is unset or invalid')
-            raise Exception('Git value of property is unset or invalid')
+            sys.exit()
 
         res[key] = val
     return res
