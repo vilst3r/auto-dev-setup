@@ -7,7 +7,6 @@ Script to automate setup of unix environment with personal configurations and to
 # System/Third-Party modules
 import logging
 import time
-import sys
 
 # Custom modules
 from utils.setup_wrapper import SETUP
@@ -19,7 +18,7 @@ import utils.brew_helper as brew_helper
 import utils.vim_helper as vim_helper
 import utils.bash_helper as bash_helper
 
-logger = None
+LOGGER = logging.getLogger()
 
 def install_brew_packages():
     '''
@@ -122,40 +121,38 @@ def pretty_print_wrapper(wrapper: object, title: str):
     '''
     Function to pretty print wrapper in beginning of setup
     '''
-    print(f'###### {title} #####')
-    print(f'\n{wrapper}\n')
+    LOGGER.info(f'###### {title} #####')
+    LOGGER.info(f'{wrapper}')
 
 def initialise_logger():
     '''
-    Set up handlers for logger object
+    Set up logging for writing stdout & stderr to files
     '''
-    global logger
-    logger = logging.getLogger()
-    logger.setLevel(logging.DEBUG)
+    LOGGER.setLevel(logging.DEBUG)
 
-    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
 
-    out_path = 'logs/setup_stdout.log'
-    err_path = 'logs/setup_stderr.log'
+    out_path = 'logs/out_setup.log'
+    err_path = 'logs/err_setup.log'
 
     stream_handler = logging.StreamHandler()
     stream_handler.setLevel(logging.INFO)
-    stream_handler.setFormatter(formatter)
 
-
-    out_handler = logging.FileHandler(f'{out_path}')
+    out_handler = logging.FileHandler(f'{out_path}', 'w+')
     out_handler.setLevel(logging.INFO)
     out_handler.setFormatter(formatter)
 
-    err_handler = logging.FileHandler(f'{err_path}')
+    err_handler = logging.FileHandler(f'{err_path}', 'w+')
     err_handler.setLevel(logging.ERROR)
     err_handler.setFormatter(formatter)
 
-    logger.addHandler(out_handler)
-    logger.addHandler(err_handler)
+    LOGGER.addHandler(out_handler)
+    LOGGER.addHandler(err_handler)
+    LOGGER.addHandler(stream_handler)
 
 if __name__ == '__main__':
     initialise_logger()
+
     START = time.time()
     pretty_print_wrapper(SETUP, 'SetupWrapper')
     pretty_print_wrapper(GITHUB, 'GithubWrapper')
@@ -167,8 +164,6 @@ if __name__ == '__main__':
     configure_vim()
     configure_bash()
     install_powerline()
-    logger.info('info message')
-    logger.error('error message')
 
     END = time.time()
-    print(f'\nSetup time: {END - START} seconds\n')
+    LOGGER.info(f'Setup time: {END - START} seconds')

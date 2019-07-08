@@ -3,12 +3,15 @@ Module delegated to handling git logic
 '''
 
 # System/Third-Party modules
+import logging
 import re
 import sys
 
 # Custom modules
 from utils.setup_wrapper import SETUP
 from utils.github_wrapper import GITHUB
+
+LOGGER = logging.getLogger()
 
 def read_git_credentials() -> dict:
     '''
@@ -27,6 +30,9 @@ def read_git_credentials() -> dict:
         with open(git_credentials, 'w') as text_file:
             for prop in valid_properties:
                 text_file.write(f'{prop}: <INSERT OWN VALUE>\n')
+
+        LOGGER.error(ierr)
+        LOGGER.error(f'Git credential file does not exist - file now generated in {git_credentials}')
         print(ierr)
         print(f'Git credential file does not exist - file now generated in {git_credentials}')
         sys.exit()
@@ -36,10 +42,13 @@ def read_git_credentials() -> dict:
         key, val = key.strip(), val.strip()
 
         if not key or not val:
+            LOGGER.error('Git credentials are not configured properly')
             raise Exception('Git credentials are not configured properly')
         if key not in valid_properties:
+            LOGGER.error('Git property is invalid')
             raise Exception('Git property is invalid')
         if val[0] == '<' or val[-1] == '>':
+            LOGGER.error('Git value of property is unset or invalid')
             raise Exception('Git value of property is unset or invalid')
 
         res[key] = val
@@ -67,6 +76,7 @@ def update_ssh_config():
     if not key_match:
         with open(ssh_config, 'a') as text_file:
             text_file.write(identity_val)
+        LOGGER.info('IdentityFile key value appended to ssh config file')
         print('IdentityFile key value appended to ssh config file')
         return
 
@@ -74,6 +84,7 @@ def update_ssh_config():
     current_config = content[start:end]
 
     if current_config == identity_val:
+        LOGGER.info('IdentityFile key value already configured in ssh config file')
         print('IdentityFile key value already configured in ssh config file')
         return
 
@@ -81,6 +92,7 @@ def update_ssh_config():
     with open(ssh_config, 'w') as text_file:
         text_file.write(content)
 
+    LOGGER.info('IdentityFile key value updated in ssh config file')
     print('IdentityFile key value updated in ssh config file')
 
 def github_public_key_exists(current_key: str, public_keys: list) -> bool:
@@ -103,6 +115,7 @@ def delete_github_pub_key(current_key: str, public_keys: list):
     for key in public_keys:
         if re.match(pattern, key['key']):
             GITHUB.delete_public_key(key['id'])
+            LOGGER.info('Provided public key now deleted from github account')
             print('Provided public key now deleted from github account')
             return
 
@@ -124,6 +137,7 @@ def remove_ssh_config():
     key_match = re.search(pattern, content)
 
     if not key_match:
+        LOGGER.info('IdentityFile key value already deleted from ssh config file')
         print('IdentityFile key value already deleted from ssh config file')
         return
 
@@ -133,6 +147,7 @@ def remove_ssh_config():
     with open(ssh_config, 'w') as text_file:
         text_file.write(content)
 
+    LOGGER.info('IdentityFile key value is now removed from ssh config file')
     print('IdentityFile key value is now removed from ssh config file')
 
 def remove_ssh_github_host():
@@ -152,6 +167,7 @@ def remove_ssh_github_host():
     key_match = re.search(pattern, content)
 
     if not key_match:
+        LOGGER.info('Github host value already deleted from known_host file')
         print('Github host value already deleted from known_host file')
         return
 
@@ -161,4 +177,5 @@ def remove_ssh_github_host():
     with open(known_hosts, 'w') as text_file:
         text_file.write(content)
 
+    LOGGER.info('Github host value is now removed from known_host file')
     print('Github host value is now removed from known_host file')

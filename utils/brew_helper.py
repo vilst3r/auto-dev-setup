@@ -3,9 +3,12 @@ Module delegated to handling brew logic
 '''
 
 # System/Third-Party modules
+import logging
 from subprocess import call, check_output, PIPE, DEVNULL
 
 # Custom modules
+
+LOGGER = logging.getLogger()
 
 def brew_exists() -> bool:
     '''
@@ -61,6 +64,7 @@ def install_that_brew(package: str):
     package_found = call(command.split())
 
     if package_found != 0:
+        LOGGER.info(f'This package does not exist in registry - {package}')
         print(f'This package does not exist in registry - {package}')
     else:
         command = f'brew install {package}'
@@ -98,6 +102,7 @@ def install_that_cask(package: str):
     package_found = call(command.split())
 
     if package_found != 0:
+        LOGGER.info(f'This package does not exist in registry - {package}')
         print(f'This package does not exist in registry - {package}')
     else:
         command = f'brew cask install {package}'

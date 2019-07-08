@@ -4,8 +4,11 @@ Wrapper object for setup script
 
 # System/Third-Party modules
 from subprocess import check_output
+import logging
 import pathlib
 import pprint
+
+LOGGER = logging.getLogger()
 
 class SetupWrapper():
     '''
@@ -41,11 +44,9 @@ class SetupWrapper():
         top = ''.join(['-' for _ in range(row_len)])
         bottom = ''.join(['-' for _ in range(row_len)])
 
-        print()
-        print(top)
-        print(step_str)
-        print(bottom)
-        print()
+        LOGGER.info(f'{top}')
+        LOGGER.info(step_str)
+        LOGGER.info(f'{bottom}')
 
 # Singleton
 SETUP = SetupWrapper()

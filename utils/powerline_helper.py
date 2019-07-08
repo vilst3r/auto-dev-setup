@@ -3,6 +3,7 @@ Module delegated to handling powerline status logic
 '''
 
 # System/Third-Party modules
+import logging
 import re
 import json
 from subprocess import call, check_call
@@ -10,6 +11,8 @@ from subprocess import call, check_call
 # Custom modules
 from utils.setup_wrapper import SETUP
 from utils.github_wrapper import GITHUB
+
+LOGGER = logging.getLogger()
 
 def install_powerline_at_user():
     '''
@@ -49,7 +52,9 @@ def write_bash_daemon():
     config_match = re.search(pattern, content)
 
     if not config_match:
+        LOGGER.info('Appended powerline configuration in bash profile')
         print('Appended powerline configuration in bash profile')
+
         with open(bash_profile, 'a') as text_file:
             text_file.write(f'\n{daemon_config}\n')
         return
@@ -57,6 +62,7 @@ def write_bash_daemon():
     current_config = config_match[0]
 
     if current_config == daemon_config:
+        LOGGER.info('Powerline already configured in bash profile')
         print('Powerline already configured in bash profile')
         return
 
@@ -65,6 +71,8 @@ def write_bash_daemon():
 
     with open(bash_profile, 'w') as text_file:
         text_file.write(content)
+
+    LOGGER.info('Powerline configuration updated in bash profile')
     print('Powerline configuration updated in bash profile')
 
 def write_vim_config():
@@ -97,7 +105,9 @@ def write_vim_config():
     config_match = re.search(pattern, content)
 
     if not config_match:
+        LOGGER.info('Appended powerline configuration in vimrc')
         print('Appended powerline configuration in vimrc')
+
         with open(vimrc, 'a') as text_file:
             text_file.write(f'\n{config}\n')
         return
@@ -105,6 +115,7 @@ def write_vim_config():
     current_config = config_match[0]
 
     if current_config == config:
+        LOGGER.info('Powerline already configured in vimrc')
         print('Powerline already configured in vimrc')
         return
 
@@ -113,6 +124,8 @@ def write_vim_config():
 
     with open(vimrc, 'w') as text_file:
         text_file.write(content)
+
+    LOGGER.info('Powerline configuration updated in vimrc')
     print('Powerline configuration updated in vimrc')
 
 def configure_user_config_directory() -> bool:
@@ -172,6 +185,7 @@ def config_git_colorscheme():
         default_group, config_group = default_data['groups'], config_data['groups']
 
         if all([group in default_group for group in config_group]):
+            LOGGER.info('Color scheme for git status for powerline is already configured')
             print('Color scheme for git status for powerline is already configured')
             return
 
@@ -180,6 +194,8 @@ def config_git_colorscheme():
 
     with open(default_block, 'w+', encoding='utf-8') as default_json:
         json.dump(data, default_json, ensure_ascii=False, indent=4)
+
+    LOGGER.info('Finish configuring color scheme for git status in powerline!')
     print('Finish configuring color scheme for git status in powerline!')
 
 def config_git_shell():
@@ -197,6 +213,7 @@ def config_git_shell():
 
         for function in function_list:
             if function == config_data:
+                LOGGER.info('Shell for git stats for powerline is already configured')
                 print('Shell for git stats for powerline is already configured')
                 return
 
@@ -206,6 +223,8 @@ def config_git_shell():
 
     with open(default_block, 'w+', encoding='utf-8') as default_json:
         json.dump(data, default_json, ensure_ascii=False, indent=4)
+
+    LOGGER.info('Finish configuring shell for git status in powerline!')
     print('Finish configuring shell for git status in powerline!')
 
 def uninstall_gitstatus():
@@ -260,6 +279,7 @@ def remove_bash_daemon():
     config_match = re.search(pattern, content)
 
     if not config_match:
+        LOGGER.info('Powerline configuration in bash profile already removed')
         print('Powerline configuration in bash profile already removed')
         return
 
@@ -268,6 +288,8 @@ def remove_bash_daemon():
 
     with open(bash_profile, 'w') as text_file:
         text_file.write(content)
+
+    LOGGER.info('Powerline configuration removed in bash profile')
     print('Powerline configuration removed in bash profile')
 
 def remove_vim_config():
@@ -293,6 +315,7 @@ def remove_vim_config():
     config_match = re.search(pattern, content)
 
     if not config_match:
+        LOGGER.info('Powerline configuration in vimrc already removed')
         print('Powerline configuration in vimrc already removed')
         return
 
@@ -301,6 +324,8 @@ def remove_vim_config():
 
     with open(vimrc, 'w') as text_file:
         text_file.write(content)
+
+    LOGGER.info('Powerline configuration removed  in vimrc')
     print('Powerline configuration removed  in vimrc')
 
 def uninstall_powerline():

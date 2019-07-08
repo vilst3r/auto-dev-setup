@@ -3,11 +3,14 @@ Module delegated to handling bash logic
 '''
 
 # System/Third-Party modules
+import logging
 from subprocess import call, check_call, DEVNULL
 
 # Custom modules
 from utils.setup_wrapper import SETUP
 from utils.github_wrapper import GITHUB
+
+LOGGER = logging.getLogger()
 
 def pull_bash_settings():
     '''
@@ -19,6 +22,7 @@ def pull_bash_settings():
     directory_found = call(command.split(), stdout=DEVNULL)
 
     if directory_found == 0:
+        LOGGER.info('Bash settings already pulled from git')
         print('Bash settings already pulled from git')
         return
 
@@ -44,6 +48,7 @@ def remove_bash_settings():
     directory_found = call(command.split(), stdout=DEVNULL)
 
     if directory_found != 0:
+        LOGGER.info('Bash settings already removed')
         print('Bash settings already removed')
         return
 

@@ -3,11 +3,14 @@ Module delegated to handling vim logic
 '''
 
 # System/Third-Party modules
+import logging
 from subprocess import call, check_call, DEVNULL
 
 # Custom modules
 from utils.setup_wrapper import SETUP
 from utils.github_wrapper import GITHUB
+
+LOGGER = logging.getLogger()
 
 def pull_vim_settings():
     '''
@@ -19,6 +22,7 @@ def pull_vim_settings():
     directory_found = call(command.split(), stdout=DEVNULL)
 
     if directory_found == 0:
+        LOGGER.info('Vim settings already pulled from git')
         print('Vim settings already pulled from git')
         return
 
@@ -53,8 +57,10 @@ def configure_color_themes():
     copy_result = call(command_list)
 
     if copy_result == 0:
+        LOGGER.info('Vim settings already pulled from git')
         print('Vim color themes copied to ~/.vim/colors')
     else:
+        LOGGER.error('Vim settings already pulled from git')
         raise Exception('Error copying vim color themes in config')
 
 def remove_color_themes():
@@ -75,6 +81,7 @@ def remove_vim_settings():
     directory_found = call(command.split(), stdout=DEVNULL)
 
     if directory_found != 0:
+        LOGGER.info('Vim settings already removed')
         print('Vim settings already removed')
         return
 

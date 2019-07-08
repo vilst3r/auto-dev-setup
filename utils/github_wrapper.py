@@ -3,9 +3,12 @@ Wrapper object for setup script
 '''
 
 ## System/Third-Party modules
+import logging
 import pprint
 import sys
 import requests
+
+LOGGER = logging.getLogger()
 
 class GithubWrapper():
     '''
@@ -43,6 +46,8 @@ class GithubWrapper():
             res = requests.get(url, timeout=3)
             res.raise_for_status()
         except requests.RequestException as req_err:
+            LOGGER.error(f'Request Error occurred: {req_err}')
+            LOGGER.error(f'Returned response: {res.json()}')
             print(f'Request Error occurred: {req_err}\n{res.json()}')
         else:
             return res
@@ -57,6 +62,8 @@ class GithubWrapper():
             res = requests.post(url, json=payload, headers=self.common_headers, timeout=3)
             res.raise_for_status()
         except requests.RequestException as req_err:
+            LOGGER.error(f'Request Error occurred: {req_err}')
+            LOGGER.error(f'Returned response: {res.json()}')
             print(f'Request Error occurred: {req_err}\n{res.json()}')
         else:
             return res
@@ -71,6 +78,8 @@ class GithubWrapper():
             res = requests.delete(url, headers=self.common_headers, timeout=3)
             res.raise_for_status()
         except requests.RequestException as req_err:
+            LOGGER.error(f'Request Error occurred: {req_err}')
+            LOGGER.error(f'Returned response: {res.json()}')
             print(f'Request Error occurred: {req_err}\n{res.json()}')
         else:
             return res
@@ -92,6 +101,9 @@ def read_git_credentials() -> dict:
         with open(git_credentials, 'w') as text_file:
             for prop in valid_properties:
                 text_file.write(f'{prop}: <INSERT OWN VALUE>\n')
+
+        LOGGER.error(ierr)
+        LOGGER.error(f'Git credential file does not exist - file now generated in {git_credentials}')
         print(ierr)
         print(f'Git credential file does not exist - file now generated in {git_credentials}')
         sys.exit()
@@ -101,10 +113,13 @@ def read_git_credentials() -> dict:
         key, val = key.strip(), val.strip()
 
         if not key or not val:
+            LOGGER.error('Git credentials are not configured properly')
             raise Exception('Git credentials are not configured properly')
         if key not in valid_properties:
+            LOGGER.error('Git property is invalid')
             raise Exception('Git property is invalid')
         if val[0] == '<' or val[-1] == '>':
+            LOGGER.error('Git value of property is unset or invalid')
             raise Exception('Git value of property is unset or invalid')
 
         res[key] = val
