@@ -292,9 +292,11 @@ def uninstall_gitstatus():
 
         if err:
             LOGGER.error(err.decode('utf-8'))
+            LOGGER.error('Failed to uninstall powerline-gitstatus at the user level')
             sys.exit()
         else:
-            LOGGER.info(out.decode('utf-8'))
+            LOGGER.debug(out.decode('utf-8'))
+            LOGGER.info('Powerline-gitstatus has successfully been uninstalled at the user level')
 
 def delete_fonts():
     '''
@@ -308,9 +310,11 @@ def delete_fonts():
 
         if err:
             LOGGER.error(err.decode('utf-8'))
+            LOGGER.error('Failed to uninstall powerline fonts')
             sys.exit()
         else:
-            LOGGER.info(out.decode('utf-8'))
+            LOGGER.debug(out.decode('utf-8'))
+            LOGGER.info('Powerline fonts has successfully been uninstalled')
 
     command = f'rm -rf {user_config_dir}/fonts'
     with Popen(command.split, stdout=PIPE, stderr=PIPE) as process:
@@ -318,9 +322,11 @@ def delete_fonts():
 
         if err:
             LOGGER.error(err.decode('utf-8'))
+            LOGGER.error('Failed to remove powerline fonts in the user config directory')
             sys.exit()
         else:
-            LOGGER.info(out.decode('utf-8'))
+            LOGGER.debug(out.decode('utf-8'))
+            LOGGER.info('Powerline fonts in the user config directory has successfully been removed')
 
 def delete_config():
     '''
@@ -335,9 +341,11 @@ def delete_config():
 
         if err:
             LOGGER.error(err.decode('utf-8'))
+            LOGGER.error('Failed to remove powerline config at user config directory')
             sys.exit()
         else:
-            LOGGER.info(out.decode('utf-8'))
+            LOGGER.debug(out.decode('utf-8'))
+            LOGGER.info('Powerline config has successfully been removed at the user config directory')
 
 def remove_bash_daemon():
     '''
@@ -418,6 +426,8 @@ def uninstall_powerline():
 
         if err:
             LOGGER.error(err.decode('utf-8'))
+            LOGGER.error('Failed to uninstall powerline through pipe3')
             sys.exit()
         else:
-            LOGGER.info(out.decode('utf-8'))
+            LOGGER.debug(out.decode('utf-8'))
+            LOGGER.info('Powerline has successfully been uninstalled through pip3')

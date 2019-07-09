@@ -184,6 +184,8 @@ def uninstall_brew():
 
         if err:
             LOGGER.error(err.decode('utf-8'))
+            LOGGER.error('Failed to uninstall homebrew')
             sys.exit()
         else:
-            LOGGER.info(out.decode('utf-8'))
+            LOGGER.debug(out.decode('utf-8'))
+            LOGGER.info('Homebrew has succesffully been uninstalled')

@@ -103,9 +103,12 @@ def remove_color_themes():
         out, err = process.communicate()
 
         if err:
-            LOGGER.info(err.decode('utf-8'))
+            LOGGER.error(err.decode('utf-8'))
+            LOGGER.error('Failed to remove vim color themes')
+            sys.exit()
         else:
-            LOGGER.info(out.decode('utf-8'))
+            LOGGER.debug(out.decode('utf-8'))
+            LOGGER.info('Vim color themes has successfully been removed')
 
 def remove_vim_settings():
     '''
@@ -124,6 +127,9 @@ def remove_vim_settings():
         out, err = process.communicate()
 
         if err:
-            LOGGER.info(err.decode('utf-8'))
+            LOGGER.error(err.decode('utf-8'))
+            LOGGER.error('Failed to remove vim settings cloned from github')
+            sys.exit()
         else:
-            LOGGER.info(out.decode('utf-8'))
+            LOGGER.debug(out.decode('utf-8'))
+            LOGGER.info('Vim settings cloned from github has successfully been removed')

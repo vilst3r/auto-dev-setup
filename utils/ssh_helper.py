@@ -123,9 +123,11 @@ def delete_ssh_rsa_keypair():
 
         if err:
             LOGGER.error(err.decode('utf-8'))
+            LOGGER.error('Failed to remove RSA keypairs configured for SSH')
             sys.exit()
         else:
-            LOGGER.info(out.decode('utf-8'))
+            LOGGER.debug(out.decode('utf-8'))
+            LOGGER.info('RSA keypairs configured for SSH has successfully been removed')
 
 def stop_ssh_agent():
     '''
@@ -149,6 +151,8 @@ def stop_ssh_agent():
 
         if err:
             LOGGER.error(err.decode('utf-8'))
+            LOGGER.error('Failed to stop ssh-agent process')
             sys.exit()
         else:
-            LOGGER.info(out.decode('utf-8'))
+            LOGGER.debug(out.decode('utf-8'))
+            LOGGER.info('SSH-agent process has successfully been stopped')

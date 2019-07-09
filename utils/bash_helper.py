@@ -78,6 +78,8 @@ def remove_bash_settings():
 
         if err:
             LOGGER.error(err.decode('utf-8'))
+            LOGGER.error('Failed to remove bash settings cloned from github')
             sys.exit()
         else:
-            LOGGER.info(out.decode('utf-8'))
+            LOGGER.debug(out.decode('utf-8'))
+            LOGGER.info('Bash settings from github has successfully been removed')
