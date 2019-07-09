@@ -67,8 +67,8 @@ def pretty_print_wrapper(wrapper: object, title: str):
     '''
     Function to pretty print wrapper in beginning of cleanup
     '''
-    LOGGER.info(f'###### {title} #####')
-    LOGGER.info(f'{wrapper}')
+    LOGGER.debug(f'###### {title} #####')
+    LOGGER.debug(f'{wrapper}')
 
 def initialise_logger():
     '''
@@ -85,11 +85,11 @@ def initialise_logger():
     stream_handler.setLevel(logging.INFO)
 
     out_handler = logging.FileHandler(f'{out_path}', 'w+')
-    out_handler.setLevel(logging.INFO)
+    out_handler.setLevel(logging.DEBUG)
     out_handler.setFormatter(formatter)
 
     err_handler = logging.FileHandler(f'{err_path}', 'w+')
-    err_handler.setLevel(logging.ERROR)
+    err_handler.setLevel(logging.WARNING)
     err_handler.setFormatter(formatter)
 
     LOGGER.addHandler(out_handler)

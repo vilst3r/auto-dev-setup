@@ -18,6 +18,9 @@ def brew_exists() -> bool:
     command = 'find /usr/local/Caskroom'
     directory_found = call(command.split(), stdout=DEVNULL, stderr=DEVNULL)
 
+    if directory_found != 0:
+        LOGGER.info('Brew hasn\'t been configured - configuring now...')
+
     return directory_found == 0
 
 def install_brew():
@@ -36,9 +39,11 @@ def install_brew():
 
         if err:
             LOGGER.error(err.decode('utf-8'))
+            LOGGER.error('Homebrew failed to install')
             sys.exit()
         else:
-            LOGGER.info(out.decode('utf-8'))
+            LOGGER.debug(out.decode('utf-8'))
+            LOGGER.info('Homebrew has successfully been installed')
 
 def tap_brew_cask():
     '''
@@ -51,9 +56,11 @@ def tap_brew_cask():
 
         if err:
             LOGGER.error(err.decode('utf-8'))
+            LOGGER.error('Brew cask failed to tap into')
             sys.exit()
         else:
-            LOGGER.info(out.decode('utf-8'))
+            LOGGER.debug(out.decode('utf-8'))
+            LOGGER.info('Brew cask has successfully been tapped into')
 
 def get_uninstalled_brew_packages() -> list:
     '''
@@ -80,7 +87,7 @@ def install_that_brew(package: str):
     package_found = call(command.split())
 
     if package_found != 0:
-        LOGGER.info(f'This package does not exist in registry - {package}')
+        LOGGER.warn(f'This package does not exist in registry - {package}')
         return
 
     command = f'brew install {package}'
@@ -89,9 +96,11 @@ def install_that_brew(package: str):
 
         if err:
             LOGGER.error(err.decode('utf-8'))
+            LOGGER.error(f'Error installing the package - {package}')
             sys.exit()
         else:
-            LOGGER.info(out.decode('utf-8'))
+            LOGGER.debug(out.decode('utf-8'))
+            LOGGER.info('{package} - successfully installed')
 
 def use_brew_python():
     '''
@@ -103,9 +112,11 @@ def use_brew_python():
 
         if err:
             LOGGER.error(err.decode('utf-8'))
+            LOGGER.error('Failed to overwrite current python symlink with brew python')
             sys.exit()
         else:
-            LOGGER.info(out.decode('utf-8'))
+            LOGGER.debug(out.decode('utf-8'))
+            LOGGER.info('Brew python has successfully been symlinked')
 
 def get_uninstalled_cask_packages() -> list:
     '''
@@ -120,7 +131,7 @@ def get_uninstalled_cask_packages() -> list:
             LOGGER.error(err.decode('utf-8'))
             sys.exit()
         else:
-            LOGGER.info(out.decode('utf-8'))
+            LOGGER.debug(out.decode('utf-8'))
             output = out
 
     cask_list = output.decode('utf-8').split('\n')
@@ -142,17 +153,20 @@ def install_that_cask(package: str):
     package_found = call(command.split())
 
     if package_found != 0:
-        LOGGER.info(f'This package does not exist in registry - {package}')
-    else:
-        command = f'brew cask install {package}'
-        with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
-            out, err = process.communicate()
+        LOGGER.warn(f'This package does not exist in registry - {package}')
+        return
 
-            if err:
-                LOGGER.error(err.decode('utf-8'))
-                sys.exit()
-            else:
-                LOGGER.info(out.decode('utf-8'))
+    command = f'brew cask install {package}'
+    with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
+        out, err = process.communicate()
+
+        if err:
+            LOGGER.error(err.decode('utf-8'))
+            LOGGER.error(f'Error installing the package - {package}')
+            sys.exit()
+        else:
+            LOGGER.debug(out.decode('utf-8'))
+            LOGGER.info('{package} - successfully installed')
 
 def uninstall_brew():
     '''
@@ -170,6 +184,8 @@ def uninstall_brew():
 
         if err:
             LOGGER.error(err.decode('utf-8'))
+            LOGGER.error('Failed to uninstall homebrew')
             sys.exit()
         else:
-            LOGGER.info(out.decode('utf-8'))
+            LOGGER.debug(out.decode('utf-8'))
+            LOGGER.info('Homebrew has succesffully been uninstalled')

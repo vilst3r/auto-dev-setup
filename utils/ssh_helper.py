@@ -22,6 +22,9 @@ def public_key_exists() -> bool:
     command = f'find {home_dir}/.ssh/id_rsa.pub'
     file_found = call(command.split(), stdout=DEVNULL, stderr=DEVNULL)
 
+    if file_found != 0:
+        LOGGER.info('Git SSH hasn\'t been configured - configuring now...')
+
     return file_found == 0
 
 def generate_rsa_keypair():
@@ -37,9 +40,11 @@ def generate_rsa_keypair():
 
         if err:
             LOGGER.error(err.decode('utf-8'))
+            LOGGER.error('RSA keypair for ssh has failed to generated')
             sys.exit()
         else:
-            LOGGER.info(out.decode('utf-8'))
+            LOGGER.debug(out.decode('utf-8'))
+            LOGGER.info('RSA keypair for ssh has successfully been generated')
 
 def start_ssh_agent():
     '''
@@ -55,9 +60,11 @@ def start_ssh_agent():
 
         if err:
             LOGGER.error(err.decode('utf-8'))
+            LOGGER.error('SSH-agent process has failed to start')
             sys.exit()
         else:
-            LOGGER.info(out.decode('utf-8'))
+            LOGGER.debug(out.decode('utf-8'))
+            LOGGER.info('SSH-agent process has successfully started')
 
 def register_private_key_to_ssh_agent():
     '''
@@ -71,9 +78,11 @@ def register_private_key_to_ssh_agent():
 
         if err:
             LOGGER.error(err.decode('utf-8'))
+            LOGGER.error('SSH private key has failed to be added to the ssh-agent')
             sys.exit()
         else:
-            LOGGER.info(out.decode('utf-8'))
+            LOGGER.debug(out.decode('utf-8'))
+            LOGGER.info('SSH private key has successfully been added to the ssh-agent')
 
 def get_public_key() -> str:
     '''
@@ -87,9 +96,10 @@ def get_public_key() -> str:
 
         if err:
             LOGGER.error(err.decode('utf-8'))
+            LOGGER.error('SSH public key is missing')
             sys.exit()
 
-        LOGGER.info(out.decode('utf-8'))
+        LOGGER.debug(out.decode('utf-8'))
         parsed_output = out.decode('utf-8').split()
         key_type = parsed_output[0]
         key_data = parsed_output[1]
@@ -113,9 +123,11 @@ def delete_ssh_rsa_keypair():
 
         if err:
             LOGGER.error(err.decode('utf-8'))
+            LOGGER.error('Failed to remove RSA keypairs configured for SSH')
             sys.exit()
         else:
-            LOGGER.info(out.decode('utf-8'))
+            LOGGER.debug(out.decode('utf-8'))
+            LOGGER.info('RSA keypairs configured for SSH has successfully been removed')
 
 def stop_ssh_agent():
     '''
@@ -139,6 +151,8 @@ def stop_ssh_agent():
 
         if err:
             LOGGER.error(err.decode('utf-8'))
+            LOGGER.error('Failed to stop ssh-agent process')
             sys.exit()
         else:
-            LOGGER.info(out.decode('utf-8'))
+            LOGGER.debug(out.decode('utf-8'))
+            LOGGER.info('SSH-agent process has successfully been stopped')
