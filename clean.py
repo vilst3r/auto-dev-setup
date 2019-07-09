@@ -97,6 +97,8 @@ def initialise_logger():
     LOGGER.addHandler(stream_handler)
 
 if __name__ == '__main__':
+    initialise_logger()
+
     START = time.time()
     pretty_print_wrapper(SETUP, 'SetupWrapper')
     pretty_print_wrapper(GITHUB, 'GithubWrapper')

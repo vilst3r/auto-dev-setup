@@ -4,7 +4,8 @@ Module delegated to handling bash logic
 
 # System/Third-Party modules
 import logging
-from subprocess import call, check_call, DEVNULL
+import sys
+from subprocess import Popen, call, check_call, DEVNULL, PIPE
 
 # Custom modules
 from utils.setup_wrapper import SETUP
@@ -28,7 +29,15 @@ def pull_bash_settings():
     source = f'git@github.com:{git_username}/bash-settings.git'
     destination = f'config/bash/bash-settings'
     command = f'git clone {source} {destination}'
-    check_call(command.split())
+
+    with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
+        out, err = process.communicate()
+
+        if err:
+            LOGGER.error(err.decode('utf-8'))
+            sys.exit()
+        else:
+            LOGGER.info(out.decode('utf-8'))
 
 def configure_bash_profile():
     '''
@@ -37,7 +46,15 @@ def configure_bash_profile():
     home_dir = SETUP.dir['home']
 
     command = f'cp config/bash/bash-settings/.bash_profile {home_dir}/.bash_profile'
-    call(command.split())
+
+    with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
+        out, err = process.communicate()
+
+        if err:
+            LOGGER.error(err.decode('utf-8'))
+            sys.exit()
+        else:
+            LOGGER.info(out.decode('utf-8'))
 
 def remove_bash_settings():
     '''
@@ -51,4 +68,12 @@ def remove_bash_settings():
         return
 
     command = 'rm -rf config/bash/bash-settings'
-    check_call(command.split())
+
+    with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
+        out, err = process.communicate()
+
+        if err:
+            LOGGER.error(err.decode('utf-8'))
+            sys.exit()
+        else:
+            LOGGER.info(out.decode('utf-8'))

@@ -4,9 +4,10 @@ Module delegated to handling powerline status logic
 
 # System/Third-Party modules
 import logging
+import sys
 import re
 import json
-from subprocess import call, check_call
+from subprocess import Popen, call, check_call, PIPE, DEVNULL
 
 # Custom modules
 from utils.setup_wrapper import SETUP
@@ -19,7 +20,15 @@ def install_powerline_at_user():
     Installs the powerline tool at the user level of the system
     '''
     command = 'pip3 install --user powerline-status'
-    check_call(command.split())
+    
+    with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
+        out, err = process.communicate()
+
+        if err:
+            LOGGER.error(err.decode('utf-8'))
+            sys.exit()
+        else:
+            LOGGER.info(out.decode('utf-8'))
 
 def write_bash_daemon():
     '''
@@ -135,13 +144,34 @@ def configure_user_config_directory() -> bool:
 
     if directory_found != 0:
         command = f'mkdir {home_dir}/.config'
-        call(command.split())
+        with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
+            out, err = process.communicate()
+
+            if err:
+                LOGGER.error(err.decode('utf-8'))
+                sys.exit()
+            else:
+                LOGGER.info(out.decode('utf-8'))
 
     command = f'mkdir {user_config_dir}'
-    call(command.split())
+    with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
+        out, err = process.communicate()
+
+        if err:
+            LOGGER.error(err.decode('utf-8'))
+            sys.exit()
+        else:
+            LOGGER.info(out.decode('utf-8'))
 
     command = f'cp -r {system_config_dir} {user_config_dir}'
-    call(command.split())
+    with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
+        out, err = process.communicate()
+
+        if err:
+            LOGGER.error(err.decode('utf-8'))
+            sys.exit()
+        else:
+            LOGGER.info(out.decode('utf-8'))
 
 def install_fonts():
     '''
@@ -153,17 +183,38 @@ def install_fonts():
     # Download & install fonts
     source = f'git@github.com:{git_username}/fonts.git'
     command = f'git clone {source}'
-    call(command.split(), cwd=f'{user_config_dir}')
+    with Popen(command.split(), stdout=PIPE, stderr=PIPE, cwd=f'{user_config_dir}') as process:
+        out, err = process.communicate()
+
+        if err:
+            LOGGER.error(err.decode('utf-8'))
+            sys.exit()
+        else:
+            LOGGER.info(out.decode('utf-8'))
 
     command = '/bin/bash ./install.sh'
-    call(command.split(), cwd=f'{user_config_dir}/fonts')
+    with Popen(command.split(), stdout=PIPE, stderr=PIPE, cwd=f'{user_config_dir}/fonts') as process:
+        out, err = process.communicate()
+
+        if err:
+            LOGGER.error(err.decode('utf-8'))
+            sys.exit()
+        else:
+            LOGGER.info(out.decode('utf-8'))
 
 def install_gitstatus_at_user():
     '''
     Installs powerline-gitstatus at user level of system
     '''
     command = 'pip3 install --user powerline-gitstatus'
-    check_call(command.split())
+    with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
+        out, err = process.communicate()
+
+        if err:
+            LOGGER.error(err.decode('utf-8'))
+            sys.exit()
+        else:
+            LOGGER.info(out.decode('utf-8'))
 
 def config_git_colorscheme():
     '''
@@ -222,7 +273,14 @@ def uninstall_gitstatus():
     Uninstalls git powerline status at user level of system
     '''
     command = 'pip3 uninstall powerline-gitstatus'
-    check_call(command.split())
+    with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
+        out, err = process.communicate()
+
+        if err:
+            LOGGER.error(err.decode('utf-8'))
+            sys.exit()
+        else:
+            LOGGER.info(out.decode('utf-8'))
 
 def delete_fonts():
     '''
@@ -230,11 +288,25 @@ def delete_fonts():
     '''
     user_config_dir = SETUP.dir['powerline_config']
 
-    command = '/bin/bash ./uninstall.sh'
-    call(command.split(), cwd=f'{user_config_dir}/fonts')
+    command = f'/bin/bash {user_config_dir}/fonts/uninstall.sh'
+    with Popen(command.split, stdout=PIPE, stderr=PIPE) as process:
+        out, err = process.communicate()
 
-    command = f'rm -rf /fonts'
-    call(command.split(), cwd=f'{user_config_dir}')
+        if err:
+            LOGGER.error(err.decode('utf-8'))
+            sys.exit()
+        else:
+            LOGGER.info(out.decode('utf-8'))
+
+    command = f'rm -rf {user_config_dir}/fonts'
+    with Popen(command.split, stdout=PIPE, stderr=PIPE) as process:
+        out, err = process.communicate()
+
+        if err:
+            LOGGER.error(err.decode('utf-8'))
+            sys.exit()
+        else:
+            LOGGER.info(out.decode('utf-8'))
 
 def delete_config():
     '''
@@ -243,7 +315,15 @@ def delete_config():
     user_config_dir = SETUP.dir['powerline_config']
 
     command = f'rm -rf {user_config_dir}'
-    call(command.split())
+
+    with Popen(command.split, stdout=PIPE, stderr=PIPE) as process:
+        out, err = process.communicate()
+
+        if err:
+            LOGGER.error(err.decode('utf-8'))
+            sys.exit()
+        else:
+            LOGGER.info(out.decode('utf-8'))
 
 def remove_bash_daemon():
     '''
@@ -319,4 +399,11 @@ def uninstall_powerline():
     Uninstalls the powerline tool
     '''
     command = 'pip3 uninstall powerline-status'
-    check_call(command.split())
+    with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
+        out, err = process.communicate()
+
+        if err:
+            LOGGER.error(err.decode('utf-8'))
+            sys.exit()
+        else:
+            LOGGER.info(out.decode('utf-8'))

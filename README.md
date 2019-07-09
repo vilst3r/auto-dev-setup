@@ -18,3 +18,6 @@ Python scripts to replicate personal development environment across any machine 
 # Notes
 - Configure iterm2 font to configure last step of powerline
 - iTerm2 configuration left to manual user intervention
+    - Add script to restart powerline-daemon
+        - `powerline-daemon -r`
+- Capture all subprocess stdout and funnel it into the logger

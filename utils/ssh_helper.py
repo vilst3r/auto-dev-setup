@@ -3,11 +3,15 @@ Module delegated to handling ssh logic
 '''
 
 # System/Third-Party modules
+import sys
+import logging
 from subprocess import call, Popen, check_output, PIPE, DEVNULL
 
 # Custom modules
 from utils.setup_wrapper import SETUP
 from utils.github_wrapper import GITHUB
+
+LOGGER = logging.getLogger()
 
 def public_key_exists() -> bool:
     '''
@@ -28,8 +32,14 @@ def generate_rsa_keypair():
 
     command = f'ssh-keygen -t rsa -b 4096 -C \"{git_email}\" -N foobar'
 
-    with Popen(command.split(), stdin=PIPE) as process:
-        process.communicate(input=b'\ny\n')
+    with Popen(command.split(), stdin=PIPE, stdout=PIPE, stderr=PIPE) as process:
+        out, err = process.communicate(input=b'\ny\n')
+
+        if err:
+            LOGGER.error(err.decode('utf-8'))
+            sys.exit()
+        else:
+            LOGGER.info(out.decode('utf-8'))
 
 def start_ssh_agent():
     '''
@@ -39,7 +49,15 @@ def start_ssh_agent():
     command_list.append('sh')
     command_list.append('-c')
     command_list.append(f'eval \"$(ssh-agent -s)\"')
-    call(command_list)
+
+    with Popen(command_list, stdout=PIPE, stderr=PIPE) as process:
+        out, err = process.communicate()
+
+        if err:
+            LOGGER.error(err.decode('utf-8'))
+            sys.exit()
+        else:
+            LOGGER.info(out.decode('utf-8'))
 
 def register_private_key_to_ssh_agent():
     '''
@@ -48,7 +66,14 @@ def register_private_key_to_ssh_agent():
     home_dir = SETUP.dir['home']
 
     command = f'ssh-add -K {home_dir}/.ssh/id_rsa'
-    call(command.split())
+    with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
+        out, err = process.communicate()
+
+        if err:
+            LOGGER.error(err.decode('utf-8'))
+            sys.exit()
+        else:
+            LOGGER.info(out.decode('utf-8'))
 
 def get_public_key() -> str:
     '''
@@ -57,13 +82,20 @@ def get_public_key() -> str:
     home_dir = SETUP.dir['home']
 
     command = f'cat {home_dir}/.ssh/id_rsa.pub'
-    output = check_output(command.split())
-    parsed_output = output.decode('utf-8').split()
-    key_type = parsed_output[0]
-    key_data = parsed_output[1]
+    with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
+        out, err = process.communicate()
 
-    public_key = f'{key_type} {key_data}'
-    return public_key
+        if err:
+            LOGGER.error(err.decode('utf-8'))
+            sys.exit()
+
+        LOGGER.info(out.decode('utf-8'))
+        parsed_output = out.decode('utf-8').split()
+        key_type = parsed_output[0]
+        key_data = parsed_output[1]
+
+        public_key = f'{key_type} {key_data}'
+        return public_key
 
 def delete_ssh_rsa_keypair():
     '''
@@ -75,7 +107,15 @@ def delete_ssh_rsa_keypair():
     command_list.append('sh')
     command_list.append('-c')
     command_list.append(f'rm {home_dir}/.ssh/id_rsa*')
-    call(command_list)
+
+    with Popen(command_list, stdout=PIPE, stderr=PIPE) as process:
+        out, err = process.communicate()
+
+        if err:
+            LOGGER.error(err.decode('utf-8'))
+            sys.exit()
+        else:
+            LOGGER.info(out.decode('utf-8'))
 
 def stop_ssh_agent():
     '''
@@ -93,4 +133,12 @@ def stop_ssh_agent():
     pid = out.decode('utf-8').split()[1]
 
     command = f'kill {pid}'
-    call(command.split())
+
+    with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
+        out, err = process.communicate()
+
+        if err:
+            LOGGER.error(err.decode('utf-8'))
+            sys.exit()
+        else:
+            LOGGER.info(out.decode('utf-8'))

@@ -4,7 +4,7 @@ Module delegated to handling brew logic
 
 # System/Third-Party modules
 import logging
-from subprocess import call, check_output, PIPE, DEVNULL
+from subprocess import Popen, call, check_output, PIPE, DEVNULL
 
 # Custom modules
 
@@ -30,14 +30,29 @@ def install_brew():
     command_list.append('sh')
     command_list.append('-c')
     command_list.append(f'{ruby_bin} -e \"$(curl -fsSL {brew_url})\"')
-    call(command_list, stdin=PIPE)
+    with Popen(command_list, stdin=PIPE, stdout=PIPE, stdout=PIPE) as process:
+        out, err = process.communicate()
+
+        if err:
+            LOGGER.error(err.decode('utf-8'))
+            sys.exit()
+        else:
+            LOGGER.info(out.decode('utf-8'))
 
 def tap_brew_cask():
     '''
     Self explanatory
     '''
     command = 'brew tap caskroom/cask'
-    call(command.split())
+
+    with Popen(command.split(), stdout=PIPE, stdout=PIPE) as process:
+        out, err = process.communicate()
+
+        if err:
+            LOGGER.error(err.decode('utf-8'))
+            sys.exit()
+        else:
+            LOGGER.info(out.decode('utf-8'))
 
 def get_uninstalled_brew_packages() -> list:
     '''
@@ -65,23 +80,48 @@ def install_that_brew(package: str):
 
     if package_found != 0:
         LOGGER.info(f'This package does not exist in registry - {package}')
-    else:
-        command = f'brew install {package}'
-        call(command.split())
+        return
+
+    command = f'brew install {package}'
+    with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
+        out, err = process.communicate()
+
+        if err:
+            LOGGER.error(err.decode('utf-8'))
+            sys.exit()
+        else:
+            LOGGER.info(out.decode('utf-8'))
 
 def use_brew_python():
     '''
     Replaces system binary path with symlink to brew python
     '''
     command = 'brew link --overwrite python'
-    call(command.split())
+    with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
+        out, err = process.communicate()
+
+        if err:
+            LOGGER.error(err.decode('utf-8'))
+            sys.exit()
+        else:
+            LOGGER.info(out.decode('utf-8'))
 
 def get_uninstalled_cask_packages() -> list:
     '''
     Scans config list of cask packages to install what's missing
     '''
     command = 'brew cask list'
-    output = check_output(command.split())
+    output = None
+    with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
+        out, err = process.communicate()
+
+        if err:
+            LOGGER.error(err.decode('utf-8'))
+            sys.exit()
+        else:
+            LOGGER.info(out.decode('utf-8'))
+            output = out
+
     cask_list = output.decode('utf-8').split('\n')
 
     buff = []
@@ -104,7 +144,14 @@ def install_that_cask(package: str):
         LOGGER.info(f'This package does not exist in registry - {package}')
     else:
         command = f'brew cask install {package}'
-        call(command.split())
+        with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
+            out, err = process.communicate()
+
+            if err:
+                LOGGER.error(err.decode('utf-8'))
+                sys.exit()
+            else:
+                LOGGER.info(out.decode('utf-8'))
 
 def uninstall_brew():
     '''
@@ -117,4 +164,11 @@ def uninstall_brew():
     command_list.append('sh')
     command_list.append('-c')
     command_list.append(f'{ruby_bin} -e \"$(curl -fsSL {brew_url})\"')
-    call(command_list, stdin=PIPE)
+    with Popen(command.split(), stdin=PIPE, stdout=PIPE, stderr=PIPE) as process:
+        out, err = process.communicate()
+
+        if err:
+            LOGGER.error(err.decode('utf-8'))
+            sys.exit()
+        else:
+            LOGGER.info(out.decode('utf-8'))
