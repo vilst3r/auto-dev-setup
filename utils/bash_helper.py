@@ -20,9 +20,9 @@ def pull_bash_settings():
     git_username = GITHUB.username
 
     command = 'find config/bash/bash-settings'
-    directory_found = call(command.split(), stdout=DEVNULL)
+    directory_found = call(command.split(), stdout=DEVNULL) == 0
 
-    if directory_found == 0:
+    if directory_found:
         LOGGER.info('Bash settings already pulled from git')
         return
 
@@ -65,9 +65,9 @@ def remove_bash_settings():
     Remove bash setting repository cloned from github
     '''
     command = 'find config/bash/bash-settings'
-    directory_found = call(command.split(), stdout=DEVNULL)
+    directory_found = call(command.split(), stdout=DEVNULL) == 0
 
-    if directory_found != 0:
+    if not directory_found:
         LOGGER.info('Bash settings already removed')
         return
 

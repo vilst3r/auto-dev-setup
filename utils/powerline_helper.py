@@ -142,9 +142,9 @@ def configure_user_config_directory() -> bool:
     system_config_dir = f'{SETUP.dir["python_site"]}/powerline/config_files/'
 
     command = f'find {home_dir}/.config'
-    directory_found = call(command.split(), stdout=DEVNULL)
+    directory_found = call(command.split(), stdout=DEVNULL) == 0
 
-    if directory_found != 0:
+    if not directory_found:
         command = f'mkdir {home_dir}/.config'
         with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
             out, err = process.communicate()

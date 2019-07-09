@@ -20,12 +20,12 @@ def public_key_exists() -> bool:
     home_dir = SETUP.dir['home']
 
     command = f'find {home_dir}/.ssh/id_rsa.pub'
-    file_found = call(command.split(), stdout=DEVNULL, stderr=DEVNULL)
+    file_found = call(command.split(), stdout=DEVNULL, stderr=DEVNULL) == 0
 
-    if file_found != 0:
+    if file_found:
         LOGGER.info('Git SSH hasn\'t been configured - configuring now...')
 
-    return file_found == 0
+    return file_found
 
 def generate_rsa_keypair():
     '''

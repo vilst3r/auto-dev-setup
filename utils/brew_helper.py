@@ -16,12 +16,12 @@ def brew_exists() -> bool:
     Check if the brew dependency management tool exists in the system
     '''
     command = 'find /usr/local/Caskroom'
-    directory_found = call(command.split(), stdout=DEVNULL, stderr=DEVNULL)
+    directory_found = call(command.split(), stdout=DEVNULL, stderr=DEVNULL) == 0
 
-    if directory_found != 0:
+    if not directory_found:
         LOGGER.info('Brew hasn\'t been configured - configuring now...')
 
-    return directory_found == 0
+    return directory_found
 
 def install_brew():
     '''
@@ -84,9 +84,9 @@ def install_that_brew(package: str):
     Downloads & Installs the single package if it's valid
     '''
     command = f'brew info {package}'
-    package_found = call(command.split(), stdout=DEVNULL)
+    package_found = call(command.split(), stdout=DEVNULL) == 0
 
-    if package_found != 0:
+    if not package_found:
         LOGGER.warn(f'This package does not exist in registry - {package}')
         return
 
@@ -134,9 +134,9 @@ def install_that_cask(package: str):
     Downloads & Installs the single package if it's valid
     '''
     command = f'brew cask info {package}'
-    package_found = call(command.split(), stdout=DEVNULL))
+    package_found = call(command.split(), stdout=DEVNULL) == 0
 
-    if package_found != 0:
+    if not package_found:
         LOGGER.warn(f'This package does not exist in registry - {package}')
         return
 

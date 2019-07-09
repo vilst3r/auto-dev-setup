@@ -20,9 +20,9 @@ def pull_vim_settings():
     git_username = GITHUB.username
 
     command = 'find config/vim/vim-settings'
-    directory_found = call(command.split(), stdout=DEVNULL)
+    directory_found = call(command.split(), stdout=DEVNULL) == 0
 
-    if directory_found == 0:
+    if directory_found:
         LOGGER.info('Vim settings already pulled from git')
         return
 
@@ -83,9 +83,9 @@ def configure_color_themes():
     command_list.append('-c')
     command_list.append(f'cp config/vim/vim-settings/color_themes/*.vim {vim_color_dir}')
 
-    copy_result = call(command_list, stdout=DEVNULL)
+    files_copied = call(command_list, stdout=DEVNULL) == 0
 
-    if copy_result == 0:
+    if files_copied:
         LOGGER.info('Vim color themes copied to ~/.vim/colors')
     else:
         LOGGER.error('Error copying vim color themes in config')
@@ -115,9 +115,9 @@ def remove_vim_settings():
     Remove vim setting repository cloned from github
     '''
     command = 'find config/vim/vim-settings'
-    directory_found = call(command.split(), stdout=DEVNULL)
+    directory_found = call(command.split(), stdout=DEVNULL) == 0
 
-    if directory_found != 0:
+    if not directory_found:
         LOGGER.info('Vim settings already removed')
         return
 
