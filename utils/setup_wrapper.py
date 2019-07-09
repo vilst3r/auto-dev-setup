@@ -15,7 +15,7 @@ class SetupWrapper():
     Wrapper object to track state of setup
     '''
     def __init__(self):
-        self.step = 0
+        self.step = 1
 
         home = str(pathlib.Path.home())
 
@@ -33,11 +33,10 @@ class SetupWrapper():
         pretty_str = pprint.pformat(str_vals)
         return pretty_str
 
-    def print_process_step(self, message: str):
+    def print_process_step_start(self, message: str):
         '''
         Prints each step of the setup in a pretty format
         '''
-        self.step += 1
         step_str = f'| {self.step}. {message} |'
         row_len = len(step_str)
 
@@ -47,6 +46,22 @@ class SetupWrapper():
         LOGGER.info(f'{top}')
         LOGGER.info(step_str)
         LOGGER.info(f'{bottom}')
+
+    def print_process_step_finish(self, message: str):
+        '''
+        Prints each step of the setup in a pretty format
+        '''
+        step_str = f'| {self.step}. {message} |'
+        row_len = len(step_str)
+
+        top = ''.join(['-' for _ in range(row_len)])
+        bottom = ''.join(['-' for _ in range(row_len)])
+
+        LOGGER.info(f'{top}')
+        LOGGER.info(step_str)
+        LOGGER.info(f'{bottom}')
+
+        self.step += 1
 
 # Singleton
 SETUP = SetupWrapper()
