@@ -102,22 +102,6 @@ def install_that_brew(package: str):
             LOGGER.debug(out.decode('utf-8'))
             LOGGER.info('{package} - successfully installed')
 
-def use_brew_python():
-    '''
-    Replaces system binary path with symlink to brew python
-    '''
-    command = 'brew link --overwrite python'
-    with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
-        out, err = process.communicate()
-
-        if err:
-            LOGGER.error(err.decode('utf-8'))
-            LOGGER.error('Failed to overwrite current python symlink with brew python')
-            sys.exit()
-        else:
-            LOGGER.debug(out.decode('utf-8'))
-            LOGGER.info('Brew python has successfully been symlinked')
-
 def get_uninstalled_cask_packages() -> list:
     '''
     Scans config list of cask packages to install what's missing

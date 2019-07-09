@@ -29,8 +29,6 @@ def install_brew_packages():
     for package in packages:
         brew_helper.install_that_brew(package)
 
-    brew_helper.use_brew_python()
-
     SETUP.print_process_step('Installation of brew packages are complete!')
 
 def install_cask_packages():
