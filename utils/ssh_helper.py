@@ -5,7 +5,7 @@ Module delegated to handling ssh logic
 # System/Third-Party modules
 import sys
 import logging
-from subprocess import call, Popen, check_output, PIPE, DEVNULL
+from subprocess import call, Popen, PIPE, DEVNULL
 
 # Custom modules
 from utils.setup_wrapper import SETUP

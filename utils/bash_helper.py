@@ -5,7 +5,7 @@ Module delegated to handling bash logic
 # System/Third-Party modules
 import logging
 import sys
-from subprocess import Popen, call, check_call, DEVNULL, PIPE
+from subprocess import Popen, call, DEVNULL, PIPE
 
 # Custom modules
 from utils.setup_wrapper import SETUP

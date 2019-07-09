@@ -4,6 +4,7 @@ Module delegated to handling brew logic
 
 # System/Third-Party modules
 import logging
+import sys
 from subprocess import Popen, call, check_output, PIPE, DEVNULL
 
 # Custom modules
@@ -30,7 +31,7 @@ def install_brew():
     command_list.append('sh')
     command_list.append('-c')
     command_list.append(f'{ruby_bin} -e \"$(curl -fsSL {brew_url})\"')
-    with Popen(command_list, stdin=PIPE, stdout=PIPE, stdout=PIPE) as process:
+    with Popen(command_list, stdin=PIPE, stdout=PIPE, stderr=PIPE) as process:
         out, err = process.communicate()
 
         if err:
@@ -45,7 +46,7 @@ def tap_brew_cask():
     '''
     command = 'brew tap caskroom/cask'
 
-    with Popen(command.split(), stdout=PIPE, stdout=PIPE) as process:
+    with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
         out, err = process.communicate()
 
         if err:
@@ -164,7 +165,7 @@ def uninstall_brew():
     command_list.append('sh')
     command_list.append('-c')
     command_list.append(f'{ruby_bin} -e \"$(curl -fsSL {brew_url})\"')
-    with Popen(command.split(), stdin=PIPE, stdout=PIPE, stderr=PIPE) as process:
+    with Popen(command_list, stdin=PIPE, stdout=PIPE, stderr=PIPE) as process:
         out, err = process.communicate()
 
         if err:

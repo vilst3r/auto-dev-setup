@@ -5,7 +5,7 @@ Module delegated to handling vim logic
 # System/Third-Party modules
 import logging
 import sys
-from subprocess import Popen, call, check_call, DEVNULL, PIPE
+from subprocess import Popen, call, DEVNULL, PIPE
 
 # Custom modules
 from utils.setup_wrapper import SETUP
@@ -121,4 +121,3 @@ def remove_vim_settings():
             LOGGER.info(err.decode('utf-8'))
         else:
             LOGGER.info(out.decode('utf-8'))
-

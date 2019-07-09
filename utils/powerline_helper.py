@@ -7,7 +7,7 @@ import logging
 import sys
 import re
 import json
-from subprocess import Popen, call, check_call, PIPE, DEVNULL
+from subprocess import Popen, call, PIPE
 
 # Custom modules
 from utils.setup_wrapper import SETUP
@@ -20,7 +20,7 @@ def install_powerline_at_user():
     Installs the powerline tool at the user level of the system
     '''
     command = 'pip3 install --user powerline-status'
-    
+
     with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
         out, err = process.communicate()
 
@@ -192,8 +192,8 @@ def install_fonts():
         else:
             LOGGER.info(out.decode('utf-8'))
 
-    command = '/bin/bash ./install.sh'
-    with Popen(command.split(), stdout=PIPE, stderr=PIPE, cwd=f'{user_config_dir}/fonts') as process:
+    command = f'/bin/bash {user_config_dir}/fonts/install.sh'
+    with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
         out, err = process.communicate()
 
         if err:

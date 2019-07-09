@@ -32,7 +32,7 @@ def read_git_credentials() -> dict:
                 text_file.write(f'{prop}: <INSERT OWN VALUE>\n')
 
         LOGGER.error(ierr)
-        LOGGER.error(f'Git credential file does not exist - file now generated in {git_credentials}')
+        LOGGER.error(f'Git credential file does not exist - now generated in {git_credentials}')
         sys.exit()
 
     for line in buff:
