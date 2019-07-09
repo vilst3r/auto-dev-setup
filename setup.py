@@ -22,7 +22,7 @@ LOGGER = logging.getLogger()
 
 def install_brew_packages():
     '''
-    Install brew packages and uses brew python over system by replacing symlink
+    Install brew packages 
     '''
     packages = brew_helper.get_uninstalled_brew_packages()
 
