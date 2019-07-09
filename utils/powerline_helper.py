@@ -26,9 +26,11 @@ def install_powerline_at_user():
 
         if err:
             LOGGER.error(err.decode('utf-8'))
+            LOGGER.error('Failed to install powerline from pip3')
             sys.exit()
         else:
-            LOGGER.info(out.decode('utf-8'))
+            LOGGER.debug(out.decode('utf-8'))
+            LOGGER.info('Powerline now installed from pip3 at the user level')
 
 def write_bash_daemon():
     '''
@@ -149,9 +151,11 @@ def configure_user_config_directory() -> bool:
 
             if err:
                 LOGGER.error(err.decode('utf-8'))
+                LOGGER.error(f'Failed to create - {home_dir}/.config')
                 sys.exit()
             else:
-                LOGGER.info(out.decode('utf-8'))
+                LOGGER.debug(out.decode('utf-8'))
+                LOGGER.info(f'{home_dir}/.config - has been created')
 
     command = f'mkdir {user_config_dir}'
     with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
@@ -159,9 +163,11 @@ def configure_user_config_directory() -> bool:
 
         if err:
             LOGGER.error(err.decode('utf-8'))
+            LOGGER.error(f'Failed to create - {user_config_dir}')
             sys.exit()
         else:
-            LOGGER.info(out.decode('utf-8'))
+            LOGGER.debug(out.decode('utf-8'))
+            LOGGER.info(f'{user_config_dir} - has been created')
 
     command = f'cp -r {system_config_dir} {user_config_dir}'
     with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
@@ -169,9 +175,11 @@ def configure_user_config_directory() -> bool:
 
         if err:
             LOGGER.error(err.decode('utf-8'))
+            LOGGER.error('Failed to copy powerline config from system to user directory')
             sys.exit()
         else:
-            LOGGER.info(out.decode('utf-8'))
+            LOGGER.debug(out.decode('utf-8'))
+            LOGGER.info('Successfully copied powerline config from system to user directory')
 
 def install_fonts():
     '''
@@ -182,15 +190,17 @@ def install_fonts():
 
     # Download & install fonts
     source = f'git@github.com:{git_username}/fonts.git'
-    command = f'git clone {source}'
-    with Popen(command.split(), stdout=PIPE, stderr=PIPE, cwd=f'{user_config_dir}') as process:
+    command = f'git clone {source} {user_config_dir}/fonts'
+    with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
         out, err = process.communicate()
 
         if err:
             LOGGER.error(err.decode('utf-8'))
+            LOGGER.error('Failed to clone powerline fonts from github')
             sys.exit()
         else:
-            LOGGER.info(out.decode('utf-8'))
+            LOGGER.debug(out.decode('utf-8'))
+            LOGGER.info('Successfully cloned powerline fonts from github')
 
     command = f'/bin/bash {user_config_dir}/fonts/install.sh'
     with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
@@ -198,9 +208,11 @@ def install_fonts():
 
         if err:
             LOGGER.error(err.decode('utf-8'))
+            LOGGER.error('Failed to install powerline fonts')
             sys.exit()
         else:
-            LOGGER.info(out.decode('utf-8'))
+            LOGGER.debug(out.decode('utf-8'))
+            LOGGER.info('Successfully installed powerline fonts')
 
 def install_gitstatus_at_user():
     '''
@@ -212,9 +224,11 @@ def install_gitstatus_at_user():
 
         if err:
             LOGGER.error(err.decode('utf-8'))
+            LOGGER.error('Failed to install powerline-gitstatus through pip3')
             sys.exit()
         else:
-            LOGGER.info(out.decode('utf-8'))
+            LOGGER.debug(out.decode('utf-8'))
+            LOGGER.info('Powerline-gitstatus successfully installed through pip3')
 
 def config_git_colorscheme():
     '''

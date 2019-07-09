@@ -35,9 +35,11 @@ def pull_vim_settings():
 
         if err:
             LOGGER.error(err.decode('utf-8'))
+            LOGGER.error('Failed to clone vim settings from github')
             sys.exit()
         else:
-            LOGGER.info(out.decode('utf-8'))
+            LOGGER.debug(out.decode('utf-8'))
+            LOGGER.info('Vim settings has successfully been cloned from github')
 
 def configure_vimrc():
     '''
@@ -52,9 +54,11 @@ def configure_vimrc():
 
         if err:
             LOGGER.error(err.decode('utf-8'))
+            LOGGER.error('Failed to configure vimrc from git repository')
             sys.exit()
         else:
-            LOGGER.info(out.decode('utf-8'))
+            LOGGER.debug(out.decode('utf-8'))
+            LOGGER.info('Vimrc now configured from git repository')
 
 def configure_color_themes():
     '''
@@ -68,9 +72,11 @@ def configure_color_themes():
         out, err = process.communicate()
 
         if err:
-            LOGGER.info(err.decode('utf-8'))
+            LOGGER.error(err.decode('utf-8'))
+            LOGGER.error(f'Failed to create - {vim_color_dir}')
         else:
-            LOGGER.info(out.decode('utf-8'))
+            LOGGER.debug(out.decode('utf-8'))
+            LOGGER.info(f'{vim_color_dir} - has been created')
 
     command_list = []
     command_list.append('sh')

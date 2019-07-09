@@ -48,6 +48,7 @@ class GithubWrapper():
         except requests.RequestException as req_err:
             LOGGER.error(f'Request Error occurred: {req_err}')
             LOGGER.error(f'Returned response: {res.json()}')
+            LOGGER.error('Failed request to GitHub API to get public keys')
             sys.exit()
         else:
             return res
@@ -64,6 +65,7 @@ class GithubWrapper():
         except requests.RequestException as req_err:
             LOGGER.error(f'Request Error occurred: {req_err}')
             LOGGER.error(f'Returned response: {res.json()}')
+            LOGGER.error('Failed request to GitHub API to create a public key')
             sys.exit()
         else:
             return res
@@ -80,6 +82,7 @@ class GithubWrapper():
         except requests.RequestException as req_err:
             LOGGER.error(f'Request Error occurred: {req_err}')
             LOGGER.error(f'Returned response: {res.json()}')
+            LOGGER.error('Failed request to GitHub API to delete a public key')
             sys.exit()
         else:
             return res

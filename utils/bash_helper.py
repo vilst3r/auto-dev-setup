@@ -35,9 +35,11 @@ def pull_bash_settings():
 
         if err:
             LOGGER.error(err.decode('utf-8'))
+            LOGGER.error('Failed to clone bash settings from github')
             sys.exit()
         else:
-            LOGGER.info(out.decode('utf-8'))
+            LOGGER.debug(out.decode('utf-8'))
+            LOGGER.info('Bash settings has successfully been cloned from github')
 
 def configure_bash_profile():
     '''
@@ -52,9 +54,11 @@ def configure_bash_profile():
 
         if err:
             LOGGER.error(err.decode('utf-8'))
+            LOGGER.error('Failed to configure bash_profile from git repository')
             sys.exit()
         else:
-            LOGGER.info(out.decode('utf-8'))
+            LOGGER.debug(out.decode('utf-8'))
+            LOGGER.info('Bash profile now configured from git repository')
 
 def remove_bash_settings():
     '''
