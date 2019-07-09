@@ -5,6 +5,7 @@ Script to automate setup of unix environment with personal configurations and to
 '''
 
 # System/Third-Party modules
+import logging
 import time
 
 # Custom modules
@@ -16,6 +17,8 @@ import utils.ssh_helper as ssh_helper
 import utils.brew_helper as brew_helper
 import utils.vim_helper as vim_helper
 import utils.bash_helper as bash_helper
+
+LOGGER = logging.getLogger()
 
 def uninstall_powerline():
     '''
@@ -64,11 +67,38 @@ def pretty_print_wrapper(wrapper: object, title: str):
     '''
     Function to pretty print wrapper in beginning of cleanup
     '''
-    print(f'###### {title} #####')
-    print(f'\n{wrapper}\n')
+    LOGGER.info(f'###### {title} #####')
+    LOGGER.info(f'{wrapper}')
 
+def initialise_logger():
+    '''
+    Set up logging for writing stdout & stderr to files
+    '''
+    LOGGER.setLevel(logging.DEBUG)
+
+    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+
+    out_path = 'logs/cleanup_out.log'
+    err_path = 'logs/cleanup_err.log'
+
+    stream_handler = logging.StreamHandler()
+    stream_handler.setLevel(logging.INFO)
+
+    out_handler = logging.FileHandler(f'{out_path}', 'w+')
+    out_handler.setLevel(logging.INFO)
+    out_handler.setFormatter(formatter)
+
+    err_handler = logging.FileHandler(f'{err_path}', 'w+')
+    err_handler.setLevel(logging.ERROR)
+    err_handler.setFormatter(formatter)
+
+    LOGGER.addHandler(out_handler)
+    LOGGER.addHandler(err_handler)
+    LOGGER.addHandler(stream_handler)
 
 if __name__ == '__main__':
+    initialise_logger()
+
     START = time.time()
     pretty_print_wrapper(SETUP, 'SetupWrapper')
     pretty_print_wrapper(GITHUB, 'GithubWrapper')
@@ -80,4 +110,4 @@ if __name__ == '__main__':
     uninstall_git_ssh()
 
     END = time.time()
-    print(f'\nCleanup time: {END - START} seconds\n')
+    LOGGER.info(f'Cleanup time: {END - START} seconds')

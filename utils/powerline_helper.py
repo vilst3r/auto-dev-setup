@@ -3,20 +3,32 @@ Module delegated to handling powerline status logic
 '''
 
 # System/Third-Party modules
+import logging
+import sys
 import re
 import json
-from subprocess import call, check_call
+from subprocess import Popen, call, check_call, PIPE, DEVNULL
 
 # Custom modules
 from utils.setup_wrapper import SETUP
 from utils.github_wrapper import GITHUB
+
+LOGGER = logging.getLogger()
 
 def install_powerline_at_user():
     '''
     Installs the powerline tool at the user level of the system
     '''
     command = 'pip3 install --user powerline-status'
-    check_call(command.split())
+    
+    with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
+        out, err = process.communicate()
+
+        if err:
+            LOGGER.error(err.decode('utf-8'))
+            sys.exit()
+        else:
+            LOGGER.info(out.decode('utf-8'))
 
 def write_bash_daemon():
     '''
@@ -49,7 +61,8 @@ def write_bash_daemon():
     config_match = re.search(pattern, content)
 
     if not config_match:
-        print('Appended powerline configuration in bash profile')
+        LOGGER.info('Appended powerline configuration in bash profile')
+
         with open(bash_profile, 'a') as text_file:
             text_file.write(f'\n{daemon_config}\n')
         return
@@ -57,7 +70,7 @@ def write_bash_daemon():
     current_config = config_match[0]
 
     if current_config == daemon_config:
-        print('Powerline already configured in bash profile')
+        LOGGER.info('Powerline already configured in bash profile')
         return
 
     start, end = config_match.span()
@@ -65,7 +78,8 @@ def write_bash_daemon():
 
     with open(bash_profile, 'w') as text_file:
         text_file.write(content)
-    print('Powerline configuration updated in bash profile')
+
+    LOGGER.info('Powerline configuration updated in bash profile')
 
 def write_vim_config():
     '''
@@ -97,7 +111,8 @@ def write_vim_config():
     config_match = re.search(pattern, content)
 
     if not config_match:
-        print('Appended powerline configuration in vimrc')
+        LOGGER.info('Appended powerline configuration in vimrc')
+
         with open(vimrc, 'a') as text_file:
             text_file.write(f'\n{config}\n')
         return
@@ -105,7 +120,7 @@ def write_vim_config():
     current_config = config_match[0]
 
     if current_config == config:
-        print('Powerline already configured in vimrc')
+        LOGGER.info('Powerline already configured in vimrc')
         return
 
     start, end = config_match.span()
@@ -113,7 +128,8 @@ def write_vim_config():
 
     with open(vimrc, 'w') as text_file:
         text_file.write(content)
-    print('Powerline configuration updated in vimrc')
+
+    LOGGER.info('Powerline configuration updated in vimrc')
 
 def configure_user_config_directory() -> bool:
     '''
@@ -128,13 +144,34 @@ def configure_user_config_directory() -> bool:
 
     if directory_found != 0:
         command = f'mkdir {home_dir}/.config'
-        call(command.split())
+        with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
+            out, err = process.communicate()
+
+            if err:
+                LOGGER.error(err.decode('utf-8'))
+                sys.exit()
+            else:
+                LOGGER.info(out.decode('utf-8'))
 
     command = f'mkdir {user_config_dir}'
-    call(command.split())
+    with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
+        out, err = process.communicate()
+
+        if err:
+            LOGGER.error(err.decode('utf-8'))
+            sys.exit()
+        else:
+            LOGGER.info(out.decode('utf-8'))
 
     command = f'cp -r {system_config_dir} {user_config_dir}'
-    call(command.split())
+    with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
+        out, err = process.communicate()
+
+        if err:
+            LOGGER.error(err.decode('utf-8'))
+            sys.exit()
+        else:
+            LOGGER.info(out.decode('utf-8'))
 
 def install_fonts():
     '''
@@ -146,17 +183,38 @@ def install_fonts():
     # Download & install fonts
     source = f'git@github.com:{git_username}/fonts.git'
     command = f'git clone {source}'
-    call(command.split(), cwd=f'{user_config_dir}')
+    with Popen(command.split(), stdout=PIPE, stderr=PIPE, cwd=f'{user_config_dir}') as process:
+        out, err = process.communicate()
+
+        if err:
+            LOGGER.error(err.decode('utf-8'))
+            sys.exit()
+        else:
+            LOGGER.info(out.decode('utf-8'))
 
     command = '/bin/bash ./install.sh'
-    call(command.split(), cwd=f'{user_config_dir}/fonts')
+    with Popen(command.split(), stdout=PIPE, stderr=PIPE, cwd=f'{user_config_dir}/fonts') as process:
+        out, err = process.communicate()
+
+        if err:
+            LOGGER.error(err.decode('utf-8'))
+            sys.exit()
+        else:
+            LOGGER.info(out.decode('utf-8'))
 
 def install_gitstatus_at_user():
     '''
     Installs powerline-gitstatus at user level of system
     '''
     command = 'pip3 install --user powerline-gitstatus'
-    check_call(command.split())
+    with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
+        out, err = process.communicate()
+
+        if err:
+            LOGGER.error(err.decode('utf-8'))
+            sys.exit()
+        else:
+            LOGGER.info(out.decode('utf-8'))
 
 def config_git_colorscheme():
     '''
@@ -172,7 +230,7 @@ def config_git_colorscheme():
         default_group, config_group = default_data['groups'], config_data['groups']
 
         if all([group in default_group for group in config_group]):
-            print('Color scheme for git status for powerline is already configured')
+            LOGGER.info('Color scheme for git status for powerline is already configured')
             return
 
         data = default_data
@@ -180,7 +238,8 @@ def config_git_colorscheme():
 
     with open(default_block, 'w+', encoding='utf-8') as default_json:
         json.dump(data, default_json, ensure_ascii=False, indent=4)
-    print('Finish configuring color scheme for git status in powerline!')
+
+    LOGGER.info('Finish configuring color scheme for git status in powerline!')
 
 def config_git_shell():
     '''
@@ -197,7 +256,7 @@ def config_git_shell():
 
         for function in function_list:
             if function == config_data:
-                print('Shell for git stats for powerline is already configured')
+                LOGGER.info('Shell for git stats for powerline is already configured')
                 return
 
         function_list.append(config_data)
@@ -206,14 +265,22 @@ def config_git_shell():
 
     with open(default_block, 'w+', encoding='utf-8') as default_json:
         json.dump(data, default_json, ensure_ascii=False, indent=4)
-    print('Finish configuring shell for git status in powerline!')
+
+    LOGGER.info('Finish configuring shell for git status in powerline!')
 
 def uninstall_gitstatus():
     '''
     Uninstalls git powerline status at user level of system
     '''
     command = 'pip3 uninstall powerline-gitstatus'
-    check_call(command.split())
+    with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
+        out, err = process.communicate()
+
+        if err:
+            LOGGER.error(err.decode('utf-8'))
+            sys.exit()
+        else:
+            LOGGER.info(out.decode('utf-8'))
 
 def delete_fonts():
     '''
@@ -221,11 +288,25 @@ def delete_fonts():
     '''
     user_config_dir = SETUP.dir['powerline_config']
 
-    command = '/bin/bash ./uninstall.sh'
-    call(command.split(), cwd=f'{user_config_dir}/fonts')
+    command = f'/bin/bash {user_config_dir}/fonts/uninstall.sh'
+    with Popen(command.split, stdout=PIPE, stderr=PIPE) as process:
+        out, err = process.communicate()
 
-    command = f'rm -rf /fonts'
-    call(command.split(), cwd=f'{user_config_dir}')
+        if err:
+            LOGGER.error(err.decode('utf-8'))
+            sys.exit()
+        else:
+            LOGGER.info(out.decode('utf-8'))
+
+    command = f'rm -rf {user_config_dir}/fonts'
+    with Popen(command.split, stdout=PIPE, stderr=PIPE) as process:
+        out, err = process.communicate()
+
+        if err:
+            LOGGER.error(err.decode('utf-8'))
+            sys.exit()
+        else:
+            LOGGER.info(out.decode('utf-8'))
 
 def delete_config():
     '''
@@ -234,7 +315,15 @@ def delete_config():
     user_config_dir = SETUP.dir['powerline_config']
 
     command = f'rm -rf {user_config_dir}'
-    call(command.split())
+
+    with Popen(command.split, stdout=PIPE, stderr=PIPE) as process:
+        out, err = process.communicate()
+
+        if err:
+            LOGGER.error(err.decode('utf-8'))
+            sys.exit()
+        else:
+            LOGGER.info(out.decode('utf-8'))
 
 def remove_bash_daemon():
     '''
@@ -260,7 +349,7 @@ def remove_bash_daemon():
     config_match = re.search(pattern, content)
 
     if not config_match:
-        print('Powerline configuration in bash profile already removed')
+        LOGGER.info('Powerline configuration in bash profile already removed')
         return
 
     start, end = config_match.span()
@@ -268,7 +357,8 @@ def remove_bash_daemon():
 
     with open(bash_profile, 'w') as text_file:
         text_file.write(content)
-    print('Powerline configuration removed in bash profile')
+
+    LOGGER.info('Powerline configuration removed in bash profile')
 
 def remove_vim_config():
     '''
@@ -293,7 +383,7 @@ def remove_vim_config():
     config_match = re.search(pattern, content)
 
     if not config_match:
-        print('Powerline configuration in vimrc already removed')
+        LOGGER.info('Powerline configuration in vimrc already removed')
         return
 
     start, end = config_match.span()
@@ -301,11 +391,19 @@ def remove_vim_config():
 
     with open(vimrc, 'w') as text_file:
         text_file.write(content)
-    print('Powerline configuration removed  in vimrc')
+
+    LOGGER.info('Powerline configuration removed in vimrc')
 
 def uninstall_powerline():
     '''
     Uninstalls the powerline tool
     '''
     command = 'pip3 uninstall powerline-status'
-    check_call(command.split())
+    with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
+        out, err = process.communicate()
+
+        if err:
+            LOGGER.error(err.decode('utf-8'))
+            sys.exit()
+        else:
+            LOGGER.info(out.decode('utf-8'))

@@ -1,12 +1,16 @@
 # Sensitive files
 /config/git-credentials.txt
 
+# Log files
+/logs/*
+
 # Git directories
 /config/vim/vim-settings/
 /config/bash/bash-settings/
 
 # Vim files
 *.swp
+*.swo
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

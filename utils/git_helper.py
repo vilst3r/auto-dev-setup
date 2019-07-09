@@ -3,12 +3,15 @@ Module delegated to handling git logic
 '''
 
 # System/Third-Party modules
+import logging
 import re
 import sys
 
 # Custom modules
 from utils.setup_wrapper import SETUP
 from utils.github_wrapper import GITHUB
+
+LOGGER = logging.getLogger()
 
 def read_git_credentials() -> dict:
     '''
@@ -27,8 +30,9 @@ def read_git_credentials() -> dict:
         with open(git_credentials, 'w') as text_file:
             for prop in valid_properties:
                 text_file.write(f'{prop}: <INSERT OWN VALUE>\n')
-        print(ierr)
-        print(f'Git credential file does not exist - file now generated in {git_credentials}')
+
+        LOGGER.error(ierr)
+        LOGGER.error(f'Git credential file does not exist - file now generated in {git_credentials}')
         sys.exit()
 
     for line in buff:
@@ -36,11 +40,14 @@ def read_git_credentials() -> dict:
         key, val = key.strip(), val.strip()
 
         if not key or not val:
-            raise Exception('Git credentials are not configured properly')
+            LOGGER.error('Git credentials are not configured properly')
+            sys.exit()
         if key not in valid_properties:
-            raise Exception('Git property is invalid')
+            LOGGER.error('Git property is invalid')
+            sys.exit()
         if val[0] == '<' or val[-1] == '>':
-            raise Exception('Git value of property is unset or invalid')
+            LOGGER.error('Git value of property is unset or invalid')
+            sys.exit()
 
         res[key] = val
     return res
@@ -67,21 +74,21 @@ def update_ssh_config():
     if not key_match:
         with open(ssh_config, 'a') as text_file:
             text_file.write(identity_val)
-        print('IdentityFile key value appended to ssh config file')
+        LOGGER.info('IdentityFile key value appended to ssh config file')
         return
 
     start, end = key_match.span()
     current_config = content[start:end]
 
     if current_config == identity_val:
-        print('IdentityFile key value already configured in ssh config file')
+        LOGGER.info('IdentityFile key value already configured in ssh config file')
         return
 
     content = content[:start] + identity_val + content[end:]
     with open(ssh_config, 'w') as text_file:
         text_file.write(content)
 
-    print('IdentityFile key value updated in ssh config file')
+    LOGGER.info('IdentityFile key value updated in ssh config file')
 
 def github_public_key_exists(current_key: str, public_keys: list) -> bool:
     '''
@@ -103,7 +110,7 @@ def delete_github_pub_key(current_key: str, public_keys: list):
     for key in public_keys:
         if re.match(pattern, key['key']):
             GITHUB.delete_public_key(key['id'])
-            print('Provided public key now deleted from github account')
+            LOGGER.info('Provided public key now deleted from github account')
             return
 
 def remove_ssh_config():
@@ -124,7 +131,7 @@ def remove_ssh_config():
     key_match = re.search(pattern, content)
 
     if not key_match:
-        print('IdentityFile key value already deleted from ssh config file')
+        LOGGER.info('IdentityFile key value already deleted from ssh config file')
         return
 
     start, end = key_match.span()
@@ -133,7 +140,7 @@ def remove_ssh_config():
     with open(ssh_config, 'w') as text_file:
         text_file.write(content)
 
-    print('IdentityFile key value is now removed from ssh config file')
+    LOGGER.info('IdentityFile key value is now removed from ssh config file')
 
 def remove_ssh_github_host():
     '''
@@ -152,7 +159,7 @@ def remove_ssh_github_host():
     key_match = re.search(pattern, content)
 
     if not key_match:
-        print('Github host value already deleted from known_host file')
+        LOGGER.info('Github host value already deleted from known_host file')
         return
 
     start, end = key_match.span()
@@ -161,4 +168,4 @@ def remove_ssh_github_host():
     with open(known_hosts, 'w') as text_file:
         text_file.write(content)
 
-    print('Github host value is now removed from known_host file')
+    LOGGER.info('Github host value is now removed from known_host file')
