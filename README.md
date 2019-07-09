@@ -3,7 +3,7 @@
 Python scripts to replicate personal development environment across any machine with proper packaging and editor profiles and settings. Linux machine environment only.
 
 # Requirements
-- Python 3 system binary installed to run the script
+- Python3 to run the script
 - Run `pip3 install -r requirements` to fetch all script dependencies
 
 # Automated Process
