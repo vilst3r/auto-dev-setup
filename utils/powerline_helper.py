@@ -7,7 +7,7 @@ import logging
 import sys
 import re
 import json
-from subprocess import Popen, call, PIPE
+from subprocess import Popen, call, PIPE, DEVNULL
 
 # Custom modules
 from utils.setup_wrapper import SETUP
@@ -142,7 +142,7 @@ def configure_user_config_directory() -> bool:
     system_config_dir = f'{SETUP.dir["python_site"]}/powerline/config_files/'
 
     command = f'find {home_dir}/.config'
-    directory_found = call(command.split())
+    directory_found = call(command.split(), stdout=DEVNULL)
 
     if directory_found != 0:
         command = f'mkdir {home_dir}/.config'

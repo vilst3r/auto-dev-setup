@@ -84,7 +84,7 @@ def install_that_brew(package: str):
     Downloads & Installs the single package if it's valid
     '''
     command = f'brew info {package}'
-    package_found = call(command.split())
+    package_found = call(command.split(), stdout=DEVNULL)
 
     if package_found != 0:
         LOGGER.warn(f'This package does not exist in registry - {package}')
@@ -134,7 +134,7 @@ def install_that_cask(package: str):
     Downloads & Installs the single package if it's valid
     '''
     command = f'brew cask info {package}'
-    package_found = call(command.split())
+    package_found = call(command.split(), stdout=DEVNULL))
 
     if package_found != 0:
         LOGGER.warn(f'This package does not exist in registry - {package}')
