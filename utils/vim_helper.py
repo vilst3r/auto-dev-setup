@@ -98,8 +98,11 @@ def remove_color_themes():
         LOGGER.info('Vim color themes already removed')
         return
 
-    command = f'rm {vim_color_dir}/*.vim'
-    with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
+    command_list = []
+    command_list.append('sh')
+    command_list.append('-c')
+    command_list.append(f'rm {vim_color_dir}/*.vim')
+    with Popen(command_list, stdout=PIPE, stderr=PIPE) as process:
         out, err = process.communicate()
 
         if err:

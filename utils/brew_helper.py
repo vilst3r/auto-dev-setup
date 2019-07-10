@@ -102,7 +102,7 @@ def install_all_brew_packages():
                 sys.exit()
             else:
                 LOGGER.debug(out.decode('utf-8'))
-                LOGGER.info('{package} - successfully installed')
+                LOGGER.info(f'{package} - successfully installed')
 
 def install_all_cask_packages():
     '''
@@ -152,7 +152,7 @@ def install_all_cask_packages():
                 sys.exit()
             else:
                 LOGGER.debug(out.decode('utf-8'))
-                LOGGER.info('{package} - successfully installed')
+                LOGGER.info(f'{package} - successfully installed')
 
 def uninstall_brew():
     '''

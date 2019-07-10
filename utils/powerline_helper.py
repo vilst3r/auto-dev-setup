@@ -174,7 +174,7 @@ def install_fonts():
         LOGGER.info('Powerline fonts are already installed')
         return
 
-    command = 'mkdir -p {destination}'
+    command = f'mkdir -p {destination}'
     call(command.split(), stdout=DEVNULL)
 
     command = f'git clone {source} {destination}'
@@ -281,8 +281,8 @@ def uninstall_gitstatus():
         return
 
     command = 'pip3 uninstall powerline-gitstatus'
-    with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
-        out, err = process.communicate()
+    with Popen(command.split(), stdin=PIPE, stdout=PIPE, stderr=PIPE) as process:
+        out, err = process.communicate(input=b'y\n')
 
         if err:
             LOGGER.error(err.decode('utf-8'))
@@ -438,8 +438,8 @@ def uninstall_powerline_status():
         return
 
     command = 'pip3 uninstall powerline-status'
-    with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
-        out, err = process.communicate()
+    with Popen(command.split(), stdin=PIPE, stdout=PIPE, stderr=PIPE) as process:
+        out, err = process.communicate(input=b'y\n')
 
         if err:
             LOGGER.error(err.decode('utf-8'))
