@@ -141,33 +141,9 @@ def configure_user_config_directory() -> bool:
     user_config_dir = SETUP.dir['powerline_config']
     system_config_dir = f'{SETUP.dir["python_site"]}/powerline/config_files/'
 
-    command = f'find {home_dir}/.config'
-    directory_found = call(command.split(), stdout=DEVNULL) == 0
-
-    if not directory_found:
-        command = f'mkdir {home_dir}/.config'
-        with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
-            out, err = process.communicate()
-
-            if err:
-                LOGGER.error(err.decode('utf-8'))
-                LOGGER.error(f'Failed to create - {home_dir}/.config')
-                sys.exit()
-            else:
-                LOGGER.debug(out.decode('utf-8'))
-                LOGGER.info(f'{home_dir}/.config - has been created')
-
-    command = f'mkdir {user_config_dir}'
-    with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
-        out, err = process.communicate()
-
-        if err:
-            LOGGER.error(err.decode('utf-8'))
-            LOGGER.error(f'Failed to create - {user_config_dir}')
-            sys.exit()
-        else:
-            LOGGER.debug(out.decode('utf-8'))
-            LOGGER.info(f'{user_config_dir} - has been created')
+    command = f'mkdir -p {user_config_dir}'
+    call(command.split(), stdout=DEVNULL)
+    LOGGER.info(f'{user_config_dir} - has been created')
 
     command = f'cp -r {system_config_dir} {user_config_dir}'
     with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:

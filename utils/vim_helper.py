@@ -67,16 +67,9 @@ def configure_color_themes():
     home_dir = SETUP.dir['home']
     vim_color_dir = f'{home_dir}/.vim/colors'
 
-    command = f'mkdir {vim_color_dir}'
-    with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
-        out, err = process.communicate()
-
-        if err:
-            LOGGER.error(err.decode('utf-8'))
-            LOGGER.error(f'Failed to create - {vim_color_dir}')
-        else:
-            LOGGER.debug(out.decode('utf-8'))
-            LOGGER.info(f'{vim_color_dir} - has been created')
+    command = f'mkdir -p {vim_color_dir}'
+    subprocess.call(command.split(), stdout=DEVNULL)
+    LOGGER.info(f'{vim_color_dir} - has been created')
 
     command_list = []
     command_list.append('sh')
