@@ -22,7 +22,7 @@ LOGGER = logging.getLogger()
 
 def install_brew_packages():
     '''
-    Install brew packages 
+    Install brew packages
     '''
     SETUP.print_process_step_start('Installing brew packages...')
 
@@ -71,7 +71,6 @@ def configure_git_ssh():
     ssh_helper.register_private_key_to_ssh_agent()
 
     current_public_key = ssh_helper.get_public_key()
-    public_keys = GITHUB.get_public_keys().json()
 
     payload = {}
     payload['title'] = 'script-env-pub-key'

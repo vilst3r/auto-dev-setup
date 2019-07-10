@@ -34,7 +34,6 @@ def generate_rsa_keypair():
     Generate asymmetric public/private keypair for ssh use
     '''
     command = f'ssh-keygen -t rsa -b 4096 -C \"{GITHUB.email}\" -N foobar'
-
     with Popen(command.split(), stdin=PIPE, stdout=PIPE, stderr=PIPE) as process:
         out, err = process.communicate(input=b'\ny\n')
 
@@ -142,7 +141,6 @@ def stop_ssh_agent():
     pid = out.decode('utf-8').split()[1]
 
     command = f'kill {pid}'
-
     with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
         out, err = process.communicate()
 

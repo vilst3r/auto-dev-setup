@@ -5,7 +5,6 @@ Module delegated to handling git logic
 # System/Third-Party modules
 import logging
 import re
-import sys
 
 # Custom modules
 from utils.setup_wrapper import SETUP
@@ -80,7 +79,7 @@ def delete_github_pub_key(current_key: str, public_keys: list):
             GITHUB.delete_public_key(key['id'])
             LOGGER.info('Provided public key now deleted from github account')
             return
-    LOGGER.warn('Provided public key does not exist on GitHub or incorrect arguments')
+    LOGGER.warning('Provided public key does not exist on GitHub or incorrect arguments')
 
 def remove_ssh_config():
     '''

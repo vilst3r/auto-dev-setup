@@ -4,6 +4,7 @@ Python scripts to replicate personal development environment across any machine 
 
 # Requirements
 - Python3 to run the script
+- Latest version of pip3 otherwise the script requires a second run to complete
 - Run `pip3 install -r requirements` to fetch all script dependencies
 
 # Automated Process
@@ -16,7 +17,6 @@ Python scripts to replicate personal development environment across any machine 
 7. Install & Configure powerline
 
 # Notes
-- Configure iterm2 font to configure last step of powerline
-- iTerm2 configuration left to manual user intervention
-    - Add script to restart powerline-daemon
-        - `powerline-daemon -r`
+- iTerm2 configuration left to manual user configuration through the GUI
+- Add script to restart powerline-daemon
+    - `powerline-daemon -r`

@@ -53,7 +53,6 @@ def tap_brew_cask():
     Self explanatory
     '''
     command = 'brew tap caskroom/cask'
-
     with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
         out, err = process.communicate()
         tapped_successfully = process.returncode == 0
@@ -91,7 +90,7 @@ def install_all_brew_packages():
         package_found = call(command.split(), stdout=DEVNULL) == 0
 
         if not package_found:
-            LOGGER.warn(f'This package does not exist in registry - {package}')
+            LOGGER.warning(f'This package does not exist in registry - {package}')
             continue
 
         command = f'brew install {package}'
@@ -100,8 +99,8 @@ def install_all_brew_packages():
             installed_successfully = process.returncode == 0
 
             if err and not installed_successfully:
-                LOGGER.warn(err.decode('utf-8'))
-                LOGGER.warn(f'{package} - issue during installation')
+                LOGGER.warning(err.decode('utf-8'))
+                LOGGER.warning(f'{package} - issue during installation')
             else:
                 LOGGER.debug(out.decode('utf-8'))
                 LOGGER.info(f'{package} - successfully installed')
@@ -110,13 +109,13 @@ def install_all_cask_packages():
     '''
     Downloads & installs every package config if it's valid
     '''
-    command = 'brew cask list'
     output = None
+    command = 'brew cask list'
     with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
         out, err = process.communicate()
 
         if err:
-            LOGGER.warn(err.decode('utf-8'))
+            LOGGER.warning(err.decode('utf-8'))
         else:
             LOGGER.debug(out.decode('utf-8'))
             output = out
@@ -140,7 +139,7 @@ def install_all_cask_packages():
         package_found = call(command.split(), stdout=DEVNULL) == 0
 
         if not package_found:
-            LOGGER.warn(f'This package does not exist in registry - {package}')
+            LOGGER.warning(f'This package does not exist in registry - {package}')
             return
 
         command = f'brew cask install {package}'
@@ -149,8 +148,8 @@ def install_all_cask_packages():
             installed_successfully = process.returncode == 0
 
             if err and not installed_successfully:
-                LOGGER.warn(err.decode('utf-8'))
-                LOGGER.warn(f'{package} - issue during installation')
+                LOGGER.warning(err.decode('utf-8'))
+                LOGGER.warning(f'{package} - issue during installation')
             else:
                 LOGGER.debug(out.decode('utf-8'))
                 LOGGER.info(f'{package} - successfully installed')

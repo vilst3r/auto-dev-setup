@@ -30,7 +30,6 @@ def pull_vim_settings():
         return
 
     command = f'git clone {source} {destination}'
-
     with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
         out, err = process.communicate()
         cloned_successfully = process.returncode == 0
@@ -50,7 +49,6 @@ def configure_vimrc():
     home_dir = SETUP.dir['home']
 
     command = f'cp config/vim/vim-settings/.vimrc {home_dir}/.vimrc'
-
     with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
         out, err = process.communicate()
 
@@ -126,7 +124,6 @@ def remove_vim_settings():
         return
 
     command = 'rm -rf config/vim/vim-settings'
-
     with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
         out, err = process.communicate()
 

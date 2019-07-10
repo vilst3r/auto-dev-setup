@@ -49,7 +49,6 @@ def configure_bash_profile():
     home_dir = SETUP.dir['home']
 
     command = f'cp config/bash/bash-settings/.bash_profile {home_dir}/.bash_profile'
-
     with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
         out, err = process.communicate()
 
@@ -73,7 +72,6 @@ def remove_bash_settings():
         return
 
     command = 'rm -rf config/bash/bash-settings'
-
     with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
         out, err = process.communicate()
 

@@ -20,7 +20,6 @@ def install_powerline_at_user():
     Installs the powerline tool at the user level of the system
     '''
     command = 'pip3 install --user powerline-status'
-
     with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
         out, err = process.communicate()
 
@@ -137,7 +136,6 @@ def configure_user_config_directory() -> bool:
     '''
     Checks & creates proper directory for the powerline configs to go
     '''
-    home_dir = SETUP.dir['home']
     user_config_dir = SETUP.dir['powerline_config']
     system_config_dir = f'{SETUP.dir["python_site"]}/powerline/config_files/'
 
@@ -303,8 +301,7 @@ def delete_fonts():
     '''
     user_config_dir = SETUP.dir['powerline_config']
     uninstall_font_script = f'{user_config_dir}/fonts/uninstall.sh'
-    
-    
+
     command = f'find {uninstall_font_script}'
     script_exists = call(command.split(), stdout=DEVNULL) == 0
 
@@ -334,7 +331,7 @@ def delete_fonts():
             sys.exit()
         else:
             LOGGER.debug(out.decode('utf-8'))
-            LOGGER.info('Powerline fonts in the user config directory has successfully been removed')
+            LOGGER.info('Powerline fonts in user config directory has successfully been removed')
 
 def delete_config():
     '''
@@ -350,7 +347,6 @@ def delete_config():
         return
 
     command = f'rm -rf {user_config_dir}'
-
     with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
         out, err = process.communicate()
 
@@ -360,7 +356,7 @@ def delete_config():
             sys.exit()
         else:
             LOGGER.debug(out.decode('utf-8'))
-            LOGGER.info('Powerline config has successfully been removed at the user config directory')
+            LOGGER.info('Powerline config has successfully been removed at user config directory')
 
 def remove_bash_daemon():
     '''
