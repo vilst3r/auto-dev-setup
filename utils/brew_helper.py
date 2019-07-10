@@ -38,8 +38,9 @@ def install_brew():
     command_list.append(f'{ruby_bin} -e \"$(curl -fsSL {brew_url})\"')
     with Popen(command_list, stdin=PIPE, stdout=PIPE, stderr=PIPE) as process:
         out, err = process.communicate()
+        brew_installed = process.returncode == 0
 
-        if err:
+        if err and not brew_installed:
             LOGGER.error(err.decode('utf-8'))
             LOGGER.error('Homebrew failed to install')
             sys.exit()
@@ -55,14 +56,15 @@ def tap_brew_cask():
 
     with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
         out, err = process.communicate()
+        tapped_successfully = process.returncode == 0
 
-        if err:
+        if err and not tapped_successfully:
             LOGGER.error(err.decode('utf-8'))
-            LOGGER.error('Brew cask failed to tap into')
+            LOGGER.error('Brew failed to tap into cask')
             sys.exit()
         else:
             LOGGER.debug(out.decode('utf-8'))
-            LOGGER.info('Brew cask has successfully been tapped into')
+            LOGGER.info('Brew has successfully tapped into cask')
 
 def install_all_brew_packages():
     '''
@@ -95,11 +97,11 @@ def install_all_brew_packages():
         command = f'brew install {package}'
         with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
             out, err = process.communicate()
+            installed_successfully = process.returncode == 0
 
-            if err:
-                LOGGER.error(err.decode('utf-8'))
-                LOGGER.error(f'Error installing the package - {package}')
-                sys.exit()
+            if err and not installed_successfully:
+                LOGGER.warn(err.decode('utf-8'))
+                LOGGER.warn(f'{package} - issue during installation')
             else:
                 LOGGER.debug(out.decode('utf-8'))
                 LOGGER.info(f'{package} - successfully installed')
@@ -114,8 +116,7 @@ def install_all_cask_packages():
         out, err = process.communicate()
 
         if err:
-            LOGGER.error(err.decode('utf-8'))
-            sys.exit()
+            LOGGER.warn(err.decode('utf-8'))
         else:
             LOGGER.debug(out.decode('utf-8'))
             output = out
@@ -145,11 +146,11 @@ def install_all_cask_packages():
         command = f'brew cask install {package}'
         with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
             out, err = process.communicate()
+            installed_successfully = process.returncode == 0
 
-            if err:
-                LOGGER.error(err.decode('utf-8'))
-                LOGGER.error(f'Error installing the package - {package}')
-                sys.exit()
+            if err and not installed_successfully:
+                LOGGER.warn(err.decode('utf-8'))
+                LOGGER.warn(f'{package} - issue during installation')
             else:
                 LOGGER.debug(out.decode('utf-8'))
                 LOGGER.info(f'{package} - successfully installed')

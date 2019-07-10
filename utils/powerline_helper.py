@@ -174,14 +174,12 @@ def install_fonts():
         LOGGER.info('Powerline fonts are already installed')
         return
 
-    command = f'mkdir -p {destination}'
-    call(command.split(), stdout=DEVNULL)
-
     command = f'git clone {source} {destination}'
     with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
         out, err = process.communicate()
+        cloned_successfully = process.returncode == 0
 
-        if err:
+        if err and not cloned_successfully:
             LOGGER.error(err.decode('utf-8'))
             LOGGER.error('Failed to clone powerline fonts from github')
             sys.exit()

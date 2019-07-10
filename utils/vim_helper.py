@@ -19,21 +19,23 @@ def pull_vim_settings():
     '''
     git_username = GITHUB.username
 
-    command = 'find config/vim/vim-settings'
+    source = f'git@github.com:{git_username}/vim-settings.git'
+    destination = f'config/vim/vim-settings'
+
+    command = f'find {destination}'
     directory_found = call(command.split(), stdout=DEVNULL) == 0
 
     if directory_found:
         LOGGER.info('Vim settings already pulled from git')
         return
 
-    source = f'git@github.com:{git_username}/vim-settings.git'
-    destination = f'config/vim/vim-settings'
     command = f'git clone {source} {destination}'
 
     with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
         out, err = process.communicate()
+        cloned_successfully = process.returncode == 0
 
-        if err:
+        if err and not cloned_successfully:
             LOGGER.error(err.decode('utf-8'))
             LOGGER.error('Failed to clone vim settings from github')
             sys.exit()
