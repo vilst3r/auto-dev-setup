@@ -273,6 +273,13 @@ def uninstall_gitstatus():
     '''
     Uninstalls git powerline status at user level of system
     '''
+    command = 'which pip3'
+    bin_exists = call(command.split(), stdout=DEVNULL) == 0
+
+    if not bin_exists:
+        LOGGER.info('Powerline-gitstatus has already been uninstalled')
+        return
+
     command = 'pip3 show powerline-gitstatus'
     package_found = call(command.split(), stdout=DEVNULL) == 0
 
@@ -430,6 +437,13 @@ def uninstall_powerline_status():
     '''
     Uninstalls the powerline tool
     '''
+    command = 'which pip3'
+    bin_exists = call(command.split(), stdout=DEVNULL) == 0
+
+    if not bin_exists:
+        LOGGER.info('Powerline-gitstatus has already been uninstalled')
+        return
+
     command = 'pip3 show powerline-status'
     package_found = call(command.split(), stdout=DEVNULL) == 0
 

@@ -106,9 +106,8 @@ def remove_color_themes():
         out, err = process.communicate()
 
         if err:
-            LOGGER.error(err.decode('utf-8'))
-            LOGGER.error('Failed to remove vim color themes')
-            sys.exit()
+            LOGGER.debug(err.decode('utf-8'))
+            LOGGER.info('Vim color themes has already been removed')
         else:
             LOGGER.debug(out.decode('utf-8'))
             LOGGER.info('Vim color themes has successfully been removed')

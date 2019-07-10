@@ -158,6 +158,13 @@ def uninstall_brew():
     '''
     Uninstalls brew from the web via git
     '''
+    command = 'which brew'
+    bin_exists = call(command.split(), stdout=DEVNULL) == 0
+
+    if not bin_exists:
+        LOGGER.info('Homebrew is already uninstalled')
+        return
+
     ruby_bin = '/usr/bin/ruby'
     brew_url = 'https://raw.githubusercontent.com/Homebrew/install/master/uninstall'
 
@@ -174,4 +181,4 @@ def uninstall_brew():
             sys.exit()
         else:
             LOGGER.debug(out.decode('utf-8'))
-            LOGGER.info('Homebrew has succesffully been uninstalled')
+            LOGGER.info('Homebrew has successfully been uninstalled')

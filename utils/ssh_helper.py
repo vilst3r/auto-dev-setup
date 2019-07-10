@@ -23,7 +23,7 @@ def public_key_exists() -> bool:
     file_found = call(command.split(), stdout=DEVNULL, stderr=DEVNULL) == 0
 
     if not file_found:
-        LOGGER.info('Git SSH hasn\'t been configured locally - configuring now...')
+        LOGGER.info('Git SSH hasn\'t been configured locally')
     else:
         LOGGER.info('Git SSH has been configured locally')
 

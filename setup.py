@@ -61,10 +61,7 @@ def configure_git_ssh():
     '''
     SETUP.print_process_step_start('Configuring Git SSH...')
 
-    current_public_key = ssh_helper.get_public_key()
-    public_keys = GITHUB.get_public_keys().json()
-
-    if ssh_helper.public_key_exists() and git_helper.github_public_key_exists(current_public_key, public_keys):
+    if ssh_helper.public_key_exists() and git_helper.public_key_exists_on_github():
         SETUP.print_process_step_finish('Git SSH is already configured!')
         return
 
@@ -72,6 +69,9 @@ def configure_git_ssh():
     ssh_helper.start_ssh_agent()
     git_helper.update_ssh_config()
     ssh_helper.register_private_key_to_ssh_agent()
+
+    current_public_key = ssh_helper.get_public_key()
+    public_keys = GITHUB.get_public_keys().json()
 
     payload = {}
     payload['title'] = 'script-env-pub-key'

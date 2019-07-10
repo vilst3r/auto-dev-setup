@@ -10,6 +10,7 @@ import sys
 # Custom modules
 from utils.setup_wrapper import SETUP
 from utils.github_wrapper import GITHUB
+import utils.ssh_helper as ssh_helper
 
 LOGGER = logging.getLogger()
 
@@ -51,10 +52,13 @@ def update_ssh_config():
 
     LOGGER.info('IdentityFile key value updated in ssh config file')
 
-def github_public_key_exists(current_key: str, public_keys: list) -> bool:
+def public_key_exists_on_github() -> bool:
     '''
     Check if current public key passed in exists on github
     '''
+    current_key = ssh_helper.get_public_key()
+    public_keys = GITHUB.get_public_keys().json()
+
     pattern = re.compile(re.escape(current_key))
 
     for key in public_keys:
