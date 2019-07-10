@@ -19,21 +19,22 @@ def pull_bash_settings():
     '''
     git_username = GITHUB.username
 
-    command = 'find config/bash/bash-settings'
-    directory_found = call(command.split(), stdout=DEVNULL)
+    source = f'git@github.com:{git_username}/bash-settings.git'
+    destination = 'config/bash/bash-settings'
 
-    if directory_found == 0:
+    command = f'find {destination}'
+    directory_found = call(command.split(), stdout=DEVNULL) == 0
+
+    if directory_found:
         LOGGER.info('Bash settings already pulled from git')
         return
 
-    source = f'git@github.com:{git_username}/bash-settings.git'
-    destination = f'config/bash/bash-settings'
     command = f'git clone {source} {destination}'
-
     with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
         out, err = process.communicate()
+        cloned_successfully = process.returncode == 0
 
-        if err:
+        if err and not cloned_successfully:
             LOGGER.error(err.decode('utf-8'))
             LOGGER.error('Failed to clone bash settings from github')
             sys.exit()
@@ -65,9 +66,9 @@ def remove_bash_settings():
     Remove bash setting repository cloned from github
     '''
     command = 'find config/bash/bash-settings'
-    directory_found = call(command.split(), stdout=DEVNULL)
+    directory_found = call(command.split(), stdout=DEVNULL) == 0
 
-    if directory_found != 0:
+    if not directory_found:
         LOGGER.info('Bash settings already removed')
         return
 

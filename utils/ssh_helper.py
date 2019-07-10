@@ -20,31 +20,31 @@ def public_key_exists() -> bool:
     home_dir = SETUP.dir['home']
 
     command = f'find {home_dir}/.ssh/id_rsa.pub'
-    file_found = call(command.split(), stdout=DEVNULL, stderr=DEVNULL)
+    file_found = call(command.split(), stdout=DEVNULL, stderr=DEVNULL) == 0
 
-    if file_found != 0:
-        LOGGER.info('Git SSH hasn\'t been configured - configuring now...')
+    if not file_found:
+        LOGGER.info('Git SSH hasn\'t been configured locally')
+    else:
+        LOGGER.info('Git SSH has been configured locally')
 
-    return file_found == 0
+    return file_found
 
 def generate_rsa_keypair():
     '''
     Generate asymmetric public/private keypair for ssh use
     '''
-    git_email = GITHUB.email
-
-    command = f'ssh-keygen -t rsa -b 4096 -C \"{git_email}\" -N foobar'
+    command = f'ssh-keygen -t rsa -b 4096 -C \"{GITHUB.email}\" -N foobar'
 
     with Popen(command.split(), stdin=PIPE, stdout=PIPE, stderr=PIPE) as process:
         out, err = process.communicate(input=b'\ny\n')
 
         if err:
             LOGGER.error(err.decode('utf-8'))
-            LOGGER.error('RSA keypair for ssh has failed to generated')
+            LOGGER.error('RSA keypair for SSH has failed to generated')
             sys.exit()
         else:
             LOGGER.debug(out.decode('utf-8'))
-            LOGGER.info('RSA keypair for ssh has successfully been generated')
+            LOGGER.info('RSA keypair for SSH has successfully been generated')
 
 def start_ssh_agent():
     '''
@@ -73,16 +73,13 @@ def register_private_key_to_ssh_agent():
     home_dir = SETUP.dir['home']
 
     command = f'ssh-add -K {home_dir}/.ssh/id_rsa'
-    with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
-        out, err = process.communicate()
+    ssh_added = call(command.split(), stdout=DEVNULL) == 0
 
-        if err:
-            LOGGER.error(err.decode('utf-8'))
-            LOGGER.error('SSH private key has failed to be added to the ssh-agent')
-            sys.exit()
-        else:
-            LOGGER.debug(out.decode('utf-8'))
-            LOGGER.info('SSH private key has successfully been added to the ssh-agent')
+    if ssh_added:
+        LOGGER.info('SSH private key has successfully been added to the ssh-agent')
+    else:
+        LOGGER.error('SSH private key has failed to be added to the ssh-agent')
+        sys.exit()
 
 def get_public_key() -> str:
     '''

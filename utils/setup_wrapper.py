@@ -59,7 +59,7 @@ class SetupWrapper():
 
         LOGGER.info(f'{top}')
         LOGGER.info(step_str)
-        LOGGER.info(f'{bottom}')
+        LOGGER.info(f'{bottom}\n')
 
         self.step += 1
 

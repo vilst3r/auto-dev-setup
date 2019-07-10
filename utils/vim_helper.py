@@ -19,21 +19,23 @@ def pull_vim_settings():
     '''
     git_username = GITHUB.username
 
-    command = 'find config/vim/vim-settings'
-    directory_found = call(command.split(), stdout=DEVNULL)
+    source = f'git@github.com:{git_username}/vim-settings.git'
+    destination = f'config/vim/vim-settings'
 
-    if directory_found == 0:
+    command = f'find {destination}'
+    directory_found = call(command.split(), stdout=DEVNULL) == 0
+
+    if directory_found:
         LOGGER.info('Vim settings already pulled from git')
         return
 
-    source = f'git@github.com:{git_username}/vim-settings.git'
-    destination = f'config/vim/vim-settings'
     command = f'git clone {source} {destination}'
 
     with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
         out, err = process.communicate()
+        cloned_successfully = process.returncode == 0
 
-        if err:
+        if err and not cloned_successfully:
             LOGGER.error(err.decode('utf-8'))
             LOGGER.error('Failed to clone vim settings from github')
             sys.exit()
@@ -67,25 +69,18 @@ def configure_color_themes():
     home_dir = SETUP.dir['home']
     vim_color_dir = f'{home_dir}/.vim/colors'
 
-    command = f'mkdir {vim_color_dir}'
-    with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
-        out, err = process.communicate()
-
-        if err:
-            LOGGER.error(err.decode('utf-8'))
-            LOGGER.error(f'Failed to create - {vim_color_dir}')
-        else:
-            LOGGER.debug(out.decode('utf-8'))
-            LOGGER.info(f'{vim_color_dir} - has been created')
+    command = f'mkdir -p {vim_color_dir}'
+    call(command.split(), stdout=DEVNULL)
+    LOGGER.info(f'{vim_color_dir} - has been created')
 
     command_list = []
     command_list.append('sh')
     command_list.append('-c')
     command_list.append(f'cp config/vim/vim-settings/color_themes/*.vim {vim_color_dir}')
 
-    copy_result = call(command_list, stdout=DEVNULL)
+    files_copied = call(command_list, stdout=DEVNULL) == 0
 
-    if copy_result == 0:
+    if files_copied:
         LOGGER.info('Vim color themes copied to ~/.vim/colors')
     else:
         LOGGER.error('Error copying vim color themes in config')
@@ -98,14 +93,23 @@ def remove_color_themes():
     home_dir = SETUP.dir['home']
     vim_color_dir = f'{home_dir}/.vim/colors'
 
-    command = f'rm {vim_color_dir}/*.vim'
-    with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
+    command = f'find {vim_color_dir}'
+    directory_found = call(command.split(), stdout=DEVNULL) == 0
+
+    if not directory_found:
+        LOGGER.info('Vim color themes already removed')
+        return
+
+    command_list = []
+    command_list.append('sh')
+    command_list.append('-c')
+    command_list.append(f'rm {vim_color_dir}/*.vim')
+    with Popen(command_list, stdout=PIPE, stderr=PIPE) as process:
         out, err = process.communicate()
 
         if err:
-            LOGGER.error(err.decode('utf-8'))
-            LOGGER.error('Failed to remove vim color themes')
-            sys.exit()
+            LOGGER.debug(err.decode('utf-8'))
+            LOGGER.info('Vim color themes has already been removed')
         else:
             LOGGER.debug(out.decode('utf-8'))
             LOGGER.info('Vim color themes has successfully been removed')
@@ -115,9 +119,9 @@ def remove_vim_settings():
     Remove vim setting repository cloned from github
     '''
     command = 'find config/vim/vim-settings'
-    directory_found = call(command.split(), stdout=DEVNULL)
+    directory_found = call(command.split(), stdout=DEVNULL) == 0
 
-    if directory_found != 0:
+    if not directory_found:
         LOGGER.info('Vim settings already removed')
         return
 

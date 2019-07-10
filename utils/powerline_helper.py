@@ -7,7 +7,7 @@ import logging
 import sys
 import re
 import json
-from subprocess import Popen, call, PIPE
+from subprocess import Popen, call, PIPE, DEVNULL
 
 # Custom modules
 from utils.setup_wrapper import SETUP
@@ -141,33 +141,9 @@ def configure_user_config_directory() -> bool:
     user_config_dir = SETUP.dir['powerline_config']
     system_config_dir = f'{SETUP.dir["python_site"]}/powerline/config_files/'
 
-    command = f'find {home_dir}/.config'
-    directory_found = call(command.split())
-
-    if directory_found != 0:
-        command = f'mkdir {home_dir}/.config'
-        with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
-            out, err = process.communicate()
-
-            if err:
-                LOGGER.error(err.decode('utf-8'))
-                LOGGER.error(f'Failed to create - {home_dir}/.config')
-                sys.exit()
-            else:
-                LOGGER.debug(out.decode('utf-8'))
-                LOGGER.info(f'{home_dir}/.config - has been created')
-
-    command = f'mkdir {user_config_dir}'
-    with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
-        out, err = process.communicate()
-
-        if err:
-            LOGGER.error(err.decode('utf-8'))
-            LOGGER.error(f'Failed to create - {user_config_dir}')
-            sys.exit()
-        else:
-            LOGGER.debug(out.decode('utf-8'))
-            LOGGER.info(f'{user_config_dir} - has been created')
+    command = f'mkdir -p {user_config_dir}'
+    call(command.split(), stdout=DEVNULL)
+    LOGGER.info(f'{user_config_dir} - has been created')
 
     command = f'cp -r {system_config_dir} {user_config_dir}'
     with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
@@ -188,13 +164,22 @@ def install_fonts():
     git_username = GITHUB.username
     user_config_dir = SETUP.dir['powerline_config']
 
-    # Download & install fonts
     source = f'git@github.com:{git_username}/fonts.git'
-    command = f'git clone {source} {user_config_dir}/fonts'
+    destination = f'{user_config_dir}/fonts'
+
+    command = f'find {destination}'
+    directory_found = call(command.split(), stdout=DEVNULL) == 0
+
+    if directory_found:
+        LOGGER.info('Powerline fonts are already installed')
+        return
+
+    command = f'git clone {source} {destination}'
     with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
         out, err = process.communicate()
+        cloned_successfully = process.returncode == 0
 
-        if err:
+        if err and not cloned_successfully:
             LOGGER.error(err.decode('utf-8'))
             LOGGER.error('Failed to clone powerline fonts from github')
             sys.exit()
@@ -202,7 +187,7 @@ def install_fonts():
             LOGGER.debug(out.decode('utf-8'))
             LOGGER.info('Successfully cloned powerline fonts from github')
 
-    command = f'/bin/bash {user_config_dir}/fonts/install.sh'
+    command = f'/bin/bash {destination}/install.sh'
     with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
         out, err = process.communicate()
 
@@ -286,9 +271,23 @@ def uninstall_gitstatus():
     '''
     Uninstalls git powerline status at user level of system
     '''
+    command = 'which pip3'
+    bin_exists = call(command.split(), stdout=DEVNULL) == 0
+
+    if not bin_exists:
+        LOGGER.info('Powerline-gitstatus has already been uninstalled')
+        return
+
+    command = 'pip3 show powerline-gitstatus'
+    package_found = call(command.split(), stdout=DEVNULL) == 0
+
+    if not package_found:
+        LOGGER.info('Powerline-gitstatus has already been uninstalled')
+        return
+
     command = 'pip3 uninstall powerline-gitstatus'
-    with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
-        out, err = process.communicate()
+    with Popen(command.split(), stdin=PIPE, stdout=PIPE, stderr=PIPE) as process:
+        out, err = process.communicate(input=b'y\n')
 
         if err:
             LOGGER.error(err.decode('utf-8'))
@@ -303,9 +302,18 @@ def delete_fonts():
     Deletes all font files assosciated with powerline from installation
     '''
     user_config_dir = SETUP.dir['powerline_config']
+    uninstall_font_script = f'{user_config_dir}/fonts/uninstall.sh'
+    
+    
+    command = f'find {uninstall_font_script}'
+    script_exists = call(command.split(), stdout=DEVNULL) == 0
 
-    command = f'/bin/bash {user_config_dir}/fonts/uninstall.sh'
-    with Popen(command.split, stdout=PIPE, stderr=PIPE) as process:
+    if not script_exists:
+        LOGGER.info('Powerline fonts are already uninstalled')
+        return
+
+    command = f'/bin/bash {uninstall_font_script}'
+    with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
         out, err = process.communicate()
 
         if err:
@@ -317,7 +325,7 @@ def delete_fonts():
             LOGGER.info('Powerline fonts has successfully been uninstalled')
 
     command = f'rm -rf {user_config_dir}/fonts'
-    with Popen(command.split, stdout=PIPE, stderr=PIPE) as process:
+    with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
         out, err = process.communicate()
 
         if err:
@@ -334,9 +342,16 @@ def delete_config():
     '''
     user_config_dir = SETUP.dir['powerline_config']
 
+    command = f'find {user_config_dir}'
+    directory_found = call(command.split(), stdout=DEVNULL) == 0
+
+    if not directory_found:
+        LOGGER.info('Powerline config has already been removed')
+        return
+
     command = f'rm -rf {user_config_dir}'
 
-    with Popen(command.split, stdout=PIPE, stderr=PIPE) as process:
+    with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
         out, err = process.communicate()
 
         if err:
@@ -416,13 +431,27 @@ def remove_vim_config():
 
     LOGGER.info('Powerline configuration removed in vimrc')
 
-def uninstall_powerline():
+def uninstall_powerline_status():
     '''
     Uninstalls the powerline tool
     '''
+    command = 'which pip3'
+    bin_exists = call(command.split(), stdout=DEVNULL) == 0
+
+    if not bin_exists:
+        LOGGER.info('Powerline-gitstatus has already been uninstalled')
+        return
+
+    command = 'pip3 show powerline-status'
+    package_found = call(command.split(), stdout=DEVNULL) == 0
+
+    if not package_found:
+        LOGGER.info('Powerline-status has already been uninstalled')
+        return
+
     command = 'pip3 uninstall powerline-status'
-    with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
-        out, err = process.communicate()
+    with Popen(command.split(), stdin=PIPE, stdout=PIPE, stderr=PIPE) as process:
+        out, err = process.communicate(input=b'y\n')
 
         if err:
             LOGGER.error(err.decode('utf-8'))

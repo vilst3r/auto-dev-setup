@@ -24,51 +24,55 @@ def uninstall_powerline():
     '''
     Remove existing powerline configurations
     '''
-    SETUP.print_process_step_start('Uninstalling powerline')
+    SETUP.print_process_step_start('Uninstalling powerline...')
 
     powerline_helper.uninstall_gitstatus()
     powerline_helper.delete_fonts()
     powerline_helper.delete_config()
     powerline_helper.remove_bash_daemon()
     powerline_helper.remove_vim_config()
-    powerline_helper.uninstall_powerline()
+    powerline_helper.uninstall_powerline_status()
 
-    SETUP.print_process_step_finish('Powerline uninstalled')
+    SETUP.print_process_step_finish('Powerline uninstalled!')
 
 def uninstall_bash():
     '''
     Remove existing bash configurations
     '''
-    SETUP.print_process_step_start('Uninstalling bash')
+    SETUP.print_process_step_start('Uninstalling bash...')
     bash_helper.remove_bash_settings()
-    SETUP.print_process_step_finish('Bash uninstalled')
+    SETUP.print_process_step_finish('Bash uninstalled!')
 
 def uninstall_vim():
     '''
     Remove existing vim configurations
     '''
-    SETUP.print_process_step_start('Uninstalling vim')
+    SETUP.print_process_step_start('Uninstalling vim...')
 
     vim_helper.remove_color_themes()
     vim_helper.remove_vim_settings()
 
-    SETUP.print_process_step_finish('Vim uninstalled')
+    SETUP.print_process_step_finish('Vim uninstalled!')
 
 def uninstall_brew():
     '''
     Uninstall brew and cask together
     '''
-    SETUP.print_process_step_start('Uninstalling homebrew')
+    SETUP.print_process_step_start('Uninstalling homebrew...')
 
     brew_helper.uninstall_brew()
 
-    SETUP.print_process_step_finish('Homebrew uninstalled')
+    SETUP.print_process_step_finish('Homebrew uninstalled!')
 
 def uninstall_git_ssh():
     '''
     Remove existing git ssh configurations locally and on github
     '''
-    SETUP.print_process_step_start('Uninstalling Git SSH')
+    SETUP.print_process_step_start('Uninstalling Git SSH...')
+
+    if not ssh_helper.public_key_exists():
+        SETUP.print_process_step_finish('Git SSH already uninstalled!')
+        return
 
     current_public_key = ssh_helper.get_public_key()
     public_keys = GITHUB.get_public_keys().json()
@@ -79,7 +83,7 @@ def uninstall_git_ssh():
     git_helper.remove_ssh_config()
     git_helper.remove_ssh_github_host()
 
-    SETUP.print_process_step_finish('Git SSH uninstalled')
+    SETUP.print_process_step_finish('Git SSH uninstalled!')
 
 def pretty_print_wrapper(wrapper: object, title: str):
     '''

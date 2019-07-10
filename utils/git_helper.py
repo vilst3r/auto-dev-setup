@@ -10,47 +10,9 @@ import sys
 # Custom modules
 from utils.setup_wrapper import SETUP
 from utils.github_wrapper import GITHUB
+import utils.ssh_helper as ssh_helper
 
 LOGGER = logging.getLogger()
-
-def read_git_credentials() -> dict:
-    '''
-    Read credentials from file into wrapper object from project directory
-    '''
-    res = {}
-    git_credentials = 'config/git-credentials.txt'
-    valid_properties = ['username', 'email', 'token']
-
-    buff = None
-    try:
-        with open(git_credentials) as text_file:
-            buff = [line for line in text_file.readlines()]
-    except IOError as ierr:
-        # Generate git credential template
-        with open(git_credentials, 'w') as text_file:
-            for prop in valid_properties:
-                text_file.write(f'{prop}: <INSERT OWN VALUE>\n')
-
-        LOGGER.error(ierr)
-        LOGGER.error(f'Git credential file does not exist - now generated in {git_credentials}')
-        sys.exit()
-
-    for line in buff:
-        key, val = line.split(':')
-        key, val = key.strip(), val.strip()
-
-        if not key or not val:
-            LOGGER.error('Git credentials are not configured properly')
-            sys.exit()
-        if key not in valid_properties:
-            LOGGER.error('Git property is invalid')
-            sys.exit()
-        if val[0] == '<' or val[-1] == '>':
-            LOGGER.error('Git value of property is unset or invalid')
-            sys.exit()
-
-        res[key] = val
-    return res
 
 def update_ssh_config():
     '''
@@ -90,15 +52,21 @@ def update_ssh_config():
 
     LOGGER.info('IdentityFile key value updated in ssh config file')
 
-def github_public_key_exists(current_key: str, public_keys: list) -> bool:
+def public_key_exists_on_github() -> bool:
     '''
     Check if current public key passed in exists on github
     '''
+    current_key = ssh_helper.get_public_key()
+    public_keys = GITHUB.get_public_keys().json()
+
     pattern = re.compile(re.escape(current_key))
 
     for key in public_keys:
         if re.match(pattern, key['key']):
+            LOGGER.info('Git SSH has been configured on Github')
             return True
+
+    LOGGER.info('Git SSH is not configured on Github')
     return False
 
 def delete_github_pub_key(current_key: str, public_keys: list):
@@ -112,6 +80,7 @@ def delete_github_pub_key(current_key: str, public_keys: list):
             GITHUB.delete_public_key(key['id'])
             LOGGER.info('Provided public key now deleted from github account')
             return
+    LOGGER.warn('Provided public key does not exist on GitHub or incorrect arguments')
 
 def remove_ssh_config():
     '''
