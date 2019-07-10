@@ -59,7 +59,10 @@ def github_public_key_exists(current_key: str, public_keys: list) -> bool:
 
     for key in public_keys:
         if re.match(pattern, key['key']):
+            LOGGER.info('Git SSH has been configured on Github')
             return True
+
+    LOGGER.info('Git SSH is not configured on Github')
     return False
 
 def delete_github_pub_key(current_key: str, public_keys: list):

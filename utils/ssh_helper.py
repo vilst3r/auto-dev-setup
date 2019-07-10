@@ -22,8 +22,10 @@ def public_key_exists() -> bool:
     command = f'find {home_dir}/.ssh/id_rsa.pub'
     file_found = call(command.split(), stdout=DEVNULL, stderr=DEVNULL) == 0
 
-    if file_found:
-        LOGGER.info('Git SSH hasn\'t been configured - configuring now...')
+    if not file_found:
+        LOGGER.info('Git SSH hasn\'t been configured locally - configuring now...')
+    else:
+        LOGGER.info('Git SSH has been configured locally')
 
     return file_found
 
@@ -31,20 +33,18 @@ def generate_rsa_keypair():
     '''
     Generate asymmetric public/private keypair for ssh use
     '''
-    git_email = GITHUB.email
-
-    command = f'ssh-keygen -t rsa -b 4096 -C \"{git_email}\" -N foobar'
+    command = f'ssh-keygen -t rsa -b 4096 -C \"{GITHUB.email}\" -N foobar'
 
     with Popen(command.split(), stdin=PIPE, stdout=PIPE, stderr=PIPE) as process:
         out, err = process.communicate(input=b'\ny\n')
 
         if err:
             LOGGER.error(err.decode('utf-8'))
-            LOGGER.error('RSA keypair for ssh has failed to generated')
+            LOGGER.error('RSA keypair for SSH has failed to generated')
             sys.exit()
         else:
             LOGGER.debug(out.decode('utf-8'))
-            LOGGER.info('RSA keypair for ssh has successfully been generated')
+            LOGGER.info('RSA keypair for SSH has successfully been generated')
 
 def start_ssh_agent():
     '''
