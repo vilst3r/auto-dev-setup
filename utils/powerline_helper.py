@@ -164,9 +164,20 @@ def install_fonts():
     git_username = GITHUB.username
     user_config_dir = SETUP.dir['powerline_config']
 
-    # Download & install fonts
     source = f'git@github.com:{git_username}/fonts.git'
-    command = f'git clone {source} {user_config_dir}/fonts'
+    destination = f'{user_config_dir}/fonts'
+
+    command = f'find {destination}'
+    directory_found = call(command.split(), stdout=DEVNULL) == 0
+
+    if directory_found:
+        LOGGER.info('Powerline fonts are already installed')
+        return
+
+    command = 'mkdir -p {destination}'
+    call(command.split(), stdout=DEVNULL)
+
+    command = f'git clone {source} {destination}'
     with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
         out, err = process.communicate()
 
@@ -178,7 +189,7 @@ def install_fonts():
             LOGGER.debug(out.decode('utf-8'))
             LOGGER.info('Successfully cloned powerline fonts from github')
 
-    command = f'/bin/bash {user_config_dir}/fonts/install.sh'
+    command = f'/bin/bash {destination}/install.sh'
     with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
         out, err = process.communicate()
 

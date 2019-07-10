@@ -68,7 +68,7 @@ def configure_color_themes():
     vim_color_dir = f'{home_dir}/.vim/colors'
 
     command = f'mkdir -p {vim_color_dir}'
-    subprocess.call(command.split(), stdout=DEVNULL)
+    call(command.split(), stdout=DEVNULL)
     LOGGER.info(f'{vim_color_dir} - has been created')
 
     command_list = []

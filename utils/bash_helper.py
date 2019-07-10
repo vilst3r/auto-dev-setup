@@ -18,18 +18,21 @@ def pull_bash_settings():
     Pull bash setting repository from github account
     '''
     git_username = GITHUB.username
+    source = f'git@github.com:{git_username}/bash-settings.git'
+    destination = 'config/bash/bash-settings'
 
-    command = 'find config/bash/bash-settings'
+    command = f'find {destination}'
     directory_found = call(command.split(), stdout=DEVNULL) == 0
 
     if directory_found:
         LOGGER.info('Bash settings already pulled from git')
         return
 
-    source = f'git@github.com:{git_username}/bash-settings.git'
-    destination = f'config/bash/bash-settings'
-    command = f'git clone {source} {destination}'
+    command = f'mkdir -p {destination}'
+    call(command.split(), stdout=DEVNULL)
+    LOGGER.info(f'{destination} - has been created')
 
+    command = f'git clone {source} {destination}'
     with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
         out, err = process.communicate()
 
