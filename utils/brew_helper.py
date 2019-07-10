@@ -18,7 +18,9 @@ def brew_exists() -> bool:
     command = 'find /usr/local/Caskroom'
     directory_found = call(command.split(), stdout=DEVNULL, stderr=DEVNULL) == 0
 
-    if not directory_found:
+    if directory_found:
+        LOGGER.info('Brew has already been configured')
+    else:
         LOGGER.info('Brew hasn\'t been configured - configuring now...')
 
     return directory_found
@@ -62,49 +64,49 @@ def tap_brew_cask():
             LOGGER.debug(out.decode('utf-8'))
             LOGGER.info('Brew cask has successfully been tapped into')
 
-def get_uninstalled_brew_packages() -> list:
+def install_all_brew_packages():
     '''
-    Scans config list of brew packages to install what's missing
+    Downloads & installs every package config if it's valid
     '''
     command = 'brew list'
     output = check_output(command.split())
     brew_list = output.decode('utf-8').split('\n')
 
-    buff = []
+    uninstalled_packages = []
     with open('config/brew/test-brew.txt') as text_file:
         for line in text_file.readlines():
             package = line.strip()
 
             if package not in brew_list:
-                buff.append(package)
-    return buff
+                uninstalled_packages.append(package)
 
-def install_that_brew(package: str):
-    '''
-    Downloads & Installs the single package if it's valid
-    '''
-    command = f'brew info {package}'
-    package_found = call(command.split(), stdout=DEVNULL) == 0
-
-    if not package_found:
-        LOGGER.warn(f'This package does not exist in registry - {package}')
+    if not uninstalled_packages:
+        LOGGER.info('No available brew packages to install')
         return
 
-    command = f'brew install {package}'
-    with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
-        out, err = process.communicate()
+    for package in uninstalled_packages:
+        command = f'brew info {package}'
+        package_found = call(command.split(), stdout=DEVNULL) == 0
 
-        if err:
-            LOGGER.error(err.decode('utf-8'))
-            LOGGER.error(f'Error installing the package - {package}')
-            sys.exit()
-        else:
-            LOGGER.debug(out.decode('utf-8'))
-            LOGGER.info('{package} - successfully installed')
+        if not package_found:
+            LOGGER.warn(f'This package does not exist in registry - {package}')
+            continue
 
-def get_uninstalled_cask_packages() -> list:
+        command = f'brew install {package}'
+        with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
+            out, err = process.communicate()
+
+            if err:
+                LOGGER.error(err.decode('utf-8'))
+                LOGGER.error(f'Error installing the package - {package}')
+                sys.exit()
+            else:
+                LOGGER.debug(out.decode('utf-8'))
+                LOGGER.info('{package} - successfully installed')
+
+def install_all_cask_packages():
     '''
-    Scans config list of cask packages to install what's missing
+    Downloads & installs every package config if it's valid
     '''
     command = 'brew cask list'
     output = None
@@ -120,37 +122,37 @@ def get_uninstalled_cask_packages() -> list:
 
     cask_list = output.decode('utf-8').split('\n')
 
-    buff = []
+    uninstalled_packages = []
     with open('config/brew/test-brew-cask.txt') as text_file:
         for line in text_file.readlines():
             package = line.strip()
 
             if package not in cask_list:
-                buff.append(package)
-    return buff
+                uninstalled_packages.append(package)
 
-def install_that_cask(package: str):
-    '''
-    Downloads & Installs the single package if it's valid
-    '''
-    command = f'brew cask info {package}'
-    package_found = call(command.split(), stdout=DEVNULL) == 0
-
-    if not package_found:
-        LOGGER.warn(f'This package does not exist in registry - {package}')
+    if not uninstalled_packages:
+        LOGGER.info('No available cask packages to install')
         return
 
-    command = f'brew cask install {package}'
-    with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
-        out, err = process.communicate()
+    for package in uninstalled_packages:
+        command = f'brew cask info {package}'
+        package_found = call(command.split(), stdout=DEVNULL) == 0
 
-        if err:
-            LOGGER.error(err.decode('utf-8'))
-            LOGGER.error(f'Error installing the package - {package}')
-            sys.exit()
-        else:
-            LOGGER.debug(out.decode('utf-8'))
-            LOGGER.info('{package} - successfully installed')
+        if not package_found:
+            LOGGER.warn(f'This package does not exist in registry - {package}')
+            return
+
+        command = f'brew cask install {package}'
+        with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
+            out, err = process.communicate()
+
+            if err:
+                LOGGER.error(err.decode('utf-8'))
+                LOGGER.error(f'Error installing the package - {package}')
+                sys.exit()
+            else:
+                LOGGER.debug(out.decode('utf-8'))
+                LOGGER.info('{package} - successfully installed')
 
 def uninstall_brew():
     '''

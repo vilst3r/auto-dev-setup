@@ -26,10 +26,7 @@ def install_brew_packages():
     '''
     SETUP.print_process_step_start('Installing brew packages')
 
-    packages = brew_helper.get_uninstalled_brew_packages()
-
-    for package in packages:
-        brew_helper.install_that_brew(package)
+    brew_helper.install_all_brew_packages()
 
     SETUP.print_process_step_finish('Installation of brew packages are complete!')
 
@@ -39,10 +36,7 @@ def install_cask_packages():
     '''
     SETUP.print_process_step_start('Installing cask packages')
 
-    packages = brew_helper.get_uninstalled_cask_packages()
-
-    for package in packages:
-        brew_helper.install_that_cask(package)
+    brew_helper.install_all_cask_packages()
 
     SETUP.print_process_step_finish('Installation of cask packages are complete!')
 
