@@ -98,6 +98,13 @@ def remove_color_themes():
     home_dir = SETUP.dir['home']
     vim_color_dir = f'{home_dir}/.vim/colors'
 
+    command = f'find {vim_color_dir}'
+    directory_found = call(command.split(), stdout=DEVNULL) == 0
+
+    if not directory_found:
+        LOGGER.info('Vim color themes already removed')
+        return
+
     command = f'rm {vim_color_dir}/*.vim'
     with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
         out, err = process.communicate()

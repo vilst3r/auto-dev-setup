@@ -286,6 +286,13 @@ def uninstall_gitstatus():
     '''
     Uninstalls git powerline status at user level of system
     '''
+    command = 'pip3 show powerline-gitstatus'
+    package_found = call(command.split(), stdout=DEVNULL) == 0
+
+    if not package_found:
+        LOGGER.info('Powerline-gitstatus has already been uninstalled')
+        return
+
     command = 'pip3 uninstall powerline-gitstatus'
     with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
         out, err = process.communicate()
@@ -303,9 +310,18 @@ def delete_fonts():
     Deletes all font files assosciated with powerline from installation
     '''
     user_config_dir = SETUP.dir['powerline_config']
+    uninstall_font_script = f'{user_config_dir}/fonts/uninstall.sh'
+    
+    
+    command = f'find {uninstall_font_script}'
+    script_exists = call(command.split(), stdout=DEVNULL) == 0
 
-    command = f'/bin/bash {user_config_dir}/fonts/uninstall.sh'
-    with Popen(command.split, stdout=PIPE, stderr=PIPE) as process:
+    if not script_exists:
+        LOGGER.info('Powerline fonts are already uninstalled')
+        return
+
+    command = f'/bin/bash {uninstall_font_script}'
+    with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
         out, err = process.communicate()
 
         if err:
@@ -317,7 +333,7 @@ def delete_fonts():
             LOGGER.info('Powerline fonts has successfully been uninstalled')
 
     command = f'rm -rf {user_config_dir}/fonts'
-    with Popen(command.split, stdout=PIPE, stderr=PIPE) as process:
+    with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
         out, err = process.communicate()
 
         if err:
@@ -334,9 +350,16 @@ def delete_config():
     '''
     user_config_dir = SETUP.dir['powerline_config']
 
+    command = f'find {user_config_dir}'
+    directory_found = call(command.split(), stdout=DEVNULL) == 0
+
+    if not directory_found:
+        LOGGER.info('Powerline config has already been removed')
+        return
+
     command = f'rm -rf {user_config_dir}'
 
-    with Popen(command.split, stdout=PIPE, stderr=PIPE) as process:
+    with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
         out, err = process.communicate()
 
         if err:
@@ -416,10 +439,17 @@ def remove_vim_config():
 
     LOGGER.info('Powerline configuration removed in vimrc')
 
-def uninstall_powerline():
+def uninstall_powerline_status():
     '''
     Uninstalls the powerline tool
     '''
+    command = 'pip3 show powerline-status'
+    package_found = call(command.split(), stdout=DEVNULL) == 0
+
+    if not package_found:
+        LOGGER.info('Powerline-status has already been uninstalled')
+        return
+
     command = 'pip3 uninstall powerline-status'
     with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
         out, err = process.communicate()

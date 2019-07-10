@@ -31,7 +31,7 @@ def uninstall_powerline():
     powerline_helper.delete_config()
     powerline_helper.remove_bash_daemon()
     powerline_helper.remove_vim_config()
-    powerline_helper.uninstall_powerline()
+    powerline_helper.uninstall_powerline_status()
 
     SETUP.print_process_step_finish('Powerline uninstalled')
 
