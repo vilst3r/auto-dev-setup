@@ -4,10 +4,12 @@ Module delegated to handling brew logic
 
 # System/Third-Party modules
 import logging
+import pexpect
 import sys
 from subprocess import Popen, call, check_output, PIPE, DEVNULL
 
 # Custom modules
+from utils.setup_wrapper import SETUP
 
 LOGGER = logging.getLogger()
 
@@ -32,21 +34,41 @@ def install_brew():
     ruby_bin = '/usr/bin/ruby'
     brew_url = 'https://raw.githubusercontent.com/Homebrew/install/master/install'
 
-    command_list = []
-    command_list.append('sh')
-    command_list.append('-c')
-    command_list.append(f'{ruby_bin} -e \"$(curl -fsSL {brew_url})\"')
-    with Popen(command_list, stdin=PIPE, stdout=PIPE, stderr=PIPE) as process:
-        out, err = process.communicate()
-        brew_installed = process.returncode == 0
+    command = f'{ruby_bin} -e \"$(curl -fsSL {brew_url})\"'
+    child = pexpect.spawn('/bin/bash', ['-c', command])
 
-        if err and not brew_installed:
-            LOGGER.error(err.decode('utf-8'))
-            LOGGER.error('Homebrew failed to install')
+    try:
+        index = child.expect('Press RETURN', timeout=60*5)
+    except pexpect.TIMEOUT:
+        LOGGER.error('Request to install from brew url timed out')
+    
+    child.sendline('')
+
+    try:
+        index = child.expect('Password:', timeout=60*5)
+    except pexpect.TIMEOUT:
+        LOGGER.error('Child process timed out from installation')
+        sys.exit()
+
+    child.sendline(SETUP.password)
+
+    try:
+        expectations = ['Sorry, try again.', pexpect.EOF]
+        index = child.expect(expectations, timeout=60*30)
+
+        if index == 0:
+            LOGGER.error('Incorrect user password given at start of setup')
             sys.exit()
-        else:
-            LOGGER.debug(out.decode('utf-8'))
-            LOGGER.info('Homebrew has successfully been installed')
+        
+        LOGGER.warn(f'Password provided for root access command - {command}')
+
+        child_output = child.before
+
+        LOGGER.debug(child_output)
+        LOGGER.info('Homebrew has successfully been installed')
+    except pexpect.TIMEOUT:
+        LOGGER.error('Invalid expectation or process timed out')
+        sys.exit()
 
 def tap_brew_cask():
     '''
@@ -168,17 +190,38 @@ def uninstall_brew():
     ruby_bin = '/usr/bin/ruby'
     brew_url = 'https://raw.githubusercontent.com/Homebrew/install/master/uninstall'
 
-    command_list = []
-    command_list.append('sh')
-    command_list.append('-c')
-    command_list.append(f'{ruby_bin} -e \"$(curl -fsSL {brew_url})\"')
-    with Popen(command_list, stdin=PIPE, stdout=PIPE, stderr=PIPE) as process:
-        out, err = process.communicate()
+    command = f'{ruby_bin} -e \"$(curl -fsSL {brew_url})\"'
+    child = pexpect.spawn('/bin/bash', ['-c', command])
 
-        if err:
-            LOGGER.error(err.decode('utf-8'))
-            LOGGER.error('Failed to uninstall homebrew')
+    try:
+        index = child.expect('\[y/N\]', timeout=60*10)
+    except pexpect.TIMEOUT:
+        LOGGER.error('Request to uninstall from brew url timed out')
+    
+    child.sendline('y')
+
+    try:
+        index = child.expect('Password:', timeout=60*10)
+    except pexpect.TIMEOUT:
+        LOGGER.error('Homebrew is cleaned locally but child process timed out from cleanup')
+        sys.exit()
+
+    child.sendline(SETUP.password)
+
+    try:
+        expectations = ['Sorry, try again.', pexpect.EOF]
+        index = child.expect(expectations)
+
+        if index == 0:
+            LOGGER.error('Incorrect user password given at start of setup')
             sys.exit()
-        else:
-            LOGGER.debug(out.decode('utf-8'))
-            LOGGER.info('Homebrew has successfully been uninstalled')
+        
+        LOGGER.warn(f'Password provided for root access command - {command}')
+
+        child_output = child.before
+
+        LOGGER.debug(child_output)
+        LOGGER.info('Homebrew has successfully been uninstalled')
+    except pexpect.TIMEOUT:
+        LOGGER.error('Invalid expectation or process timed out')
+        sys.exit()
