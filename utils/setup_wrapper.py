@@ -2,8 +2,9 @@
 Wrapper object for setup script
 '''
 
-# System/Third-Party modules
+# Native Modules
 from subprocess import check_output
+import getpass
 import logging
 import pathlib
 import pprint
@@ -27,6 +28,9 @@ class SetupWrapper():
 
         self.dir['python_site'] = python_site
         self.dir['powerline_config'] = f'{home}/.config/powerline'
+
+        # Can't add to __str__ due to logging/printing of object
+        self.password = getpass.getpass()
 
     def __str__(self):
         str_vals = {**self.dir, 'step': self.step}
