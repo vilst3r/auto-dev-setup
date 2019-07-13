@@ -2,13 +2,15 @@
 Module delegated to handling brew logic
 '''
 
-# System/Third-Party modules
+# Native Modules
 import logging
-import pexpect
 import sys
 from subprocess import Popen, call, check_output, PIPE, DEVNULL
 
-# Custom modules
+# Third Party Modules
+import pexpect
+
+# Custom Modules
 from utils.setup_wrapper import SETUP
 
 LOGGER = logging.getLogger()
@@ -41,7 +43,7 @@ def install_brew():
         index = child.expect('Press RETURN', timeout=60*5)
     except pexpect.TIMEOUT:
         LOGGER.error('Request to install from brew url timed out')
-    
+
     child.sendline('')
 
     try:
@@ -59,8 +61,8 @@ def install_brew():
         if index == 0:
             LOGGER.error('Incorrect user password given at start of setup')
             sys.exit()
-        
-        LOGGER.warn(f'Password provided for root access command - {command}')
+
+        LOGGER.warning(f'Password provided for root access command - {command}')
 
         child_output = child.before
 
@@ -194,10 +196,10 @@ def uninstall_brew():
     child = pexpect.spawn('/bin/bash', ['-c', command])
 
     try:
-        index = child.expect('\[y/N\]', timeout=60*10)
+        index = child.expect(r'\[y/N\]', timeout=60*10)
     except pexpect.TIMEOUT:
         LOGGER.error('Request to uninstall from brew url timed out')
-    
+
     child.sendline('y')
 
     try:
@@ -215,8 +217,8 @@ def uninstall_brew():
         if index == 0:
             LOGGER.error('Incorrect user password given at start of setup')
             sys.exit()
-        
-        LOGGER.warn(f'Password provided for root access command - {command}')
+
+        LOGGER.warning(f'Password provided for root access command - {command}')
 
         child_output = child.before
 

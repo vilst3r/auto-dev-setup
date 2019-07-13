@@ -2,12 +2,12 @@
 Module delegated to handling ssh logic
 '''
 
-# System/Third-Party modules
+# Native Modules
 import sys
 import logging
 from subprocess import call, Popen, PIPE, DEVNULL
 
-# Custom modules
+# Custom Modules
 from utils.setup_wrapper import SETUP
 from utils.github_wrapper import GITHUB
 
@@ -59,15 +59,15 @@ def start_ssh_agent():
         ps_process.communicate()
 
         if err and not grepped:
-            LOG.error(err.decode('utf-8'))
-            LOG.error('Failed to grep')
+            LOGGER.error(err.decode('utf-8'))
+            LOGGER.error('Failed to grep')
             sys.exit()
 
         parsed_output = out.decode('utf-8').split('\n')
         for line in parsed_output:
             if not line:
                 continue
-            
+
             user, pid = line.split()[:2]
 
             if 'egrep' not in line and user == SETUP.username:
@@ -164,8 +164,8 @@ def stop_ssh_agent():
     grepped = egrep_process.returncode == 0
 
     if err and not grepped:
-        LOG.error(err.decode('utf-8'))
-        LOG.error('Failed to grep')
+        LOGGER.error(err.decode('utf-8'))
+        LOGGER.error('Failed to grep')
         sys.exit()
 
     ps_process.communicate()
@@ -176,13 +176,13 @@ def stop_ssh_agent():
         if not line:
             continue
 
-        user, pid = line.split()[:2] 
+        user, pid = line.split()[:2]
 
         if 'egrep' not in line and user == SETUP.username:
             LOGGER.debug(f'Existing ssh-agent pid - {pid}')
             LOGGER.debug(f'{line}')
             pids_to_kill.append(pid)
-    
+
     for pid in pids_to_kill:
         command = f'kill {pid}'
         with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:

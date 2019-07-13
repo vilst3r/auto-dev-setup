@@ -2,10 +2,12 @@
 Wrapper object for setup script
 '''
 
-## System/Third-Party modules
+## Native Modules
 import logging
 import pprint
 import sys
+
+# Third Party Modules
 import requests
 
 LOGGER = logging.getLogger()

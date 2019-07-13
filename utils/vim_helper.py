@@ -2,12 +2,12 @@
 Module delegated to handling vim logic
 '''
 
-# System/Third-Party modules
+# Native Modules
 import logging
 import sys
 from subprocess import Popen, call, DEVNULL, PIPE
 
-# Custom modules
+# Custom Modules
 from utils.setup_wrapper import SETUP
 from utils.github_wrapper import GITHUB
 

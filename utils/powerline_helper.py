@@ -2,14 +2,14 @@
 Module delegated to handling powerline status logic
 '''
 
-# System/Third-Party modules
+# Native Modules
 import logging
 import sys
 import re
 import json
 from subprocess import Popen, call, PIPE, DEVNULL
 
-# Custom modules
+# Custom Modules
 from utils.setup_wrapper import SETUP
 from utils.github_wrapper import GITHUB
 
@@ -177,7 +177,7 @@ def install_fonts():
     fork_exists = call(command.split(), stdout=DEVNULL) == 0
 
     if not fork_exists:
-        source = 'https://github.com/powerline/fonts'
+        source = 'git@github.com:powerline/powerline.git'
 
     command = f'git clone {source} {destination}'
     with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:

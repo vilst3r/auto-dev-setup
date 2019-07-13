@@ -2,11 +2,11 @@
 Module delegated to handling git logic
 '''
 
-# System/Third-Party modules
+# Native Modules
 import logging
 import re
 
-# Custom modules
+# Custom Modules
 from utils.setup_wrapper import SETUP
 from utils.github_wrapper import GITHUB
 import utils.ssh_helper as ssh_helper

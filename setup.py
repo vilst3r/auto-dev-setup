@@ -4,11 +4,11 @@
 Script to automate setup of unix environment with personal configurations and tools
 '''
 
-# System/Third-Party modules
+# Native Modules
 import logging
 import time
 
-# Custom modules
+# Custom Modules
 from utils.setup_wrapper import SETUP
 from utils.github_wrapper import GITHUB
 import utils.powerline_helper as powerline_helper
