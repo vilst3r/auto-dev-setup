@@ -76,7 +76,7 @@ def tap_brew_cask():
     '''
     Self explanatory
     '''
-    command = 'brew tap caskroom/cask'
+    command = 'brew tap homebrew/cask'
     with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
         out, err = process.communicate()
         tapped_successfully = process.returncode == 0

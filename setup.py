@@ -163,7 +163,7 @@ if __name__ == '__main__':
     configure_git_ssh()
     install_homebrew()
     install_brew_packages()
-#    install_cask_packages()
+    install_cask_packages()
     configure_vim()
     configure_bash()
     install_powerline()
