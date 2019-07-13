@@ -49,6 +49,31 @@ def start_ssh_agent():
     '''
     Start ssh-agent process in local machine
     '''
+    command = 'ps aux'
+    ps_process = Popen(command.split(), stdout=PIPE)
+
+    command = 'egrep ssh-agent'
+    with Popen(command.split(), stdin=ps_process.stdout, stdout=PIPE) as process:
+        out, err = process.communicate()
+        grepped = process.returncode == 0
+        ps_process.communicate()
+
+        if err and not grepped:
+            LOG.error(err.decode('utf-8'))
+            LOG.error('Failed to grep')
+            sys.exit()
+
+        parsed_output = out.decode('utf-8').split('\n')
+        for line in parsed_output:
+            if not line:
+                continue
+            
+            user, pid = line.split()[:2]
+
+            if 'egrep' not in line and user == SETUP.username:
+                LOGGER.debug(f'Existing ssh-agent pid - {pid}')
+                LOGGER.debug(f'{line}')
+
     command_list = []
     command_list.append('sh')
     command_list.append('-c')
@@ -132,22 +157,43 @@ def stop_ssh_agent():
     command = 'ps aux'
     ps_process = Popen(command.split(), stdout=PIPE)
 
-    command = 'egrep /usr/bin/ssh-agent'
+    command = 'egrep ssh-agent'
     egrep_process = Popen(command.split(), stdin=ps_process.stdout, stdout=PIPE)
 
-    out = egrep_process.communicate()[0]
+    out, err = egrep_process.communicate()
+    grepped = egrep_process.returncode == 0
+
+    if err and not grepped:
+        LOG.error(err.decode('utf-8'))
+        LOG.error('Failed to grep')
+        sys.exit()
+
     ps_process.communicate()
 
-    pid = out.decode('utf-8').split()[1]
+    pids_to_kill = []
+    parsed_output = out.decode('utf-8').split('\n')
+    for line in parsed_output:
+        if not line:
+            continue
 
-    command = f'kill {pid}'
-    with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
-        out, err = process.communicate()
+        user, pid = line.split()[:2] 
 
-        if err:
-            LOGGER.error(err.decode('utf-8'))
-            LOGGER.error('Failed to stop ssh-agent process')
-            sys.exit()
-        else:
-            LOGGER.debug(out.decode('utf-8'))
-            LOGGER.info('SSH-agent process has successfully been stopped')
+        if 'egrep' not in line and user == SETUP.username:
+            LOGGER.debug(f'Existing ssh-agent pid - {pid}')
+            LOGGER.debug(f'{line}')
+            pids_to_kill.append(pid)
+    
+    for pid in pids_to_kill:
+        command = f'kill {pid}'
+        with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
+            out, err = process.communicate()
+
+            if err:
+                LOGGER.error(err.decode('utf-8'))
+                LOGGER.error('Failed to stop ssh-agent process')
+                sys.exit()
+            else:
+                LOGGER.debug(out.decode('utf-8'))
+                LOGGER.debug('SSH-agent pid {pid} has been terminated')
+
+    LOGGER.info('SSH-agent process has successfully been stopped')

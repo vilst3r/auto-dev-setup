@@ -30,6 +30,7 @@ class SetupWrapper():
         self.dir['powerline_config'] = f'{home}/.config/powerline'
 
         # Can't add to __str__ due to logging/printing of object
+        self.username = getpass.getuser()
         self.password = getpass.getpass()
 
     def __str__(self):
