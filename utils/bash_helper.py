@@ -29,6 +29,14 @@ def pull_bash_settings():
         LOGGER.info('Bash settings already pulled from git')
         return
 
+    # Check if repository is forked in configured account
+    command = f'git ls-remote {source}'
+    fork_exists = call(command.split(), stdout=DEVNULL) == 0
+
+    if not fork_exists:
+        LOGGER.info(f'This step is optional but it requires - {source}')
+        return
+
     command = f'git clone {source} {destination}'
     with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
         out, err = process.communicate()

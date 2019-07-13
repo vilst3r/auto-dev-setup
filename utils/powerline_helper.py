@@ -172,6 +172,13 @@ def install_fonts():
         LOGGER.info('Powerline fonts are already installed')
         return
 
+    # Check if repository is forked in configured account
+    command = f'git ls-remote {source}'
+    fork_exists = call(command.split(), stdout=DEVNULL) == 0
+
+    if not fork_exists:
+        source = 'https://github.com/powerline/fonts'
+
     command = f'git clone {source} {destination}'
     with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
         out, err = process.communicate()
