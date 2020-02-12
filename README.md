@@ -19,3 +19,6 @@ Python scripts to replicate personal development environment across any machine 
 # Notes
 - Password is required when OS X prompts you to enter your password for the keychain access, choosing 'Always Allow' would make the whole process seamless without any prompts from then onwards
 - iTerm2 configuration left to manual user configuration through the GUI
+
+# TODO
+- Update script to pull from `dotfiles` repository for bash, vim & emacs settings

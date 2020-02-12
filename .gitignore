@@ -1,3 +1,6 @@
+# IDEA
+.idea
+
 # Sensitive files
 /config/git-credentials.txt
 
