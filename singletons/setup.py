@@ -22,7 +22,6 @@ class SetupSingleton:
 
     def _initialize_singleton(self):
         """ Initialise the singleton"""
-        self.step = 1
         initialise_logger()
 
         home = str(pathlib.Path.home())
@@ -57,21 +56,6 @@ class SetupSingleton:
         object_copy.pop("password")
         subset_string = pprint.pformat(object_copy)
         return subset_string
-
-    def print_process_step(self, message: str, step_has_finish: bool = False):
-        """
-        Prints each step of the setup in a pretty format
-        """
-        template = f"| {self.step}. {message} |"
-
-        horizontal_bars = f"+{('-' * (len(template) - 2))}+"
-
-        LOGGER.info(horizontal_bars)
-        LOGGER.info(template)
-        LOGGER.info(horizontal_bars)
-
-        if step_has_finish:
-            self.step += 1
 
     @staticmethod
     def get_instance():
@@ -112,5 +96,3 @@ def initialise_logger():
     LOGGER.addHandler(out_handler)
     LOGGER.addHandler(err_handler)
     LOGGER.addHandler(stream_handler)
-
-
