@@ -8,6 +8,8 @@ import getpass
 import logging
 import pathlib
 import pprint
+import re
+import traceback
 from subprocess import check_output, call, DEVNULL
 
 LOGGER = logging.getLogger()
@@ -67,15 +69,34 @@ class SetupSingleton:
 
 def initialise_logger():
     """
-    Set up logging for writing stdout & stderr to files
+    Set up logging for writing stdout & stderr to files based on the
+    filename executed
     """
+    def determine_log_output() -> str:
+        """
+        Determines where to log the output by reading the first stack frame
+        :return: root file that executed the containing process
+        """
+        first_stack_message = traceback.format_stack(limit=1)[0]
+
+        pattern = re.compile(r'File ".*"')
+        match_object = re.search(pattern, first_stack_message).group(0)
+
+        # Expected match template -> "**/**/<file>.py"
+        file = match_object.split()[1].replace('\"', "")
+        file = file.split('/')[-1]
+        file = file.split('.')[0]
+
+        return f'logs/{file.lower()}'
+
     LOGGER.setLevel(logging.DEBUG)
 
     formatter = logging.Formatter("[%(asctime)s - %(levelname)s - "
                                   "%(filename)s.%(funcName)s.%(lineno)d] : "
                                   "%(message)s")
 
-    log_dir = 'logs/setup'
+    log_dir = determine_log_output()
+
     command = f"mkdir -p {log_dir}"
     call(command.split(), stdout=DEVNULL)
 
