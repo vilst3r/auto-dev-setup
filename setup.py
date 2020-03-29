@@ -11,18 +11,14 @@ import logging
 # Custom Modules
 from singletons.setup import SetupSingleton
 from singletons.github import GithubSingleton
+from utils import powerline_helper, git_helper, ssh_helper, \
+                    brew_helper, vim_helper, bash_helper
 from utils.decorators import measure_time, print_process_step
-
-import utils.powerline_helper as powerline_helper
-import utils.git_helper as git_helper
-import utils.ssh_helper as ssh_helper
-import utils.brew_helper as brew_helper
-import utils.vim_helper as vim_helper
-import utils.bash_helper as bash_helper
 
 SETUP = SetupSingleton.get_instance()
 GITHUB = GithubSingleton.get_instance()
 LOGGER = logging.getLogger()
+
 
 @print_process_step(step_no=1,
                     begin_message='Configuring Git SSH...',
@@ -31,20 +27,19 @@ def configure_git_ssh():
     """
     Configure git ssh key to user ssh agent
     """
-    # if ssh_helper.public_key_exists() and git_helper.public_key_exists_on_github():
-    # 	SETUP.print_process_step("Git SSH is already configured!")
-    # 	return
-
+    # if (ssh_helper.public_key_exists() and
+    #         git_helper.public_key_exists_on_github()):
+    #     LOGGER.info("Git SSH is already configured!")
+    #     return
+    #
     # ssh_helper.generate_rsa_keypair()
     # ssh_helper.start_ssh_agent()
     # git_helper.update_ssh_config()
     # ssh_helper.register_private_key_to_ssh_agent()
-
+    #
     # current_public_key = ssh_helper.get_public_key()
-
-    # payload = {}
-    # payload["title"] = "script-env-pub-key"
-    # payload["key"] = current_public_key
+    #
+    # payload = {"title": "script-env-pub-key", "key": current_public_key}
     # GITHUB.create_public_key(payload)
 
 
@@ -57,9 +52,9 @@ def install_homebrew():
     password input
     """
     # if brew_helper.brew_exists():
-    # 	SETUP.print_process_step("Homebrew is already installed!")
-    # 	return
-
+    #     LOGGER.info("Homebrew is already installed!")
+    #     return
+    #
     # brew_helper.install_brew()
     # brew_helper.tap_brew_cask()
 
@@ -120,7 +115,7 @@ def install_powerline():
     # powerline_helper.write_vim_config()
     # powerline_helper.configure_user_config_directory()
     # powerline_helper.install_fonts()
-
+    #
     # powerline_helper.install_gitstatus_at_user()
     # powerline_helper.config_git_colorscheme()
     # powerline_helper.config_git_shell()

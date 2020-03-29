@@ -37,20 +37,21 @@ def install_brew():
     Pulls brew from the web via git and installs it with local authentication
     """
     ruby_bin = '/usr/bin/ruby'
-    brew_url = 'https://raw.githubusercontent.com/Homebrew/install/master/install'
+    brew_url = 'https://raw.githubusercontent.com/Homebrew/install/master/' \
+               'install'
 
     command = f'{ruby_bin} -e \"$(curl -fsSL {brew_url})\"'
     child = pexpect.spawn('/bin/bash', ['-c', command])
 
     try:
-        index = child.expect('Press RETURN', timeout=60*5)
+        child.expect('Press RETURN', timeout=60*5)
     except pexpect.TIMEOUT:
         LOGGER.error('Request to install from brew url timed out')
 
     child.sendline('')
 
     try:
-        index = child.expect('Password:', timeout=60*5)
+        child.expect('Password:', timeout=60*5)
     except pexpect.TIMEOUT:
         LOGGER.error('Child process timed out from installation')
         sys.exit()
@@ -119,7 +120,8 @@ def install_all_brew_packages():
         package_found = call(command.split(), stdout=DEVNULL) == 0
 
         if not package_found:
-            LOGGER.warning(f'This package does not exist in registry - {package}')
+            LOGGER.warning(f'This package does not exist in registry - '
+                           f'{package}')
             continue
 
         command = f'brew install {package}'
@@ -169,7 +171,8 @@ def install_all_cask_packages():
         package_found = call(command.split(), stdout=DEVNULL) == 0
 
         if not package_found:
-            LOGGER.warning(f'This package does not exist in registry - {package}')
+            LOGGER.warning(f'This package does not exist in registry - '
+                           f'{package}')
             return
 
         command = f'brew cask install {package}'
@@ -197,22 +200,24 @@ def uninstall_brew():
         return
 
     ruby_bin = '/usr/bin/ruby'
-    brew_url = 'https://raw.githubusercontent.com/Homebrew/install/master/uninstall'
+    brew_url = 'https://raw.githubusercontent.com/Homebrew/install/master/' \
+               'uninstall'
 
     command = f'{ruby_bin} -e \"$(curl -fsSL {brew_url})\"'
     child = pexpect.spawn('/bin/bash', ['-c', command])
 
     try:
-        index = child.expect(r'\[y/N\]', timeout=60*10)
+        child.expect(r'\[y/N\]', timeout=60*10)
     except pexpect.TIMEOUT:
         LOGGER.error('Request to uninstall from brew url timed out')
 
     child.sendline('y')
 
     try:
-        index = child.expect('Password:', timeout=60*10)
+        child.expect('Password:', timeout=60*10)
     except pexpect.TIMEOUT:
-        LOGGER.error('Homebrew is cleaned locally but child process timed out from cleanup')
+        LOGGER.error('Homebrew is cleaned locally but child process timed out '
+                     'from cleanup')
         sys.exit()
 
     child.sendline(SETUP.password)

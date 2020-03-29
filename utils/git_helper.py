@@ -45,7 +45,8 @@ def update_ssh_config():
     current_config = content[start:end]
 
     if current_config == identity_val:
-        LOGGER.info('IdentityFile key value already configured in ssh config file')
+        LOGGER.info('IdentityFile key value already configured in ssh config '
+                    'file')
         return
 
     content = content[:start] + identity_val + content[end:]
@@ -84,7 +85,8 @@ def delete_github_pub_key(current_key: str, public_keys: list):
             GITHUB.delete_public_key(key['id'])
             LOGGER.info('Provided public key now deleted from github account')
             return
-    LOGGER.warning('Provided public key does not exist on GitHub or incorrect arguments')
+    LOGGER.warning('Provided public key does not exist on GitHub or incorrect '
+                   'arguments')
 
 
 def remove_ssh_config():
@@ -105,7 +107,8 @@ def remove_ssh_config():
     key_match = re.search(pattern, content)
 
     if not key_match:
-        LOGGER.info('IdentityFile key value already deleted from ssh config file')
+        LOGGER.info('IdentityFile key value already deleted from ssh config '
+                    'file')
         return
 
     start, end = key_match.span()

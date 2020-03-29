@@ -51,7 +51,8 @@ def pull_bash_settings():
             sys.exit()
         else:
             LOGGER.debug(out.decode('utf-8'))
-            LOGGER.info('Bash settings has successfully been cloned from github')
+            LOGGER.info('Bash settings has successfully been cloned from '
+                        'github')
 
 
 def configure_bash_profile():
@@ -60,7 +61,8 @@ def configure_bash_profile():
     """
     home_dir = SETUP.dir['home']
 
-    command = f'cp config/bash/bash-settings/.bash_profile {home_dir}/.bash_profile'
+    command = f'cp config/bash/bash-settings/.bash_profile ' \
+              f'{home_dir}/.bash_profile'
     with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
         out, err = process.communicate()
 
@@ -94,4 +96,5 @@ def remove_bash_settings():
             sys.exit()
         else:
             LOGGER.debug(out.decode('utf-8'))
-            LOGGER.info('Bash settings from github has successfully been removed')
+            LOGGER.info('Bash settings from github has successfully been '
+                        'removed')

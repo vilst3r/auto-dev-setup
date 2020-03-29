@@ -88,7 +88,8 @@ def configure_color_themes():
     command_list = []
     command_list.append('sh')
     command_list.append('-c')
-    command_list.append(f'cp config/vim/vim-settings/color_themes/*.vim {vim_color_dir}')
+    command_list.append(f'cp config/vim/vim-settings/color_themes/*.vim '
+                        f'{vim_color_dir}')
 
     files_copied = call(command_list, stdout=DEVNULL) == 0
 
@@ -149,4 +150,5 @@ def remove_vim_settings():
             sys.exit()
         else:
             LOGGER.debug(out.decode('utf-8'))
-            LOGGER.info('Vim settings cloned from github has successfully been removed')
+            LOGGER.info('Vim settings cloned from github has successfully been '
+                        'removed')

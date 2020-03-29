@@ -43,7 +43,8 @@ def write_bash_daemon():
     python_site = SETUP.dir["python_site"]
     bash_profile = f"{home_dir}/.bash_profile"
 
-    source_version = f"source {python_site}/powerline/bindings/bash/powerline.sh"
+    source_version = f"source " \
+                     f"{python_site}/powerline/bindings/bash/powerline.sh"
 
     daemon_config = []
     daemon_config.append("# Powerline user config")
@@ -161,9 +162,8 @@ def configure_user_config_directory() -> bool:
             sys.exit()
         else:
             LOGGER.debug(out.decode("utf-8"))
-            LOGGER.info(
-                "Successfully copied powerline config from system to user directory"
-            )
+            LOGGER.info("Successfully copied powerline config from system to "
+                        "user directory")
 
 
 def install_fonts():
@@ -230,7 +230,8 @@ def install_gitstatus_at_user():
             sys.exit()
         else:
             LOGGER.debug(out.decode("utf-8"))
-            LOGGER.info("Powerline-gitstatus successfully installed through pip3")
+            LOGGER.info("Powerline-gitstatus successfully installed through "
+                        "pip3")
 
 
 def config_git_colorscheme():
@@ -243,13 +244,14 @@ def config_git_colorscheme():
 
     data = None
     with open(default_block) as default_json, open(config_block) as config_json:
-        default_data, config_data = json.load(default_json), json.load(config_json)
-        default_group, config_group = default_data["groups"], config_data["groups"]
+        default_data = json.load(default_json)
+        config_data = json.load(config_json)
+        default_group = default_data["groups"]
+        config_group = config_data["groups"]
 
         if all([group in default_group for group in config_group]):
-            LOGGER.info(
-                "Color scheme for git status for powerline is already configured"
-            )
+            LOGGER.info("Color scheme for git status for powerline is already "
+                        "configured")
             return
 
         data = default_data
@@ -271,12 +273,14 @@ def config_git_shell():
 
     data = None
     with open(default_block) as default_json, open(config_block) as config_json:
-        default_data, config_data = json.load(default_json), json.load(config_json)
+        default_data = json.load(default_json)
+        config_data = json.load(config_json)
         function_list = default_data["segments"]["left"]
 
         for function in function_list:
             if function == config_data:
-                LOGGER.info("Shell for git stats for powerline is already configured")
+                LOGGER.info("Shell for git stats for powerline is already "
+                            "configured")
                 return
 
         function_list.append(config_data)
@@ -313,13 +317,13 @@ def uninstall_gitstatus():
 
         if err:
             LOGGER.error(err.decode("utf-8"))
-            LOGGER.error("Failed to uninstall powerline-gitstatus at the user level")
+            LOGGER.error("Failed to uninstall powerline-gitstatus at the user "
+                         "level")
             sys.exit()
         else:
             LOGGER.debug(out.decode("utf-8"))
-            LOGGER.info(
-                "Powerline-gitstatus has successfully been uninstalled at the user level"
-            )
+            LOGGER.info("Powerline-gitstatus has successfully been uninstalled "
+                        "at the user level")
 
 
 def delete_fonts():
@@ -360,9 +364,8 @@ def delete_fonts():
             sys.exit()
         else:
             LOGGER.debug(out.decode("utf-8"))
-            LOGGER.info(
-                "Powerline fonts in user config directory has successfully been removed"
-            )
+            LOGGER.info("Powerline fonts in user config directory has "
+                        "successfully been removed")
 
 
 def delete_config():
@@ -384,13 +387,13 @@ def delete_config():
 
         if err:
             LOGGER.error(err.decode("utf-8"))
-            LOGGER.error("Failed to remove powerline config at user config directory")
+            LOGGER.error("Failed to remove powerline config at user config "
+                         "directory")
             sys.exit()
         else:
             LOGGER.debug(out.decode("utf-8"))
-            LOGGER.info(
-                "Powerline config has successfully been removed at user config directory"
-            )
+            LOGGER.info("Powerline config has successfully been removed at "
+                        "user config directory")
 
 
 def remove_bash_daemon():
@@ -492,4 +495,5 @@ def uninstall_powerline_status():
             sys.exit()
         else:
             LOGGER.debug(out.decode("utf-8"))
-            LOGGER.info("Powerline has successfully been uninstalled through pip3")
+            LOGGER.info("Powerline has successfully been uninstalled through "
+                        "pip3")

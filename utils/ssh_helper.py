@@ -38,7 +38,8 @@ def generate_rsa_keypair():
     Generate asymmetric public/private keypair for ssh use
     """
     command = f'ssh-keygen -t rsa -b 4096 -C \"{GITHUB.email}\" -N foobar'
-    with Popen(command.split(), stdin=PIPE, stdout=PIPE, stderr=PIPE) as process:
+    with Popen(command.split(), stdin=PIPE, stdout=PIPE, stderr=PIPE) \
+            as process:
         out, err = process.communicate(input=b'\ny\n')
 
         if err:
@@ -58,7 +59,8 @@ def start_ssh_agent():
     ps_process = Popen(command.split(), stdout=PIPE)
 
     command = 'egrep ssh-agent'
-    with Popen(command.split(), stdin=ps_process.stdout, stdout=PIPE) as process:
+    with Popen(command.split(), stdin=ps_process.stdout, stdout=PIPE) \
+            as process:
         out, err = process.communicate()
         grepped = process.returncode == 0
         ps_process.communicate()
@@ -106,7 +108,8 @@ def register_private_key_to_ssh_agent():
     ssh_added = call(command.split(), stdout=DEVNULL) == 0
 
     if ssh_added:
-        LOGGER.info('SSH private key has successfully been added to the ssh-agent')
+        LOGGER.info('SSH private key has successfully been added to the '
+                    'ssh-agent')
     else:
         LOGGER.error('SSH private key has failed to be added to the ssh-agent')
         sys.exit()
@@ -156,7 +159,8 @@ def delete_ssh_rsa_keypair():
             sys.exit()
         else:
             LOGGER.debug(out.decode('utf-8'))
-            LOGGER.info('RSA keypairs configured for SSH has successfully been removed')
+            LOGGER.info('RSA keypairs configured for SSH has successfully been '
+                        'removed')
 
 
 def stop_ssh_agent():
