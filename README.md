@@ -1,11 +1,13 @@
-# env-setup
+# auto-dev-setup
 
-Python scripts to replicate personal development environment across any machine with proper packaging and editor profiles and settings. Linux machine environment only.
+Python script to replicate personal development environment across any machine 
+with proper packaging, editor profiles & settings. OSX machine environment only.
 
 # Requirements
 - Python3 to run the script
 - Latest version of pip3 otherwise the script requires a second run to complete
-- Run `pip3 install -r requirements` to fetch all script dependencies
+    - Run `pip3 install -r requirements` to fetch all script dependencies
+         after installing pip3
 
 # Automated Process
 1. Configure git ssh key
@@ -17,8 +19,12 @@ Python scripts to replicate personal development environment across any machine 
 7. Install & Configure powerline
 
 # Notes
-- Password is required when OS X prompts you to enter your password for the keychain access, choosing 'Always Allow' would make the whole process seamless without any prompts from then onwards
+- Password is required when OS X prompts you to enter your password for the 
+    keychain access, choosing 'Always Allow' would make the whole process 
+    seamless without any prompts from then onwards
 - iTerm2 configuration left to manual user configuration through the GUI
 
 # TODO
-- Update script to pull from `dotfiles` repository for bash, vim & emacs settings
+- Update script to pull from `dotfiles` repository for bash, vim & emacs 
+    settings
+- Add iTerm2 configuration in spare time in the future
