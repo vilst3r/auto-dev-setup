@@ -7,34 +7,28 @@ tools & software by mainyl using the subprocess interface
 
 # Native Modules
 import logging
-import time
 
 # Custom Modules
-from singletons.setup import SetupSingleton, time_the_method
+from singletons.setup import SetupSingleton
 from singletons.github import GithubSingleton
+from utils.decorators import measure_time
 
-
-# from utils.github_wrapper import GITHUB
-
-# from utils.setup_wrapper import SetupSingleton
-# import utils.powerline_helper as powerline_helper
-
-# import utils.git_helper as git_helper
-# import utils.ssh_helper as ssh_helper
-# import utils.brew_helper as brew_helper
-# import utils.vim_helper as vim_helper
-# import utils.bash_helper as bash_helper
+import utils.powerline_helper as powerline_helper
+import utils.git_helper as git_helper
+import utils.ssh_helper as ssh_helper
+import utils.brew_helper as brew_helper
+import utils.vim_helper as vim_helper
+import utils.bash_helper as bash_helper
 
 SETUP = SetupSingleton.get_instance()
 GITHUB = GithubSingleton.get_instance()
-
 LOGGER = logging.getLogger()
 
 
 def install_brew_packages():
     """
-	Install brew packages
-	"""
+    Install brew packages
+    """
     SETUP.print_process_step("Installing brew packages...")
 
     # brew_helper.install_all_brew_packages()
@@ -46,9 +40,9 @@ def install_brew_packages():
 
 def install_cask_packages():
     """
-	Reads brew-cask.txt file in child config directory to install all software
+    Reads brew-cask.txt file in child config directory to install all software
     applications
-	"""
+    """
     SETUP.print_process_step("Installing cask packages...")
 
     # brew_helper.install_all_cask_packages()
@@ -60,9 +54,9 @@ def install_cask_packages():
 
 def install_homebrew():
     """
-	Install homebrew & cask if it doesn't exist in *nix environment and requires
+    Install homebrew & cask if it doesn't exist in *nix environment and requires
     password input
-	"""
+    """
     SETUP.print_process_step("Installing homebrew...")
 
     # if brew_helper.brew_exists():
@@ -77,8 +71,8 @@ def install_homebrew():
 
 def configure_git_ssh():
     """
-	Configure git ssh key to user ssh agent
-	"""
+    Configure git ssh key to user ssh agent
+    """
     SETUP.print_process_step("Configuring Git SSH...")
 
     # if ssh_helper.public_key_exists() and git_helper.public_key_exists_on_github():
@@ -102,8 +96,8 @@ def configure_git_ssh():
 
 def configure_vim():
     """
-	Configure vim settings
-	"""
+    Configure vim settings
+    """
     SETUP.print_process_step("Configuring vim...")
 
     # vim_helper.pull_vim_settings()
@@ -115,8 +109,8 @@ def configure_vim():
 
 def configure_bash():
     """
-	Configure bash settings
-	"""
+    Configure bash settings
+    """
     SETUP.print_process_step("Configuring bash...")
 
     # bash_helper.pull_bash_settings()
@@ -127,8 +121,8 @@ def configure_bash():
 
 def install_powerline():
     """
-	Install powerline & configure it to bash & vim
-	"""
+    Install powerline & configure it to bash & vim
+    """
     SETUP.print_process_step("Installing powerline...")
 
     # powerline_helper.install_powerline_at_user()
@@ -145,18 +139,12 @@ def install_powerline():
 
 
 if __name__ == "__main__":
-
-    @time_the_method
+    @measure_time
     def main():
         """
         Run the following installations in sequence
         """
-        LOGGER.debug("###### SetupWrapper #####")
-        LOGGER.debug(SETUP)
-        LOGGER.debug("###### GithubWrapper #####")
-        LOGGER.debug(GITHUB)
-
-        # configure_git_ssh()
+        configure_git_ssh()
         # install_homebrew()
         # install_brew_packages()
         # install_cask_packages()

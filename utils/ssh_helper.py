@@ -1,6 +1,6 @@
-'''
+"""
 Module delegated to handling ssh logic
-'''
+"""
 
 # Native Modules
 import sys
@@ -8,15 +8,18 @@ import logging
 from subprocess import call, Popen, PIPE, DEVNULL
 
 # Custom Modules
-from utils.setup_wrapper import SETUP
-from utils.github_wrapper import GITHUB
+from singletons.setup import SetupSingleton
+from singletons.github import GithubSingleton
 
+SETUP = SetupSingleton.get_instance()
+GITHUB = GithubSingleton.get_instance()
 LOGGER = logging.getLogger()
 
+
 def public_key_exists() -> bool:
-    '''
+    """
     Check if public key exists to confirm whether ssh is already configured
-    '''
+    """
     home_dir = SETUP.dir['home']
 
     command = f'find {home_dir}/.ssh/id_rsa.pub'
@@ -29,10 +32,11 @@ def public_key_exists() -> bool:
 
     return file_found
 
+
 def generate_rsa_keypair():
-    '''
+    """
     Generate asymmetric public/private keypair for ssh use
-    '''
+    """
     command = f'ssh-keygen -t rsa -b 4096 -C \"{GITHUB.email}\" -N foobar'
     with Popen(command.split(), stdin=PIPE, stdout=PIPE, stderr=PIPE) as process:
         out, err = process.communicate(input=b'\ny\n')
@@ -45,10 +49,11 @@ def generate_rsa_keypair():
             LOGGER.debug(out.decode('utf-8'))
             LOGGER.info('RSA keypair for SSH has successfully been generated')
 
+
 def start_ssh_agent():
-    '''
+    """
     Start ssh-agent process in local machine
-    '''
+    """
     command = 'ps aux'
     ps_process = Popen(command.split(), stdout=PIPE)
 
@@ -90,10 +95,11 @@ def start_ssh_agent():
             LOGGER.debug(out.decode('utf-8'))
             LOGGER.info('SSH-agent process has successfully started')
 
+
 def register_private_key_to_ssh_agent():
-    '''
+    """
     Add ssh private key to ssh-agent
-    '''
+    """
     home_dir = SETUP.dir['home']
 
     command = f'ssh-add -K {home_dir}/.ssh/id_rsa'
@@ -105,10 +111,11 @@ def register_private_key_to_ssh_agent():
         LOGGER.error('SSH private key has failed to be added to the ssh-agent')
         sys.exit()
 
+
 def get_public_key() -> str:
-    '''
+    """
     Return utf-8 string of ssh public key
-    '''
+    """
     home_dir = SETUP.dir['home']
 
     command = f'cat {home_dir}/.ssh/id_rsa.pub'
@@ -128,10 +135,11 @@ def get_public_key() -> str:
         public_key = f'{key_type} {key_data}'
         return public_key
 
+
 def delete_ssh_rsa_keypair():
-    '''
+    """
     Delete both public and private key configured for ssh
-    '''
+    """
     home_dir = SETUP.dir['home']
 
     command_list = []
@@ -150,10 +158,11 @@ def delete_ssh_rsa_keypair():
             LOGGER.debug(out.decode('utf-8'))
             LOGGER.info('RSA keypairs configured for SSH has successfully been removed')
 
+
 def stop_ssh_agent():
-    '''
+    """
     Stop process responsible for ssh connections
-    '''
+    """
     command = 'ps aux'
     ps_process = Popen(command.split(), stdout=PIPE)
 

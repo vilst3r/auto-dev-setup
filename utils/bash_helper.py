@@ -1,6 +1,6 @@
-'''
+"""
 Module delegated to handling bash logic
-'''
+"""
 
 # Native Modules
 import logging
@@ -8,15 +8,18 @@ import sys
 from subprocess import Popen, call, DEVNULL, PIPE
 
 # Custom Modules
-from utils.setup_wrapper import SETUP
-from utils.github_wrapper import GITHUB
+from singletons.setup import SetupSingleton
+from singletons.github import GithubSingleton
 
+SETUP = SetupSingleton.get_instance()
+GITHUB = GithubSingleton.get_instance()
 LOGGER = logging.getLogger()
 
+
 def pull_bash_settings():
-    '''
+    """
     Pull bash setting repository from github account
-    '''
+    """
     git_username = GITHUB.username
 
     source = f'git@github.com:{git_username}/bash-settings.git'
@@ -50,10 +53,11 @@ def pull_bash_settings():
             LOGGER.debug(out.decode('utf-8'))
             LOGGER.info('Bash settings has successfully been cloned from github')
 
+
 def configure_bash_profile():
-    '''
+    """
     Copies bash profile from local project bash settings to user settings
-    '''
+    """
     home_dir = SETUP.dir['home']
 
     command = f'cp config/bash/bash-settings/.bash_profile {home_dir}/.bash_profile'
@@ -68,10 +72,11 @@ def configure_bash_profile():
             LOGGER.debug(out.decode('utf-8'))
             LOGGER.info('Bash profile now configured from git repository')
 
+
 def remove_bash_settings():
-    '''
+    """
     Remove bash setting repository cloned from github
-    '''
+    """
     command = 'find config/bash/bash-settings'
     directory_found = call(command.split(), stdout=DEVNULL) == 0
 

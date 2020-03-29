@@ -1,22 +1,25 @@
-'''
+"""
 Module delegated to handling git logic
-'''
+"""
 
 # Native Modules
 import logging
 import re
 
 # Custom Modules
-from utils.setup_wrapper import SETUP
-from utils.github_wrapper import GITHUB
 import utils.ssh_helper as ssh_helper
+from singletons.setup import SetupSingleton
+from singletons.github import GithubSingleton
 
+SETUP = SetupSingleton.get_instance()
+GITHUB = GithubSingleton.get_instance()
 LOGGER = logging.getLogger()
 
+
 def update_ssh_config():
-    '''
+    """
     Update config file in .ssh directory
-    '''
+    """
     home_dir = SETUP.dir['home']
     ssh_config = f'{home_dir}/.ssh/config'
 
@@ -51,10 +54,11 @@ def update_ssh_config():
 
     LOGGER.info('IdentityFile key value updated in ssh config file')
 
+
 def public_key_exists_on_github() -> bool:
-    '''
+    """
     Check if current public key passed in exists on github
-    '''
+    """
     current_key = ssh_helper.get_public_key()
     public_keys = GITHUB.get_public_keys().json()
 
@@ -68,10 +72,11 @@ def public_key_exists_on_github() -> bool:
     LOGGER.info('Git SSH is not configured on Github')
     return False
 
+
 def delete_github_pub_key(current_key: str, public_keys: list):
-    '''
+    """
     Removes current public key in host machine stored on github
-    '''
+    """
     pattern = re.compile(re.escape(current_key))
 
     for key in public_keys:
@@ -81,10 +86,11 @@ def delete_github_pub_key(current_key: str, public_keys: list):
             return
     LOGGER.warning('Provided public key does not exist on GitHub or incorrect arguments')
 
+
 def remove_ssh_config():
-    '''
+    """
     Removes the identity value of the rsa private key from the ssh config file
-    '''
+    """
     home_dir = SETUP.dir['home']
     ssh_config = f'{home_dir}/.ssh/config'
 
@@ -110,10 +116,11 @@ def remove_ssh_config():
 
     LOGGER.info('IdentityFile key value is now removed from ssh config file')
 
+
 def remove_ssh_github_host():
-    '''
+    """
     Remove host key & agent from known_host file in .ssh directory
-    '''
+    """
     home_dir = SETUP.dir['home']
     known_hosts = f'{home_dir}/.ssh/config'
 

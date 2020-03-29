@@ -3,14 +3,12 @@ Singleton object for managing the setup script
 """
 
 # Native Modules
-from subprocess import check_output
-from typing import Callable
 import copy
 import getpass
 import logging
 import pathlib
 import pprint
-import time
+from subprocess import check_output, call, DEVNULL
 
 LOGGER = logging.getLogger()
 
@@ -29,8 +27,7 @@ class SetupSingleton:
 
         home = str(pathlib.Path.home())
 
-        self.dir = {}
-        self.dir["home"] = home
+        self.dir = {"home": home}
 
         command = "python3 -m site --user-site"
         python_site = check_output(command.split()).decode("utf-8").strip()
@@ -48,6 +45,8 @@ class SetupSingleton:
 
         self._initialize_singleton()
         SetupSingleton.__instance = self
+
+        LOGGER.debug(f'SetupSingleton:\n {self}')
 
     def __str__(self):
         """
@@ -84,14 +83,20 @@ class SetupSingleton:
 
 def initialise_logger():
     """
-	Set up logging for writing stdout & stderr to files
-	"""
+    Set up logging for writing stdout & stderr to files
+    """
     LOGGER.setLevel(logging.DEBUG)
 
-    formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
+    formatter = logging.Formatter("[%(asctime)s - %(levelname)s - "
+                                  "%(filename)s.%(funcName)s.%(lineno)d] : "
+                                  "%(message)s")
 
-    out_path = "logs/setup_out.log"
-    err_path = "logs/setup_err.log"
+    log_dir = 'logs/setup'
+    command = f"mkdir -p {log_dir}"
+    call(command.split(), stdout=DEVNULL)
+
+    out_path = f"{log_dir}/out.log"
+    err_path = f"{log_dir}/err.log"
 
     stream_handler = logging.StreamHandler()
     stream_handler.setLevel(logging.INFO)
@@ -109,13 +114,3 @@ def initialise_logger():
     LOGGER.addHandler(stream_handler)
 
 
-def time_the_method(wrapped_function: Callable) -> None:
-    """
-    Times how long the method takes to complete in seconds
-    """
-    START = time.time()
-    wrapped_function()
-    END = time.time()
-
-    TIME_ELAPSED = END - START
-    LOGGER.info(f"Time: {TIME_ELAPSED} seconds")

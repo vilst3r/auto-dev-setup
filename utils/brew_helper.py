@@ -1,6 +1,6 @@
-'''
+"""
 Module delegated to handling brew logic
-'''
+"""
 
 # Native Modules
 import logging
@@ -11,14 +11,16 @@ from subprocess import Popen, call, check_output, PIPE, DEVNULL
 import pexpect
 
 # Custom Modules
-from utils.setup_wrapper import SETUP
+from singletons.setup import SetupSingleton
 
+SETUP = SetupSingleton.get_instance()
 LOGGER = logging.getLogger()
 
+
 def brew_exists() -> bool:
-    '''
+    """
     Check if the brew dependency management tool exists in the system
-    '''
+    """
     command = 'find /usr/local/Caskroom'
     directory_found = call(command.split(), stdout=DEVNULL, stderr=DEVNULL) == 0
 
@@ -29,10 +31,11 @@ def brew_exists() -> bool:
 
     return directory_found
 
+
 def install_brew():
-    '''
+    """
     Pulls brew from the web via git and installs it with local authentication
-    '''
+    """
     ruby_bin = '/usr/bin/ruby'
     brew_url = 'https://raw.githubusercontent.com/Homebrew/install/master/install'
 
@@ -72,10 +75,11 @@ def install_brew():
         LOGGER.error('Invalid expectation or process timed out')
         sys.exit()
 
+
 def tap_brew_cask():
-    '''
+    """
     Self explanatory
-    '''
+    """
     command = 'brew tap homebrew/cask'
     with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
         out, err = process.communicate()
@@ -89,10 +93,11 @@ def tap_brew_cask():
             LOGGER.debug(out.decode('utf-8'))
             LOGGER.info('Brew has successfully tapped into cask')
 
+
 def install_all_brew_packages():
-    '''
+    """
     Downloads & installs every package config if it's valid
-    '''
+    """
     command = 'brew list'
     output = check_output(command.split())
     brew_list = output.decode('utf-8').split('\n')
@@ -129,10 +134,11 @@ def install_all_brew_packages():
                 LOGGER.debug(out.decode('utf-8'))
                 LOGGER.info(f'{package} - successfully installed')
 
+
 def install_all_cask_packages():
-    '''
+    """
     Downloads & installs every package config if it's valid
-    '''
+    """
     output = None
     command = 'brew cask list'
     with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
@@ -178,10 +184,11 @@ def install_all_cask_packages():
                 LOGGER.debug(out.decode('utf-8'))
                 LOGGER.info(f'{package} - successfully installed')
 
+
 def uninstall_brew():
-    '''
+    """
     Uninstalls brew from the web via git
-    '''
+    """
     command = 'which brew'
     bin_exists = call(command.split(), stdout=DEVNULL) == 0
 

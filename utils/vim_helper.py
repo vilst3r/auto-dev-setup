@@ -1,6 +1,6 @@
-'''
+"""
 Module delegated to handling vim logic
-'''
+"""
 
 # Native Modules
 import logging
@@ -8,15 +8,18 @@ import sys
 from subprocess import Popen, call, DEVNULL, PIPE
 
 # Custom Modules
-from utils.setup_wrapper import SETUP
-from utils.github_wrapper import GITHUB
+from singletons.setup import SetupSingleton
+from singletons.github import GithubSingleton
 
+SETUP = SetupSingleton.get_instance()
+GITHUB = GithubSingleton.get_instance()
 LOGGER = logging.getLogger()
 
+
 def pull_vim_settings():
-    '''
+    """
     Pull vim setting repository from github account
-    '''
+    """
     git_username = GITHUB.username
 
     source = f'git@github.com:{git_username}/vim-settings.git'
@@ -51,10 +54,11 @@ def pull_vim_settings():
             LOGGER.debug(out.decode('utf-8'))
             LOGGER.info('Vim settings has successfully been cloned from github')
 
+
 def configure_vimrc():
-    '''
+    """
     Copies vimrc from local project vim settings to user settings
-    '''
+    """
     home_dir = SETUP.dir['home']
 
     command = f'cp config/vim/vim-settings/.vimrc {home_dir}/.vimrc'
@@ -69,10 +73,11 @@ def configure_vimrc():
             LOGGER.debug(out.decode('utf-8'))
             LOGGER.info('Vimrc now configured from git repository')
 
+
 def configure_color_themes():
-    '''
+    """
     Moves color theme vim scripts to correct location
-    '''
+    """
     home_dir = SETUP.dir['home']
     vim_color_dir = f'{home_dir}/.vim/colors'
 
@@ -93,10 +98,11 @@ def configure_color_themes():
         LOGGER.error('Error copying vim color themes in config')
         sys.exit()
 
+
 def remove_color_themes():
-    '''
+    """
     Remove all color themes in the vim config folder of user
-    '''
+    """
     home_dir = SETUP.dir['home']
     vim_color_dir = f'{home_dir}/.vim/colors'
 
@@ -121,10 +127,11 @@ def remove_color_themes():
             LOGGER.debug(out.decode('utf-8'))
             LOGGER.info('Vim color themes has successfully been removed')
 
+
 def remove_vim_settings():
-    '''
+    """
     Remove vim setting repository cloned from github
-    '''
+    """
     command = 'find config/vim/vim-settings'
     directory_found = call(command.split(), stdout=DEVNULL) == 0
 

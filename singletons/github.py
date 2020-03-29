@@ -40,15 +40,10 @@ class GithubSingleton:
         self._initialize_singleton()
         GithubSingleton.__instance = self
 
+        LOGGER.debug(f'GithubSingleton:\n {self}')
+
     def __str__(self):
-        str_vals = {}
-        str_vals["api_url"] = self.api
-        str_vals["username"] = self.username
-        str_vals["email"] = self.email
-        str_vals["token"] = self.token
-        str_vals["common_headers"] = self.common_headers
-        pretty_str = pprint.pformat(str_vals)
-        return pretty_str
+        return pprint.pformat(self.__dict__)
 
     def get_public_keys(self) -> dict:
         """
