@@ -77,7 +77,7 @@ def initialise_logger():
         Determines where to log the output by reading the first stack frame
         :return: root file that executed the containing process
         """
-        first_stack_message = traceback.format_stack(limit=1)[0]
+        first_stack_message = traceback.format_stack()[0]
 
         pattern = re.compile(r'File ".*"')
         match_object = re.search(pattern, first_stack_message).group(0)
