@@ -7,7 +7,7 @@ import logging
 import re
 
 # Custom Modules
-import utils.ssh_helper as ssh_helper
+from services import ssh
 from singletons.setup import SetupSingleton
 from singletons.github import GithubSingleton
 
@@ -55,7 +55,7 @@ def public_key_exists_on_github() -> bool:
     """
     Check if current public key passed in exists on github
     """
-    current_key = ssh_helper.get_public_key()
+    current_key = ssh.get_public_key()
     public_keys = GITHUB.get_public_keys().json()
 
     pattern = re.compile(re.escape(current_key))

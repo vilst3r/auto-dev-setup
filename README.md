@@ -25,6 +25,4 @@ with proper packaging, editor profiles & settings. OSX machine environment only.
 - iTerm2 configuration left to manual user configuration through the GUI
 
 # TODO
-- Update script to pull from `dotfiles` repository for bash, vim & emacs 
-    settings
 - Add iTerm2 configuration in spare time in the future

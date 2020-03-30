@@ -28,6 +28,7 @@ class SetupSingleton:
 
         home = str(pathlib.Path.home())
         self.home_dir = home
+        self.dotfiles_dir = f'{home}/dotfiles'
 
         command = "python3 -m site --user-site"
         python_site = check_output(
@@ -37,6 +38,8 @@ class SetupSingleton:
         self.powerline_local_config_dir = f'{home}/.config/powerline'
         self.powerline_system_config_dir = f'{python_site}/' \
                                            f'powerline/config_files'
+        self.vim_color_dir = f'{home}/.vim/colors'
+
         self.brew_config_file = 'config/brew/brew.txt'
         self.brew_cask_config_file = 'config/brew/brew-cask.txt'
         self.bash_profile_file = f'{home}/.bash_profile'

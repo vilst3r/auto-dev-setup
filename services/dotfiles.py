@@ -16,94 +16,107 @@ GITHUB: GithubSingleton = GithubSingleton.get_instance()
 LOGGER = logging.getLogger()
 
 
-def pull_vim_settings():
+def pull_dotfile_settings():
     """
-    Pull vim setting repository from github account
+    Pull dotfiles repository from github account
     """
-    git_username = GITHUB.username
-
-    source = f'git@github.com:{git_username}/vim-settings.git'
-    destination = f'config/vim/vim-settings'
-
-    command = f'find {destination}'
+    command = f'find {SETUP.dotfiles_dir}'
     directory_found = call(command.split(), stdout=DEVNULL) == 0
 
     if directory_found:
-        LOGGER.info('Vim settings already pulled from git')
+        LOGGER.info('Dotfile settings already pulled from git')
         return
 
     # Check if repository is forked in configured account
+    source = f'git@github.com:{GITHUB.username}/dotfiles.git'
     command = f'git ls-remote {source}'
     fork_exists = call(command.split(), stdout=DEVNULL) == 0
 
     if not fork_exists:
         LOGGER.info(f'This step is optional but it requires - {source}')
         return
+    # TODO - ^ check this again, can't remember why I added this logic
 
-
-    command = f'git clone {source} {destination}'
+    command = f'git clone {source} {SETUP.dotfiles_dir}'
     with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
         out, err = process.communicate()
         cloned_successfully = process.returncode == 0
 
         if err and not cloned_successfully:
             LOGGER.error(err.decode('utf-8'))
-            LOGGER.error('Failed to clone vim settings from github')
+            LOGGER.error('Failed to clone dotfile settings from github')
             sys.exit()
         else:
             LOGGER.debug(out.decode('utf-8'))
-            LOGGER.info('Vim settings has successfully been cloned from github')
+            LOGGER.info('Dotfile settings has successfully been cloned from '
+                        'github')
 
 
 def configure_vimrc():
     """
-    Copies vimrc from local project vim settings to user settings
+    Copies vimrc from dotfile settings to user settings
     """
-    command = f'cp config/vim/vim-settings/.vimrc {SETUP.home_dir}/.vimrc'
+    command = f'cp {SETUP.dotfiles_dir}/.vimrc {SETUP.home_dir}/.vimrc'
     with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
         out, err = process.communicate()
 
         if err:
             LOGGER.error(err.decode('utf-8'))
-            LOGGER.error('Failed to configure vimrc from git repository')
+            LOGGER.error('Failed to configure vimrc from the dotfiles '
+                         'repository')
             sys.exit()
         else:
             LOGGER.debug(out.decode('utf-8'))
-            LOGGER.info('Vimrc now configured from git repository')
+            LOGGER.info('Vimrc now configured from the dotfiles repository')
 
 
-def configure_color_themes():
+def configure_vim_color_themes():
     """
-    Moves color theme vim scripts to correct location
+    Moves the vim color theme scripts from the dotfiles settings repository to
+    the correct location
     """
-    vim_color_dir = f'{SETUP.home_dir}/.vim/colors'
-
-    command = f'mkdir -p {vim_color_dir}'
+    command = f'mkdir -p {SETUP.vim_color_dir}'
     call(command.split(), stdout=DEVNULL)
-    LOGGER.info(f'{vim_color_dir} - has been created')
+    LOGGER.info(f'{SETUP.vim_color_dir} - has been created')
 
     command_list = []
     command_list.append('sh')
     command_list.append('-c')
-    command_list.append(f'cp config/vim/vim-settings/color_themes/*.vim '
-                        f'{vim_color_dir}')
+    command_list.append(f'cp {SETUP.dotfiles_dir}/vim_color_themes/*.vim '
+                        f'{SETUP.vim_color_dir}')
 
     files_copied = call(command_list, stdout=DEVNULL) == 0
 
     if files_copied:
         LOGGER.info('Vim color themes copied to ~/.vim/colors')
     else:
-        LOGGER.error('Error copying vim color themes in config')
+        LOGGER.error('Error copying vim color themes in user config')
         sys.exit()
+
+
+def configure_bash_profile():
+    """
+    Copies bash profile from local project bash settings to user settings
+    """
+    command = f'cp config/bash/bash-settings/.bash_profile ' \
+              f'{SETUP.home_dir}/.bash_profile'
+    with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
+        out, err = process.communicate()
+
+        if err:
+            LOGGER.error(err.decode('utf-8'))
+            LOGGER.error('Failed to configure bash_profile from git repository')
+            sys.exit()
+        else:
+            LOGGER.debug(out.decode('utf-8'))
+            LOGGER.info('Bash profile now configured from git repository')
 
 
 def remove_color_themes():
     """
     Remove all color themes in the vim config folder of user
     """
-    vim_color_dir = f'{SETUP.home_dir}/.vim/colors'
-
-    command = f'find {vim_color_dir}'
+    command = f'find {SETUP.vim_color_dir}'
     directory_found = call(command.split(), stdout=DEVNULL) == 0
 
     if not directory_found:
@@ -113,7 +126,7 @@ def remove_color_themes():
     command_list = []
     command_list.append('sh')
     command_list.append('-c')
-    command_list.append(f'rm {vim_color_dir}/*.vim')
+    command_list.append(f'rm {SETUP.vim_color_dir}/*.vim')
     with Popen(command_list, stdout=PIPE, stderr=PIPE) as process:
         out, err = process.communicate()
 
@@ -125,26 +138,29 @@ def remove_color_themes():
             LOGGER.info('Vim color themes has successfully been removed')
 
 
-def remove_vim_settings():
+def remove_dotfiles_settings():
     """
-    Remove vim setting repository cloned from github
+    Remove dotfile setting repository cloned from github
     """
-    command = 'find config/vim/vim-settings'
+    command = f'find {SETUP.dotfiles_dir}'
     directory_found = call(command.split(), stdout=DEVNULL) == 0
 
     if not directory_found:
-        LOGGER.info('Vim settings already removed')
+        LOGGER.info('Dotfile settings has been already removed')
         return
 
-    command = 'rm -rf config/vim/vim-settings'
+    command = f'rm -rf {SETUP.dotfiles_dir}'
     with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
         out, err = process.communicate()
 
         if err:
             LOGGER.error(err.decode('utf-8'))
-            LOGGER.error('Failed to remove vim settings cloned from github')
+            LOGGER.error('Failed to remove the dotfiles settings '
+                         'respository cloned from github')
             sys.exit()
         else:
             LOGGER.debug(out.decode('utf-8'))
-            LOGGER.info('Vim settings cloned from github has successfully been '
-                        'removed')
+            LOGGER.info('Dotfiles settings repository cloned from github has '
+                        'successfully been removed')
+
+
