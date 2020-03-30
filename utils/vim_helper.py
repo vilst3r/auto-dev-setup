@@ -11,8 +11,8 @@ from subprocess import Popen, call, DEVNULL, PIPE
 from singletons.setup import SetupSingleton
 from singletons.github import GithubSingleton
 
-SETUP = SetupSingleton.get_instance()
-GITHUB = GithubSingleton.get_instance()
+SETUP: SetupSingleton = SetupSingleton.get_instance()
+GITHUB: GithubSingleton = GithubSingleton.get_instance()
 LOGGER = logging.getLogger()
 
 
@@ -59,9 +59,7 @@ def configure_vimrc():
     """
     Copies vimrc from local project vim settings to user settings
     """
-    home_dir = SETUP.dir['home']
-
-    command = f'cp config/vim/vim-settings/.vimrc {home_dir}/.vimrc'
+    command = f'cp config/vim/vim-settings/.vimrc {SETUP.home_dir}/.vimrc'
     with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
         out, err = process.communicate()
 
@@ -78,8 +76,7 @@ def configure_color_themes():
     """
     Moves color theme vim scripts to correct location
     """
-    home_dir = SETUP.dir['home']
-    vim_color_dir = f'{home_dir}/.vim/colors'
+    vim_color_dir = f'{SETUP.home_dir}/.vim/colors'
 
     command = f'mkdir -p {vim_color_dir}'
     call(command.split(), stdout=DEVNULL)
@@ -104,8 +101,7 @@ def remove_color_themes():
     """
     Remove all color themes in the vim config folder of user
     """
-    home_dir = SETUP.dir['home']
-    vim_color_dir = f'{home_dir}/.vim/colors'
+    vim_color_dir = f'{SETUP.home_dir}/.vim/colors'
 
     command = f'find {vim_color_dir}'
     directory_found = call(command.split(), stdout=DEVNULL) == 0

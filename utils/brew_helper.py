@@ -3,6 +3,8 @@ Module delegated to handling brew logic
 """
 
 # Native Modules
+import functools
+import itertools
 import logging
 import sys
 from subprocess import Popen, call, check_output, PIPE, DEVNULL
@@ -13,7 +15,7 @@ import pexpect
 # Custom Modules
 from singletons.setup import SetupSingleton
 
-SETUP = SetupSingleton.get_instance()
+SETUP: SetupSingleton = SetupSingleton.get_instance()
 LOGGER = logging.getLogger()
 
 
@@ -99,30 +101,17 @@ def install_all_brew_packages():
     """
     Downloads & installs every package config if it's valid
     """
-    command = 'brew list'
-    output = check_output(command.split())
-    brew_list = output.decode('utf-8').split('\n')
-
-    uninstalled_packages = []
-    with open('config/brew/brew.txt') as text_file:
-        for line in text_file.readlines():
-            package = line.strip()
-
-            if package not in brew_list:
-                uninstalled_packages.append(package)
-
-    if not uninstalled_packages:
-        LOGGER.info('No available brew packages to install')
-        return
-
-    for package in uninstalled_packages:
+    def process_package(package: str):
+        """
+        Installs the package if possible & logs correspondingly
+        """
         command = f'brew info {package}'
         package_found = call(command.split(), stdout=DEVNULL) == 0
 
         if not package_found:
             LOGGER.warning(f'This package does not exist in registry - '
                            f'{package}')
-            continue
+            return
 
         command = f'brew install {package}'
         with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
@@ -136,37 +125,35 @@ def install_all_brew_packages():
                 LOGGER.debug(out.decode('utf-8'))
                 LOGGER.info(f'{package} - successfully installed')
 
+    command = 'brew list'
+    output = check_output(command.split()).strip()
+    brew_list = output.decode('utf-8').split('\n')
+
+    with open(SETUP.brew_config_file) as text_file:
+        configured_packages = map(lambda x: x.strip(), text_file.readlines())
+
+    uninstalled_packages = filter(
+        lambda x: x not in brew_list, configured_packages)
+
+    uninstalled_packages, uninstalled_packages_copy = \
+        itertools.tee(uninstalled_packages)
+
+    if not next(uninstalled_packages_copy, None):
+        LOGGER.info('No available brew packages to install')
+    else:
+        # list(map(lambda x: process_package(x), uninstalled_packages))
+        # TODO remove below
+        print('Stub completed')
+
 
 def install_all_cask_packages():
     """
     Downloads & installs every package config if it's valid
     """
-    output = None
-    command = 'brew cask list'
-    with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
-        out, err = process.communicate()
-
-        if err:
-            LOGGER.warning(err.decode('utf-8'))
-        else:
-            LOGGER.debug(out.decode('utf-8'))
-            output = out
-
-    cask_list = output.decode('utf-8').split('\n')
-
-    uninstalled_packages = []
-    with open('config/brew/brew-cask.txt') as text_file:
-        for line in text_file.readlines():
-            package = line.strip()
-
-            if package not in cask_list:
-                uninstalled_packages.append(package)
-
-    if not uninstalled_packages:
-        LOGGER.info('No available cask packages to install')
-        return
-
-    for package in uninstalled_packages:
+    def process_package(package: str):
+        """
+        Installs the package if possible & logs correspondingly
+        """
         command = f'brew cask info {package}'
         package_found = call(command.split(), stdout=DEVNULL) == 0
 
@@ -186,6 +173,26 @@ def install_all_cask_packages():
             else:
                 LOGGER.debug(out.decode('utf-8'))
                 LOGGER.info(f'{package} - successfully installed')
+
+    command = 'brew cask list'
+    output = check_output(command.split()).strip()
+    cask_list = output.decode('utf-8').split('\n')
+
+    with open(SETUP.brew_cask_config_file) as text_file:
+        configured_packages = map(lambda x: x.strip(), text_file.readlines())
+
+    uninstalled_packages = filter(
+        lambda x: x not in cask_list, configured_packages)
+
+    uninstalled_packages, uninstalled_packages_copy = \
+        itertools.tee(uninstalled_packages)
+
+    if not uninstalled_packages:
+        LOGGER.info('No available cask packages to install')
+    else:
+        # list(map(lambda x: process_package(x), uninstalled_packages))
+        # TODO remove below
+        print('Stub completed')
 
 
 def uninstall_brew():

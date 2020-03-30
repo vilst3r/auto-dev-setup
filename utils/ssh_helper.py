@@ -11,8 +11,8 @@ from subprocess import call, Popen, PIPE, DEVNULL
 from singletons.setup import SetupSingleton
 from singletons.github import GithubSingleton
 
-SETUP = SetupSingleton.get_instance()
-GITHUB = GithubSingleton.get_instance()
+SETUP: SetupSingleton = SetupSingleton.get_instance()
+GITHUB: GithubSingleton = GithubSingleton.get_instance()
 LOGGER = logging.getLogger()
 
 
@@ -20,9 +20,7 @@ def public_key_exists() -> bool:
     """
     Check if public key exists to confirm whether ssh is already configured
     """
-    home_dir = SETUP.dir['home']
-
-    command = f'find {home_dir}/.ssh/id_rsa.pub'
+    command = f'find {SETUP.home_dir}/.ssh/id_rsa.pub'
     file_found = call(command.split(), stdout=DEVNULL, stderr=DEVNULL) == 0
 
     if not file_found:
@@ -55,6 +53,19 @@ def start_ssh_agent():
     """
     Start ssh-agent process in local machine
     """
+    def find_ssh_process(line):
+        """
+        Processes output to log the ssh agent process
+        """
+        if not line:
+            return
+
+        user, pid = line.split()[:2]
+
+        if 'egrep' not in line and user == SETUP.username:
+            LOGGER.debug(f'Existing ssh-agent pid - {pid}')
+            LOGGER.debug(f'{line}')
+
     command = 'ps aux'
     ps_process = Popen(command.split(), stdout=PIPE)
 
@@ -71,21 +82,10 @@ def start_ssh_agent():
             sys.exit()
 
         parsed_output = out.decode('utf-8').split('\n')
-        for line in parsed_output:
-            if not line:
-                continue
 
-            user, pid = line.split()[:2]
+    list(lambda x: find_ssh_process(x), parsed_output)
 
-            if 'egrep' not in line and user == SETUP.username:
-                LOGGER.debug(f'Existing ssh-agent pid - {pid}')
-                LOGGER.debug(f'{line}')
-
-    command_list = []
-    command_list.append('sh')
-    command_list.append('-c')
-    command_list.append(f'eval \"$(ssh-agent -s)\"')
-
+    command_list = ['sh', '-c', f'eval \"$(ssh-agent -s)\"']
     with Popen(command_list, stdout=PIPE, stderr=PIPE) as process:
         out, err = process.communicate()
 
@@ -102,9 +102,7 @@ def register_private_key_to_ssh_agent():
     """
     Add ssh private key to ssh-agent
     """
-    home_dir = SETUP.dir['home']
-
-    command = f'ssh-add -K {home_dir}/.ssh/id_rsa'
+    command = f'ssh-add -K {SETUP.home_dir}/.ssh/id_rsa'
     ssh_added = call(command.split(), stdout=DEVNULL) == 0
 
     if ssh_added:
@@ -119,9 +117,7 @@ def get_public_key() -> str:
     """
     Return utf-8 string of ssh public key
     """
-    home_dir = SETUP.dir['home']
-
-    command = f'cat {home_dir}/.ssh/id_rsa.pub'
+    command = f'cat {SETUP.home_dir}/.ssh/id_rsa.pub'
     with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
         out, err = process.communicate()
 
@@ -143,12 +139,7 @@ def delete_ssh_rsa_keypair():
     """
     Delete both public and private key configured for ssh
     """
-    home_dir = SETUP.dir['home']
-
-    command_list = []
-    command_list.append('sh')
-    command_list.append('-c')
-    command_list.append(f'rm {home_dir}/.ssh/id_rsa*')
+    command_list = ['sh', '-c', f'rm {SETUP.home_dir}/.ssh/id_rsa*']
 
     with Popen(command_list, stdout=PIPE, stderr=PIPE) as process:
         out, err = process.communicate()

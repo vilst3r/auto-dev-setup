@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 
 """
-Script to automate setup of unix environment with personal configurations and tools
+Script to automate setup of unix environment with personal configurations and
+tools
 """
 
 # Native Modules
@@ -15,8 +16,8 @@ from utils import powerline_helper, git_helper, ssh_helper, \
     brew_helper, vim_helper, bash_helper
 from utils.decorators import measure_time, print_process_step
 
-SETUP = SetupSingleton.get_instance()
-GITHUB = GithubSingleton.get_instance()
+SETUP: SetupSingleton = SetupSingleton.get_instance()
+GITHUB: GithubSingleton = GithubSingleton.get_instance()
 LOGGER = logging.getLogger()
 
 

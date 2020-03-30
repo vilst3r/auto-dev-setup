@@ -11,8 +11,8 @@ import utils.ssh_helper as ssh_helper
 from singletons.setup import SetupSingleton
 from singletons.github import GithubSingleton
 
-SETUP = SetupSingleton.get_instance()
-GITHUB = GithubSingleton.get_instance()
+SETUP: SetupSingleton = SetupSingleton.get_instance()
+GITHUB: GithubSingleton = GithubSingleton.get_instance()
 LOGGER = logging.getLogger()
 
 
@@ -20,20 +20,15 @@ def update_ssh_config():
     """
     Update config file in .ssh directory
     """
-    home_dir = SETUP.dir['home']
-    ssh_config = f'{home_dir}/.ssh/config'
-
-    config = None
+    ssh_config = f'{SETUP.home_dir}/.ssh/config'
 
     with open(ssh_config) as text_file:
-        config = [line for line in text_file.readlines()]
-
-    content = ''.join(config)
+        content = ''.join(text_file.readlines())
 
     pattern = re.compile(r'IdentityFile .*')
     key_match = re.search(pattern, content)
 
-    identity_val = f'IdentityFile {home_dir}/.ssh/id_rsa'
+    identity_val = f'IdentityFile {SETUP.home_dir}/.ssh/id_rsa'
 
     if not key_match:
         with open(ssh_config, 'a') as text_file:
@@ -42,7 +37,7 @@ def update_ssh_config():
         return
 
     start, end = key_match.span()
-    current_config = content[start:end]
+    current_config = content[start: end]
 
     if current_config == identity_val:
         LOGGER.info('IdentityFile key value already configured in ssh config '
@@ -65,13 +60,15 @@ def public_key_exists_on_github() -> bool:
 
     pattern = re.compile(re.escape(current_key))
 
-    for key in public_keys:
-        if re.match(pattern, key['key']):
-            LOGGER.info('Git SSH has been configured on Github')
-            return True
+    key_found = next(filter(
+        lambda x: re.match(pattern, x['key']), public_keys), None)
 
-    LOGGER.info('Git SSH is not configured on Github')
-    return False
+    if key_found:
+        LOGGER.info('Git SSH has been configured on Github')
+    else:
+        LOGGER.info('Git SSH is not configured on Github')
+
+    return key_found is not None
 
 
 def delete_github_pub_key(current_key: str, public_keys: list):
@@ -93,10 +90,7 @@ def remove_ssh_config():
     """
     Removes the identity value of the rsa private key from the ssh config file
     """
-    home_dir = SETUP.dir['home']
-    ssh_config = f'{home_dir}/.ssh/config'
-
-    config = None
+    ssh_config = f'{SETUP.home_dir}/.ssh/config'
 
     with open(ssh_config) as text_file:
         config = [line for line in text_file.readlines()]
@@ -124,10 +118,8 @@ def remove_ssh_github_host():
     """
     Remove host key & agent from known_host file in .ssh directory
     """
-    home_dir = SETUP.dir['home']
-    known_hosts = f'{home_dir}/.ssh/config'
+    known_hosts = f'{SETUP.home_dir}/.ssh/config'
 
-    config = None
     with open(known_hosts) as text_file:
         config = [line for line in text_file.readlines()]
 

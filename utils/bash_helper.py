@@ -11,8 +11,8 @@ from subprocess import Popen, call, DEVNULL, PIPE
 from singletons.setup import SetupSingleton
 from singletons.github import GithubSingleton
 
-SETUP = SetupSingleton.get_instance()
-GITHUB = GithubSingleton.get_instance()
+SETUP: SetupSingleton = SetupSingleton.get_instance()
+GITHUB: GithubSingleton = GithubSingleton.get_instance()
 LOGGER = logging.getLogger()
 
 
@@ -59,10 +59,8 @@ def configure_bash_profile():
     """
     Copies bash profile from local project bash settings to user settings
     """
-    home_dir = SETUP.dir['home']
-
     command = f'cp config/bash/bash-settings/.bash_profile ' \
-              f'{home_dir}/.bash_profile'
+              f'{SETUP.home_dir}/.bash_profile'
     with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
         out, err = process.communicate()
 

@@ -13,8 +13,8 @@ from subprocess import Popen, call, PIPE, DEVNULL
 from singletons.setup import SetupSingleton
 from singletons.github import GithubSingleton
 
-SETUP = SetupSingleton.get_instance()
-GITHUB = GithubSingleton.get_instance()
+SETUP: SetupSingleton = SetupSingleton.get_instance()
+GITHUB: GithubSingleton = GithubSingleton.get_instance()
 LOGGER = logging.getLogger()
 
 
@@ -39,12 +39,9 @@ def write_bash_daemon():
     """
     Append daemon configuration lines to bash profile
     """
-    home_dir = SETUP.dir["home"]
-    python_site = SETUP.dir["python_site"]
-    bash_profile = f"{home_dir}/.bash_profile"
-
     source_version = f"source " \
-                     f"{python_site}/powerline/bindings/bash/powerline.sh"
+                     f"{SETUP.python_site_dir}/powerline/bindings" \
+                     f"/bash/powerline.sh"
 
     daemon_config = []
     daemon_config.append("# Powerline user config")
@@ -59,9 +56,8 @@ def write_bash_daemon():
     daemon_config = "\n".join(daemon_config)
     pattern = "\n".join(pattern)
 
-    content = None
-    with open(bash_profile) as text_file:
-        content = "".join([line for line in text_file.readlines()])
+    with open(SETUP.bash_profile_file) as text_file:
+        content = "".join(text_file.readlines())
 
     pattern = re.compile(pattern)
     config_match = re.search(pattern, content)
@@ -69,7 +65,7 @@ def write_bash_daemon():
     if not config_match:
         LOGGER.info("Appended powerline configuration in bash profile")
 
-        with open(bash_profile, "a") as text_file:
+        with open(SETUP.bash_profile_file, "a") as text_file:
             text_file.write(f"\n{daemon_config}\n")
         return
 
@@ -82,7 +78,7 @@ def write_bash_daemon():
     start, end = config_match.span()
     content = content[:start] + daemon_config + content[end:]
 
-    with open(bash_profile, "w") as text_file:
+    with open(SETUP.bash_profile_file, "w") as text_file:
         text_file.write(content)
 
     LOGGER.info("Powerline configuration updated in bash profile")
@@ -92,11 +88,7 @@ def write_vim_config():
     """
     Append powerline configuration to vimrc
     """
-    home_dir = SETUP.dir["home"]
-    python_site = SETUP.dir["python_site"]
-    vimrc = f"{home_dir}/.vimrc"
-
-    rtp_version = f"set rtp+={python_site}/powerline/bindings/vim"
+    rtp_version = f"set rtp+={SETUP.python_site_dir}/powerline/bindings/vim"
 
     config = []
     config.append('" Powerline')
@@ -110,9 +102,8 @@ def write_vim_config():
     config = "\n".join(config)
     pattern = "\n".join(pattern)
 
-    content = None
-    with open(vimrc) as text_file:
-        content = "".join([line for line in text_file.readlines()])
+    with open(SETUP.vimrc_file) as text_file:
+        content = "".join(text_file.readlines())
 
     pattern = re.compile(pattern)
     config_match = re.search(pattern, content)
@@ -120,7 +111,7 @@ def write_vim_config():
     if not config_match:
         LOGGER.info("Appended powerline configuration in vimrc")
 
-        with open(vimrc, "a") as text_file:
+        with open(SETUP.vimrc_file, "a") as text_file:
             text_file.write(f"\n{config}\n")
         return
 
@@ -133,7 +124,7 @@ def write_vim_config():
     start, end = config_match.span()
     content = content[:start] + config + content[end:]
 
-    with open(vimrc, "w") as text_file:
+    with open(SETUP.vimrc_file, "w") as text_file:
         text_file.write(content)
 
     LOGGER.info("Powerline configuration updated in vimrc")
@@ -143,14 +134,13 @@ def configure_user_config_directory() -> bool:
     """
     Checks & creates proper directory for the powerline configs to go
     """
-    user_config_dir = SETUP.dir["powerline_config"]
-    system_config_dir = f'{SETUP.dir["python_site"]}/powerline/config_files/'
-
-    command = f"mkdir -p {user_config_dir}"
+    command = f"mkdir -p {SETUP.powerline_local_config_dir}"
     call(command.split(), stdout=DEVNULL)
-    LOGGER.info(f"{user_config_dir} - has been created")
 
-    command = f"cp -r {system_config_dir} {user_config_dir}"
+    LOGGER.info(f"{SETUP.powerline_local_config_dir} - has been created")
+
+    command = f"cp -r {SETUP.powerline_system_config_dir}/ " \
+              f"{SETUP.powerline_local_config_dir}"
     with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
         out, err = process.communicate()
 
@@ -170,11 +160,8 @@ def install_fonts():
     """
     Downloads & installs all font files to proper location
     """
-    git_username = GITHUB.username
-    user_config_dir = SETUP.dir["powerline_config"]
-
-    source = f"git@github.com:{git_username}/fonts.git"
-    destination = f"{user_config_dir}/fonts"
+    source = f"git@github.com:{GITHUB.username}/fonts.git"
+    destination = f"{SETUP.powerline_local_config_dir}/fonts"
 
     command = f"find {destination}"
     directory_found = call(command.split(), stdout=DEVNULL) == 0
@@ -238,11 +225,11 @@ def config_git_colorscheme():
     """
     Configures color scheme for git status in powerline
     """
-    powerline_config = SETUP.dir["powerline_config"]
-    default_block = f"{powerline_config}/colorschemes/default.json"
-    config_block = "config/powerline/powerline_git_color.json"
+    # TODO Double check these two lines again
+    default_block = f'{SETUP.powerline_local_config_dir}/' \
+                    f'colorschemes/default.json'
+    config_block = 'config/powerline/powerline_git_color.json'
 
-    data = None
     with open(default_block) as default_json, open(config_block) as config_json:
         default_data = json.load(default_json)
         config_data = json.load(config_json)
@@ -267,11 +254,10 @@ def config_git_shell():
     """
     Configure shell to display git status
     """
-    powerline_config = SETUP.dir["powerline_config"]
-    default_block = f"{powerline_config}/themes/shell/default.json"
+    default_block = f'{SETUP.powerline_local_config_dir}/' \
+                    f'themes/shell/default.json'
     config_block = "config/powerline/powerline_git_shell.json"
 
-    data = None
     with open(default_block) as default_json, open(config_block) as config_json:
         default_data = json.load(default_json)
         config_data = json.load(config_json)

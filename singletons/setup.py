@@ -27,14 +27,20 @@ class SetupSingleton:
         initialise_logger()
 
         home = str(pathlib.Path.home())
-
-        self.dir = {"home": home}
+        self.home_dir = home
 
         command = "python3 -m site --user-site"
-        python_site = check_output(command.split()).decode("utf-8").strip()
+        python_site = check_output(
+            command.split()).decode('utf-8').strip()
+        self.python_site_dir = python_site
 
-        self.dir["python_site"] = python_site
-        self.dir["powerline_config"] = f"{home}/.config/powerline"
+        self.powerline_local_config_dir = f'{home}/.config/powerline'
+        self.powerline_system_config_dir = f'{python_site}/' \
+                                           f'powerline/config_files'
+        self.brew_config_file = 'config/brew/brew.txt'
+        self.brew_cask_config_file = 'config/brew/brew-cask.txt'
+        self.bash_profile_file = f'{home}/.bash_profile'
+        self.vimrc_file = f'{home}/.vimrc'
 
         self.username = getpass.getuser()
         self.password = getpass.getpass()
