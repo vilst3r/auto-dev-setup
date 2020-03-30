@@ -90,7 +90,7 @@ def configure_dotfiles():
     # dotfiles.configure_vimrc()
     # dotfiles.configure_vim_color_themes()
     # dotfiles.configure_bash_profile()
-    # TODO - Add emacs later
+    # dotfiles.configure_emacs()
 
 
 @print_process_step(step_no=6,
@@ -119,11 +119,11 @@ if __name__ == "__main__":
         single thread for now
         TODO - Add multithreading for idle-dependencies, chart dependency graph
         """
-        configure_git_ssh()
-        install_homebrew()
-        install_brew_packages()
-        install_cask_packages()
-        configure_dotfiles()
+        # configure_git_ssh()
+        # install_homebrew()
+        # install_brew_packages()
+        # install_cask_packages()
+        # configure_dotfiles()
         # install_powerline()
 
     build_dev_environment()

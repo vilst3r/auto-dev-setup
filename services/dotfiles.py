@@ -96,7 +96,7 @@ def configure_vim_color_themes():
 
 def configure_bash_profile():
     """
-    Copies bash profile from local project bash settings to user settings
+    Copies bash profile from dotfile settings to user settings
     """
     command = f'cp config/bash/bash-settings/.bash_profile ' \
               f'{SETUP.home_dir}/.bash_profile'
@@ -105,11 +105,33 @@ def configure_bash_profile():
 
         if err:
             LOGGER.error(err.decode('utf-8'))
-            LOGGER.error('Failed to configure bash_profile from git repository')
+            LOGGER.error('Failed to configure bash_profile from the dotfiles '
+                         'repository')
             sys.exit()
         else:
             LOGGER.debug(out.decode('utf-8'))
-            LOGGER.info('Bash profile now configured from git repository')
+            LOGGER.info('Bash profile now configured from the dotfiles '
+                        'repository')
+
+
+def configure_emacs():
+    """
+    Maps `.emacs` from dotfile settings to `init.el` in user settings
+    """
+    command = f'cp {SETUP.dotfiles_dir}/.emacs ' \
+              f'{SETUP.home_dir}/.emacs'
+    with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
+        out, err = process.communicate()
+
+        if err:
+            LOGGER.error(err.decode('utf-8'))
+            LOGGER.error('Failed to configure emacs settings from the dotfiles '
+                         'repository')
+            sys.exit()
+        else:
+            LOGGER.debug(out.decode('utf-8'))
+            LOGGER.info('Emacs settings are now configured from the dotfiles '
+                        'repository')
 
 
 def remove_color_themes():
