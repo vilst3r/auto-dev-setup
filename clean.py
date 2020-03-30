@@ -7,13 +7,11 @@ tools
 
 # Native Modules
 import logging
-import time
 
 # Custom Modules
 from singletons.setup import SetupSingleton
 from singletons.github import GithubSingleton
-from utils import powerline_helper, git_helper, ssh_helper, \
-    brew_helper, vim_helper, bash_helper
+from services import powerline, git, ssh, brew, vim, bash
 from utils.decorators import measure_time, print_process_step
 
 SETUP: SetupSingleton = SetupSingleton.get_instance()
@@ -28,12 +26,12 @@ def uninstall_powerline():
     """
     Remove existing powerline configurations
     """
-    # powerline_helper.uninstall_gitstatus()
-    # powerline_helper.delete_fonts()
-    # powerline_helper.delete_config()
-    # powerline_helper.remove_bash_daemon()
-    # powerline_helper.remove_vim_config()
-    # powerline_helper.uninstall_powerline_status()
+    # powerline.uninstall_gitstatus()
+    # powerline.delete_fonts()
+    # powerline.delete_config()
+    # powerline.remove_bash_daemon()
+    # powerline.remove_vim_config()
+    # powerline.uninstall_powerline_status()
 
 
 @print_process_step(step_no=2,
@@ -43,7 +41,7 @@ def uninstall_bash():
     """
     Remove existing bash configurations
     """
-    # bash_helper.remove_bash_settings()
+    # bash.remove_bash_settings()
 
 
 @print_process_step(step_no=3,
@@ -53,8 +51,8 @@ def uninstall_vim():
     """
     Remove existing vim configurations
     """
-    # vim_helper.remove_color_themes()
-    # vim_helper.remove_vim_settings()
+    # vim.remove_color_themes()
+    # vim.remove_vim_settings()
 
 
 @print_process_step(step_no=4,
@@ -64,7 +62,7 @@ def uninstall_brew():
     """
     Uninstall brew and cask together
     """
-    # brew_helper.uninstall_brew()
+    # brew.uninstall_brew()
 
 
 @print_process_step(step_no=5,
@@ -74,18 +72,18 @@ def uninstall_git_ssh():
     """
     Remove existing git ssh configurations locally and on github
     """
-    # if not ssh_helper.public_key_exists():
+    # if not ssh.public_key_exists():
     #     LOGGER.info('Git SSH already uninstalled!')
     #     return
     #
-    # current_public_key = ssh_helper.get_public_key()
+    # current_public_key = ssh.get_public_key()
     # public_keys = GITHUB.get_public_keys().json()
     #
-    # git_helper.delete_github_pub_key(current_public_key, public_keys)
-    # ssh_helper.delete_ssh_rsa_keypair()
-    # ssh_helper.stop_ssh_agent()
-    # git_helper.remove_ssh_config()
-    # git_helper.remove_ssh_github_host()
+    # git.delete_github_pub_key(current_public_key, public_keys)
+    # ssh.delete_ssh_rsa_keypair()
+    # ssh.stop_ssh_agent()
+    # git.remove_ssh_config()
+    # git.remove_ssh_github_host()
 
 
 if __name__ == '__main__':
