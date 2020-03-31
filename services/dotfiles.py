@@ -56,7 +56,7 @@ def configure_vimrc():
     """
     Copies vimrc from dotfile settings to user settings
     """
-    command = f'cp {SETUP.dotfiles_dir}/.vimrc {SETUP.home_dir}/.vimrc'
+    command = f'cp {SETUP.dotfiles_dir}/.vimrc {SETUP.vimrc_file}'
     with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
         out, err = process.communicate()
 
@@ -98,8 +98,8 @@ def configure_bash_profile():
     """
     Copies bash profile from dotfile settings to user settings
     """
-    command = f'cp config/bash/bash-settings/.bash_profile ' \
-              f'{SETUP.home_dir}/.bash_profile'
+    command = f'cp {SETUP.dotfiles_dir}/.bash_profile ' \
+              f'{SETUP.bash_profile_file}'
     with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
         out, err = process.communicate()
 

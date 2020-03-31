@@ -26,11 +26,14 @@ class SetupSingleton:
         """ Initialise the singleton"""
         initialise_logger()
 
+        self.brew_dir = '/usr/local/Caskroom'
+
         home = str(pathlib.Path.home())
         self.home_dir = home
+
         self.dotfiles_dir = f'{home}/dotfiles'
 
-        command = "python3 -m site --user-site"
+        command = 'python3 -m site --user-site'
         python_site = check_output(
             command.split()).decode('utf-8').strip()
         self.python_site_dir = python_site
@@ -38,6 +41,8 @@ class SetupSingleton:
         self.powerline_local_config_dir = f'{home}/.config/powerline'
         self.powerline_system_config_dir = f'{python_site}/' \
                                            f'powerline/config_files'
+
+        self.ssh_dir = f'{home}/.ssh'
         self.vim_color_dir = f'{home}/.vim/colors'
 
         self.brew_config_file = 'config/brew/brew.txt'
@@ -51,7 +56,7 @@ class SetupSingleton:
     def __init__(self):
         """ Virtually private constructor """
         if SetupSingleton.__instance:
-            raise Exception("Class already instantiated")
+            raise Exception('Class already instantiated')
 
         self._initialize_singleton()
         SetupSingleton.__instance = self
@@ -63,8 +68,8 @@ class SetupSingleton:
         Stringifies the singleton object except for the username & password
         """
         object_copy = copy.deepcopy(self.__dict__)
-        object_copy.pop("username")
-        object_copy.pop("password")
+        object_copy.pop('username')
+        object_copy.pop('password')
         subset_string = pprint.pformat(object_copy)
         return subset_string
 
@@ -92,7 +97,7 @@ def initialise_logger():
         match_object = re.search(pattern, first_stack_message).group(0)
 
         # Expected match template -> "**/**/<file>.py"
-        file = match_object.split()[1].replace('\"', "")
+        file = match_object.split()[1].replace('\"', '')
         file = file.split('/')[-1]
         file = file.split('.')[0]
 
@@ -106,20 +111,20 @@ def initialise_logger():
 
     log_dir = determine_log_output()
 
-    command = f"mkdir -p {log_dir}"
+    command = f'mkdir -p {log_dir}'
     call(command.split(), stdout=DEVNULL)
 
-    out_path = f"{log_dir}/out.log"
-    err_path = f"{log_dir}/err.log"
+    out_path = f'{log_dir}/out.log'
+    err_path = f'{log_dir}/err.log'
 
     stream_handler = logging.StreamHandler()
     stream_handler.setLevel(logging.INFO)
 
-    out_handler = logging.FileHandler(f"{out_path}", "w+")
+    out_handler = logging.FileHandler(f'{out_path}', 'w+')
     out_handler.setLevel(logging.DEBUG)
     out_handler.setFormatter(formatter)
 
-    err_handler = logging.FileHandler(f"{err_path}", "w+")
+    err_handler = logging.FileHandler(f'{err_path}', 'w+')
     err_handler.setLevel(logging.WARNING)
     err_handler.setFormatter(formatter)
 

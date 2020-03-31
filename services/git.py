@@ -20,9 +20,9 @@ def update_ssh_config():
     """
     Update config file in .ssh directory
     """
-    ssh_config = f'{SETUP.home_dir}/.ssh/config'
+    ssh_config_file = f'{SETUP.ssh_dir}/config'
 
-    with open(ssh_config) as text_file:
+    with open(ssh_config_file) as text_file:
         content = ''.join(text_file.readlines())
 
     pattern = re.compile(r'IdentityFile .*')
@@ -31,7 +31,7 @@ def update_ssh_config():
     identity_val = f'IdentityFile {SETUP.home_dir}/.ssh/id_rsa'
 
     if not key_match:
-        with open(ssh_config, 'a') as text_file:
+        with open(ssh_config_file, 'a') as text_file:
             text_file.write(identity_val)
         LOGGER.info('IdentityFile key value appended to ssh config file')
         return
@@ -45,7 +45,7 @@ def update_ssh_config():
         return
 
     content = content[:start] + identity_val + content[end:]
-    with open(ssh_config, 'w') as text_file:
+    with open(ssh_config_file, 'w') as text_file:
         text_file.write(content)
 
     LOGGER.info('IdentityFile key value updated in ssh config file')
@@ -90,12 +90,10 @@ def remove_ssh_config():
     """
     Removes the identity value of the rsa private key from the ssh config file
     """
-    ssh_config = f'{SETUP.home_dir}/.ssh/config'
+    ssh_config_file = f'{SETUP.ssh_dir}/config'
 
-    with open(ssh_config) as text_file:
-        config = [line for line in text_file.readlines()]
-
-    content = ''.join(config)
+    with open(ssh_config_file) as text_file:
+        content = ''.join(text_file.readlines())
 
     pattern = re.compile(r'IdentityFile .*')
     key_match = re.search(pattern, content)
@@ -108,7 +106,7 @@ def remove_ssh_config():
     start, end = key_match.span()
 
     content = content[:start] + content[end:]
-    with open(ssh_config, 'w') as text_file:
+    with open(ssh_config_file, 'w') as text_file:
         text_file.write(content)
 
     LOGGER.info('IdentityFile key value is now removed from ssh config file')
@@ -118,12 +116,10 @@ def remove_ssh_github_host():
     """
     Remove host key & agent from known_host file in .ssh directory
     """
-    known_hosts = f'{SETUP.home_dir}/.ssh/config'
+    known_hosts = f'{SETUP.ssh_dir}/known_hosts'
 
     with open(known_hosts) as text_file:
-        config = [line for line in text_file.readlines()]
-
-    content = ''.join(config)
+        content = ''.join(text_file.readlines())
 
     pattern = re.compile(r'github.* ssh-rsa .*')
     key_match = re.search(pattern, content)

@@ -3,10 +3,9 @@ Module delegated to handling brew logic
 """
 
 # Native Modules
-import functools
-import itertools
 import logging
 import sys
+from itertools import tee
 from subprocess import Popen, call, check_output, PIPE, DEVNULL
 
 # Third Party Modules
@@ -14,6 +13,7 @@ import pexpect
 
 # Custom Modules
 from singletons.setup import SetupSingleton
+from utils.general import consume
 
 SETUP: SetupSingleton = SetupSingleton.get_instance()
 LOGGER = logging.getLogger()
@@ -23,7 +23,7 @@ def brew_exists() -> bool:
     """
     Check if the brew dependency management tool exists in the system
     """
-    command = 'find /usr/local/Caskroom'
+    command = f'find {SETUP.brew_dir}'
     directory_found = call(command.split(), stdout=DEVNULL, stderr=DEVNULL) == 0
 
     if directory_found:
@@ -135,13 +135,12 @@ def install_all_brew_packages():
     uninstalled_packages = filter(
         lambda x: x not in brew_list, configured_packages)
 
-    uninstalled_packages, uninstalled_packages_copy = \
-        itertools.tee(uninstalled_packages)
+    uninstalled_packages, uninstalled_packages_copy = tee(uninstalled_packages)
 
     if not next(uninstalled_packages_copy, None):
         LOGGER.info('No available brew packages to install')
     else:
-        # list(map(lambda x: process_package(x), uninstalled_packages))
+        # consume(map(lambda x: process_package(x), uninstalled_packages))
         # TODO remove below
         print('Stub completed')
 
@@ -184,13 +183,12 @@ def install_all_cask_packages():
     uninstalled_packages = filter(
         lambda x: x not in cask_list, configured_packages)
 
-    uninstalled_packages, uninstalled_packages_copy = \
-        itertools.tee(uninstalled_packages)
+    uninstalled_packages, uninstalled_packages_copy = tee(uninstalled_packages)
 
     if not uninstalled_packages:
         LOGGER.info('No available cask packages to install')
     else:
-        # list(map(lambda x: process_package(x), uninstalled_packages))
+        # consume(map(lambda x: process_package(x), uninstalled_packages))
         # TODO remove below
         print('Stub completed')
 

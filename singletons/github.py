@@ -24,18 +24,18 @@ class GithubSingleton:
         """ Initialise the singleton"""
         git = read_git_credentials()
 
-        self.api = "https://api.github.com"
-        self.username = git["username"]
-        self.email = git["email"]
-        self.token = git["token"]
+        self.api = 'https://api.github.com'
+        self.username = git['username']
+        self.email = git['email']
+        self.token = git['token']
 
         self.common_headers = {}
-        self.common_headers["Authorization"] = f"token {self.token}"
+        self.common_headers['Authorization'] = f'token {self.token}'
 
     def __init__(self):
         """ Virtually private constructor """
         if GithubSingleton.__instance:
-            raise Exception("Class already instantiated")
+            raise Exception('Class already instantiated')
 
         self._initialize_singleton()
         GithubSingleton.__instance = self
@@ -49,15 +49,15 @@ class GithubSingleton:
         """
         Retrieve list of existing public keys for configured user
         """
-        url = f"{self.api}/users/{self.username}/keys"
+        url = f'{self.api}/users/{self.username}/keys'
 
         try:
             res = requests.get(url, timeout=3)
             res.raise_for_status()
         except requests.RequestException as req_err:
-            LOGGER.error(f"Request Error occurred: {req_err}")
-            LOGGER.error(f"Returned response: {res.json()}")
-            LOGGER.error("Failed request to GitHub API to get public keys")
+            LOGGER.error(f'Request Error occurred: {req_err}')
+            LOGGER.error(f'Returned response: {res.json()}')
+            LOGGER.error('Failed request to GitHub API to get public keys')
             sys.exit()
         else:
             return res
@@ -66,7 +66,7 @@ class GithubSingleton:
         """
         Create public key given input to github user account
         """
-        url = f"{self.api}/user/keys"
+        url = f'{self.api}/user/keys'
 
         try:
             res = requests.post(
@@ -74,9 +74,9 @@ class GithubSingleton:
             )
             res.raise_for_status()
         except requests.RequestException as req_err:
-            LOGGER.error(f"Request Error occurred: {req_err}")
-            LOGGER.error(f"Returned response: {res.json()}")
-            LOGGER.error("Failed request to GitHub API to create a public key")
+            LOGGER.error(f'Request Error occurred: {req_err}')
+            LOGGER.error(f'Returned response: {res.json()}')
+            LOGGER.error('Failed request to GitHub API to create a public key')
             sys.exit()
         else:
             return res
@@ -85,15 +85,15 @@ class GithubSingleton:
         """
         Delete given public key from github user account
         """
-        url = f"{self.api}/user/keys/{key_id}"
+        url = f'{self.api}/user/keys/{key_id}'
 
         try:
             res = requests.delete(url, headers=self.common_headers, timeout=3)
             res.raise_for_status()
         except requests.RequestException as req_err:
-            LOGGER.error(f"Request Error occurred: {req_err}")
-            LOGGER.error(f"Returned response: {res.json()}")
-            LOGGER.error("Failed request to GitHub API to delete a public key")
+            LOGGER.error(f'Request Error occurred: {req_err}')
+            LOGGER.error(f'Returned response: {res.json()}')
+            LOGGER.error('Failed request to GitHub API to delete a public key')
             sys.exit()
         else:
             return res
@@ -109,39 +109,38 @@ class GithubSingleton:
 def read_git_credentials() -> dict:
     """
     Read credentials from file into wrapper object from project directory
+    TODO - think about refactoring this later...
     """
     res = {}
-    git_credentials = "config/git-credentials.txt"
-    valid_properties = ["username", "email", "token"]
+    git_credentials = 'config/git-credentials.txt'
+    valid_properties = ['username', 'email', 'token']
 
-    buff = None
     try:
         with open(git_credentials) as text_file:
-            buff = [line for line in text_file.readlines()]
+            buff = text_file.readlines()
     except IOError as ierr:
         # Generate git credential template
-        with open(git_credentials, "w") as text_file:
+        with open(git_credentials, 'w') as text_file:
             for prop in valid_properties:
                 text_file.write(f"{prop}: <INSERT OWN VALUE>\n")
 
         LOGGER.error(ierr)
-        LOGGER.error(
-            f"Git credential file does not exist - now generated in {git_credentials}"
-        )
+        LOGGER.error(f'Git credential file does not exist - now generated in '
+                     f'{git_credentials}')
         sys.exit()
 
     for line in buff:
-        key, val = line.split(":")
+        key, val = line.split(':')
         key, val = key.strip(), val.strip()
 
         if not key or not val:
-            LOGGER.error("Git credentials are not configured properly")
+            LOGGER.error('Git credentials are not configured properly')
             sys.exit()
         if key not in valid_properties:
-            LOGGER.error("Git property is invalid")
+            LOGGER.error('Git property is invalid')
             sys.exit()
-        if val[0] == "<" or val[-1] == ">":
-            LOGGER.error("Git value of property is unset or invalid")
+        if val[0] == '<' or val[-1] == '>':
+            LOGGER.error('Git value of property is unset or invalid')
             sys.exit()
 
         res[key] = val

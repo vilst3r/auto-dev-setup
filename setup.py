@@ -27,7 +27,7 @@ def configure_git_ssh():
     Configure git ssh key to user ssh agent
     """
     if ssh.public_key_exists() and git.public_key_exists_on_github():
-        LOGGER.info("Git SSH is already configured!")
+        LOGGER.info('Git SSH is already configured!')
         return
 
     ssh.generate_rsa_keypair()
@@ -37,7 +37,7 @@ def configure_git_ssh():
 
     current_public_key = ssh.get_public_key()
 
-    payload = {"title": "script-env-pub-key", "key": current_public_key}
+    payload = {'title': 'script-env-pub-key', 'key': current_public_key}
     GITHUB.create_public_key(payload)
 
 
@@ -50,7 +50,7 @@ def install_homebrew():
     password input
     """
     if brew.brew_exists():
-        LOGGER.info("Homebrew is already installed!")
+        LOGGER.info('Homebrew is already installed!')
         return
 
     brew.install_brew()
@@ -111,7 +111,7 @@ def install_powerline():
     # powerline.config_git_shell()
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     @measure_time
     def build_dev_environment():
         """

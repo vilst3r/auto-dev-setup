@@ -23,8 +23,8 @@ def measure_time(wrapped_function: Callable) -> Callable:
         finish_time = time()
 
         time_elapsed = finish_time - start_time
-        LOGGER.info(f"{wrapped_function.__name__}() execution time:"
-                    f" {time_elapsed} seconds")
+        LOGGER.info(f'{wrapped_function.__name__}() execution time:'
+                    f' {time_elapsed} seconds')
     return decorator
 
 

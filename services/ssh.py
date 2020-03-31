@@ -8,6 +8,7 @@ import logging
 from subprocess import call, Popen, PIPE, DEVNULL
 
 # Custom Modules
+from utils import general
 from singletons.setup import SetupSingleton
 from singletons.github import GithubSingleton
 
@@ -20,7 +21,7 @@ def public_key_exists() -> bool:
     """
     Check if public key exists to confirm whether ssh is already configured
     """
-    command = f'find {SETUP.home_dir}/.ssh/id_rsa.pub'
+    command = f'find {SETUP.ssh_dir}/id_rsa.pub'
     file_found = call(command.split(), stdout=DEVNULL, stderr=DEVNULL) == 0
 
     if not file_found:
@@ -35,7 +36,8 @@ def generate_rsa_keypair():
     """
     Generate asymmetric public/private keypair for ssh use
     """
-    command = f'ssh-keygen -t rsa -b 4096 -C \"{GITHUB.email}\" -N foobar'
+    passphrase = general.random_string(8)
+    command = f'ssh-keygen -t rsa -b 4096 -C \"{GITHUB.email}\" -N {passphrase}'
     with Popen(command.split(), stdin=PIPE, stdout=PIPE, stderr=PIPE) \
             as process:
         out, err = process.communicate(input=b'\ny\n')
@@ -102,7 +104,7 @@ def register_private_key_to_ssh_agent():
     """
     Add ssh private key to ssh-agent
     """
-    command = f'ssh-add -K {SETUP.home_dir}/.ssh/id_rsa'
+    command = f'ssh-add -K {SETUP.ssh_dir}/id_rsa'
     ssh_added = call(command.split(), stdout=DEVNULL) == 0
 
     if ssh_added:
@@ -117,7 +119,7 @@ def get_public_key() -> str:
     """
     Return utf-8 string of ssh public key
     """
-    command = f'cat {SETUP.home_dir}/.ssh/id_rsa.pub'
+    command = f'cat {SETUP.ssh_dir}/id_rsa.pub'
     with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
         out, err = process.communicate()
 
@@ -139,7 +141,7 @@ def delete_ssh_rsa_keypair():
     """
     Delete both public and private key configured for ssh
     """
-    command_list = ['sh', '-c', f'rm {SETUP.home_dir}/.ssh/id_rsa*']
+    command_list = ['sh', '-c', f'rm {SETUP.ssh_dir}/id_rsa*']
 
     with Popen(command_list, stdout=PIPE, stderr=PIPE) as process:
         out, err = process.communicate()
@@ -157,6 +159,7 @@ def delete_ssh_rsa_keypair():
 def stop_ssh_agent():
     """
     Stop process responsible for ssh connections
+    TODO - refactor logic to functional later...
     """
     command = 'ps aux'
     ps_process = Popen(command.split(), stdout=PIPE)
