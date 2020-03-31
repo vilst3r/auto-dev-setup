@@ -7,6 +7,11 @@ import logging
 import pprint
 import sys
 
+# Custom Modules
+from utils.general import format_ansi_string
+from utils.unicode import *
+
+
 # Third Party Modules
 import requests
 
@@ -57,7 +62,9 @@ class GithubSingleton:
         except requests.RequestException as req_err:
             LOGGER.error(f'Request Error occurred: {req_err}')
             LOGGER.error(f'Returned response: {res.json()}')
-            LOGGER.error('Failed request to GitHub API to get public keys')
+            LOGGER.error(format_ansi_string('Failed request to GitHub API to '
+                                            'get public keys',
+                                            ForeGroundColor.RED))
             sys.exit()
         else:
             return res
@@ -76,9 +83,14 @@ class GithubSingleton:
         except requests.RequestException as req_err:
             LOGGER.error(f'Request Error occurred: {req_err}')
             LOGGER.error(f'Returned response: {res.json()}')
-            LOGGER.error('Failed request to GitHub API to create a public key')
+            LOGGER.error(format_ansi_string('Failed request to GitHub API to '
+                                            'create a public key',
+                                            ForeGroundColor.RED))
             sys.exit()
         else:
+            LOGGER.info(format_ansi_string('Github public key has '
+                                           'successfully been created!',
+                                           ForeGroundColor.GREEN))
             return res
 
     def delete_public_key(self, key_id: int):
@@ -93,7 +105,9 @@ class GithubSingleton:
         except requests.RequestException as req_err:
             LOGGER.error(f'Request Error occurred: {req_err}')
             LOGGER.error(f'Returned response: {res.json()}')
-            LOGGER.error('Failed request to GitHub API to delete a public key')
+            LOGGER.error(format_ansi_string('Failed request to GitHub API to '
+                                            'delete a public key',
+                                            ForeGroundColor.RED))
             sys.exit()
         else:
             return res
@@ -125,8 +139,9 @@ def read_git_credentials() -> dict:
                 text_file.write(f"{prop}: <INSERT OWN VALUE>\n")
 
         LOGGER.error(ierr)
-        LOGGER.error(f'Git credential file does not exist - now generated in '
-                     f'{git_credentials}')
+        LOGGER.error(format_ansi_string(f'Git credential file does not exist '
+                                        f'- now generated in {git_credentials}',
+                                        ForeGroundColor.RED))
         sys.exit()
 
     for line in buff:
@@ -134,13 +149,17 @@ def read_git_credentials() -> dict:
         key, val = key.strip(), val.strip()
 
         if not key or not val:
-            LOGGER.error('Git credentials are not configured properly')
+            LOGGER.error(format_ansi_string('Git credentials are not '
+                                            'configured properly',
+                                            ForeGroundColor.RED))
             sys.exit()
         if key not in valid_properties:
-            LOGGER.error('Git property is invalid')
+            LOGGER.error(format_ansi_string('Git property is invalid',
+                                            ForeGroundColor.RED))
             sys.exit()
         if val[0] == '<' or val[-1] == '>':
-            LOGGER.error('Git value of property is unset or invalid')
+            LOGGER.error(format_ansi_string('Git value of property is unset '
+                                            'or invalid', ForeGroundColor.RED))
             sys.exit()
 
         res[key] = val

@@ -10,6 +10,8 @@ from subprocess import Popen, call, DEVNULL, PIPE
 # Custom Modules
 from singletons.setup import SetupSingleton
 from singletons.github import GithubSingleton
+from utils.general import format_ansi_string
+from utils.unicode import *
 
 SETUP: SetupSingleton = SetupSingleton.get_instance()
 GITHUB: GithubSingleton = GithubSingleton.get_instance()
@@ -24,7 +26,8 @@ def pull_dotfile_settings():
     directory_found = call(command.split(), stdout=DEVNULL) == 0
 
     if directory_found:
-        LOGGER.info('Dotfile settings already pulled from git')
+        LOGGER.info(format_ansi_string('Dotfile settings already pulled from '
+                                       'git', ForeGroundColor.LIGHT_GREEN))
         return
 
     # Check if repository is forked in configured account
@@ -33,9 +36,10 @@ def pull_dotfile_settings():
     fork_exists = call(command.split(), stdout=DEVNULL) == 0
 
     if not fork_exists:
-        LOGGER.info(f'This step is optional but it requires - {source}')
+        LOGGER.warning(format_ansi_string(f'This step is optional but it '
+                                          f'requires - {source} to proceed',
+                                          ForeGroundColor.YELLOW, Format.BOLD))
         return
-    # TODO - ^ check this again, can't remember why I added this logic
 
     command = f'git clone {source} {SETUP.dotfiles_dir}'
     with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
@@ -44,12 +48,14 @@ def pull_dotfile_settings():
 
         if err and not cloned_successfully:
             LOGGER.error(err.decode('utf-8'))
-            LOGGER.error('Failed to clone dotfile settings from github')
+            LOGGER.error(format_ansi_string('Failed to clone dotfile settings '
+                                            'from github', ForeGroundColor.RED))
             sys.exit()
         else:
             LOGGER.debug(out.decode('utf-8'))
-            LOGGER.info('Dotfile settings has successfully been cloned from '
-                        'github')
+            LOGGER.info(format_ansi_string('Dotfile settings has successfully '
+                                           'been cloned from github',
+                                           ForeGroundColor.GREEN))
 
 
 def configure_vimrc():
@@ -62,12 +68,15 @@ def configure_vimrc():
 
         if err:
             LOGGER.error(err.decode('utf-8'))
-            LOGGER.error('Failed to configure vimrc from the dotfiles '
-                         'repository')
+            LOGGER.error(format_ansi_string('Failed to configure vimrc from '
+                                            'the dotfiles repository',
+                                            ForeGroundColor.RED))
             sys.exit()
         else:
             LOGGER.debug(out.decode('utf-8'))
-            LOGGER.info('Vimrc now configured from the dotfiles repository')
+            LOGGER.info(format_ansi_string('Vimrc now configured from the '
+                                           'dotfiles repository',
+                                           ForeGroundColor.GREEN))
 
 
 def configure_vim_color_themes():
@@ -77,7 +86,8 @@ def configure_vim_color_themes():
     """
     command = f'mkdir -p {SETUP.vim_color_dir}'
     call(command.split(), stdout=DEVNULL)
-    LOGGER.info(f'{SETUP.vim_color_dir} - has been created')
+    LOGGER.info(format_ansi_string(f'{SETUP.vim_color_dir} - has been '
+                                   f'created', ForeGroundColor.GREEN))
 
     command_list = []
     command_list.append('sh')
@@ -88,9 +98,11 @@ def configure_vim_color_themes():
     files_copied = call(command_list, stdout=DEVNULL) == 0
 
     if files_copied:
-        LOGGER.info('Vim color themes copied to ~/.vim/colors')
+        LOGGER.info(format_ansi_string('Vim color themes copied to '
+                                       '~/.vim/colors', ForeGroundColor.GREEN))
     else:
-        LOGGER.error('Error copying vim color themes in user config')
+        LOGGER.error(format_ansi_string('Error copying vim color themes in '
+                                        'user config', ForeGroundColor.RED))
         sys.exit()
 
 
@@ -105,13 +117,15 @@ def configure_bash_profile():
 
         if err:
             LOGGER.error(err.decode('utf-8'))
-            LOGGER.error('Failed to configure bash_profile from the dotfiles '
-                         'repository')
+            LOGGER.error(format_ansi_string('Failed to configure bash_profile'
+                                            ' from the dotfiles repository',
+                                            ForeGroundColor.RED))
             sys.exit()
         else:
             LOGGER.debug(out.decode('utf-8'))
-            LOGGER.info('Bash profile now configured from the dotfiles '
-                        'repository')
+            LOGGER.info(format_ansi_string('Bash profile now configured from '
+                                           'the dotfiles repository',
+                                           ForeGroundColor.GREEN))
 
 
 def configure_emacs():
@@ -125,13 +139,15 @@ def configure_emacs():
 
         if err:
             LOGGER.error(err.decode('utf-8'))
-            LOGGER.error('Failed to configure emacs settings from the dotfiles '
-                         'repository')
+            LOGGER.error(format_ansi_string('Failed to configure emacs '
+                                            'settings from the dotfiles '
+                         'repository', ForeGroundColor.RED))
             sys.exit()
         else:
             LOGGER.debug(out.decode('utf-8'))
-            LOGGER.info('Emacs settings are now configured from the dotfiles '
-                        'repository')
+            LOGGER.info(format_ansi_string('Emacs settings are now configured'
+                                           ' from the dotfiles repository',
+                                           ForeGroundColor.GREEN))
 
 
 def remove_color_themes():
@@ -142,7 +158,8 @@ def remove_color_themes():
     directory_found = call(command.split(), stdout=DEVNULL) == 0
 
     if not directory_found:
-        LOGGER.info('Vim color themes already removed')
+        LOGGER.info(format_ansi_string('Vim color themes already removed',
+                                       ForeGroundColor.LIGHT_GREEN))
         return
 
     command_list = []
@@ -154,10 +171,14 @@ def remove_color_themes():
 
         if err:
             LOGGER.debug(err.decode('utf-8'))
-            LOGGER.info('Vim color themes has already been removed')
+            LOGGER.info(format_ansi_string('Vim color themes has already been '
+                                           'removed',
+                                           ForeGroundColor.LIGHT_GREEN))
         else:
             LOGGER.debug(out.decode('utf-8'))
-            LOGGER.info('Vim color themes has successfully been removed')
+            LOGGER.info(format_ansi_string('Vim color themes has successfully '
+                                           'been removed',
+                                           ForeGroundColor.GREEN))
 
 
 def remove_dotfiles_settings():
@@ -168,7 +189,8 @@ def remove_dotfiles_settings():
     directory_found = call(command.split(), stdout=DEVNULL) == 0
 
     if not directory_found:
-        LOGGER.info('Dotfile settings has been already removed')
+        LOGGER.info(format_ansi_string('Dotfile settings has been already '
+                                       'removed', ForeGroundColor.LIGHT_GREEN))
         return
 
     command = f'rm -rf {SETUP.dotfiles_dir}'
@@ -177,12 +199,15 @@ def remove_dotfiles_settings():
 
         if err:
             LOGGER.error(err.decode('utf-8'))
-            LOGGER.error('Failed to remove the dotfiles settings '
-                         'respository cloned from github')
+            LOGGER.error(format_ansi_string('Failed to remove the dotfiles '
+                                            'settings respository cloned from '
+                                            'github', ForeGroundColor.RED))
             sys.exit()
         else:
             LOGGER.debug(out.decode('utf-8'))
-            LOGGER.info('Dotfiles settings repository cloned from github has '
-                        'successfully been removed')
+            LOGGER.info(format_ansi_string('Dotfiles settings repository '
+                                           'cloned from github has '
+                                           'successfully been removed',
+                                           ForeGroundColor.GREEN))
 
 

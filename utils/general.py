@@ -7,10 +7,27 @@ import collections
 import random
 import string
 from itertools import islice
-from typing import Iterable, Union
+from typing import Iterable, Union, Callable
 
 # Custom Modules
 from utils.unicode import Symbols, Format, ForeGroundColor, BackgroundColor
+
+
+def partition(predicate: Callable, iterable: Iterable[any]) -> tuple:
+    """
+    Partition a iterable into two lists, representing true & false values
+    respectively, the iterable is partitioned by the predicate function
+    passed in
+    """
+    true_values = []
+    false_values = []
+
+    for item in iterable:
+        if predicate(item):
+            true_values.append(item)
+        else:
+            false_values.append(item)
+    return true_values, false_values
 
 
 def consume(iterator: Iterable[any], n: int = None) -> None:

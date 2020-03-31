@@ -11,8 +11,10 @@ import logging
 # Custom Modules
 from singletons.setup import SetupSingleton
 from singletons.github import GithubSingleton
-from services import powerline, git, ssh, brew, vim, bash
+from services import powerline, git, ssh, brew, dotfiles
 from utils.decorators import measure_time, print_process_step
+from utils.general import format_ansi_string
+from utils.unicode import *
 
 SETUP: SetupSingleton = SetupSingleton.get_instance()
 GITHUB: GithubSingleton = GithubSingleton.get_instance()
@@ -28,7 +30,7 @@ def uninstall_powerline():
     """
     # powerline.uninstall_gitstatus()
     # powerline.delete_fonts()
-    # powerline.delete_config()
+    # powerline.delete_powerline_config_folder()
     # powerline.remove_bash_daemon()
     # powerline.remove_vim_config()
     # powerline.uninstall_powerline_status()
@@ -72,8 +74,9 @@ def uninstall_git_ssh():
     """
     Remove existing git ssh configurations locally and on github
     """
-    # if not ssh.public_key_exists():
-    #     LOGGER.info('Git SSH already uninstalled!')
+    # if not ssh.public_key_exists() and not git.public_key_exists_on_github():
+    #     LOGGER.info(format_ansi_string('Git SSH already uninstalled!',
+    #                                    ForeGroundColor.LIGHT_GREEN))
     #     return
     #
     # current_public_key = ssh.get_public_key()
@@ -95,6 +98,7 @@ if __name__ == '__main__':
         """
         uninstall_powerline()
         uninstall_bash()
+        # TODO - add uninstall for dotfiles later
         uninstall_vim()
         uninstall_brew()
         uninstall_git_ssh()

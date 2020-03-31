@@ -13,6 +13,8 @@ from singletons.setup import SetupSingleton
 from singletons.github import GithubSingleton
 from services import powerline, git, ssh, brew, dotfiles
 from utils.decorators import measure_time, print_process_step
+from utils.general import format_ansi_string
+from utils.unicode import *
 
 SETUP: SetupSingleton = SetupSingleton.get_instance()
 GITHUB: GithubSingleton = GithubSingleton.get_instance()
@@ -27,7 +29,8 @@ def configure_git_ssh():
     Configure git ssh key to user ssh agent
     """
     if ssh.public_key_exists() and git.public_key_exists_on_github():
-        LOGGER.info('Git SSH is already configured!')
+        LOGGER.info(format_ansi_string('Git SSH is already configured!',
+                                       Format.BOLD))
         return
 
     ssh.generate_rsa_keypair()
@@ -42,15 +45,16 @@ def configure_git_ssh():
 
 
 @print_process_step(step_no=2,
-                    begin_message='Installing homebrew...',
-                    end_message='Installation of homebrew is complete!')
+                    begin_message='Installing Homebrew...',
+                    end_message='Homebrew is now successfully setup!')
 def install_homebrew():
     """
     Install homebrew & cask if it doesn't exist in *nix environment and requires
     password input
     """
     if brew.brew_exists():
-        LOGGER.info('Homebrew is already installed!')
+        LOGGER.info(format_ansi_string('Homebrew is already installed!',
+                                       Format.BOLD))
         return
 
     brew.install_brew()
@@ -59,7 +63,9 @@ def install_homebrew():
 
 @print_process_step(step_no=3,
                     begin_message='Installing brew packages...',
-                    end_message='Installation of brew packages are complete!')
+                    end_message='Brew packages listed in '
+                                '\'./config/brew/brew.txt\' are now '
+                                'configured!')
 def install_brew_packages():
     """
     Install brew packages
@@ -69,7 +75,9 @@ def install_brew_packages():
 
 @print_process_step(step_no=4,
                     begin_message='Installing cask packages...',
-                    end_message='Installation of cask packages are complete!')
+                    end_message='Cask packages listed in '
+                                '\'./config/brew/brew-cask.txt\' are now '
+                                'configured!')
 def install_cask_packages():
     """
     Reads brew-cask.txt file in child config directory to install all software
@@ -86,7 +94,7 @@ def configure_dotfiles():
     Configure user bash, vim & emacs settings
     """
 
-    dotfiles.pull_dotfile_settings()
+    # dotfiles.pull_dotfile_settings()
     # dotfiles.configure_vimrc()
     # dotfiles.configure_vim_color_themes()
     # dotfiles.configure_bash_profile()
@@ -119,12 +127,12 @@ if __name__ == '__main__':
         single thread for now
         TODO - Add multithreading for idle-dependencies, chart dependency graph
         """
-        # configure_git_ssh()
-        # install_homebrew()
-        # install_brew_packages()
-        # install_cask_packages()
-        # configure_dotfiles()
-        # install_powerline()
+        configure_git_ssh()
+        install_homebrew()
+        install_brew_packages()
+        install_cask_packages()
+        configure_dotfiles()
+        install_powerline()
 
     build_dev_environment()
 

@@ -13,7 +13,8 @@ import pexpect
 
 # Custom Modules
 from singletons.setup import SetupSingleton
-from utils.general import consume
+from utils.general import consume, partition, format_ansi_string
+from utils.unicode import *
 
 SETUP: SetupSingleton = SetupSingleton.get_instance()
 LOGGER = logging.getLogger()
@@ -26,10 +27,9 @@ def brew_exists() -> bool:
     command = f'find {SETUP.brew_dir}'
     directory_found = call(command.split(), stdout=DEVNULL, stderr=DEVNULL) == 0
 
-    if directory_found:
-        LOGGER.info('Brew has already been configured')
-    else:
-        LOGGER.info('Brew hasn\'t been configured - configuring now...')
+    if not directory_found:
+        LOGGER.info(format_ansi_string('Brew hasn\'t been configured',
+                                       ForeGroundColor.LIGHT_RED))
 
     return directory_found
 
@@ -48,14 +48,17 @@ def install_brew():
     try:
         child.expect('Press RETURN', timeout=60*5)
     except pexpect.TIMEOUT:
-        LOGGER.error('Request to install from brew url timed out')
+        LOGGER.error(format_ansi_string('Request to install from brew url '
+                                        'timed out', ForeGroundColor.RED))
+        sys.exit()
 
     child.sendline('')
 
     try:
         child.expect('Password:', timeout=60*5)
     except pexpect.TIMEOUT:
-        LOGGER.error('Child process timed out from installation')
+        LOGGER.error(format_ansi_string('Child process timed out from '
+                                        'installation', ForeGroundColor.RED))
         sys.exit()
 
     child.sendline(SETUP.password)
@@ -65,17 +68,23 @@ def install_brew():
         index = child.expect(expectations, timeout=60*30)
 
         if index == 0:
-            LOGGER.error('Incorrect user password given at start of setup')
+            LOGGER.error(format_ansi_string('Incorrect user password given at '
+                                            'start of setup',
+                                            ForeGroundColor.RED))
             sys.exit()
 
-        LOGGER.warning(f'Password provided for root access command - {command}')
+        LOGGER.warning(format_ansi_string(f'Password provided for root access'
+                                          f' command - {command}',
+                                          ForeGroundColor.YELLOW))
 
         child_output = child.before
 
         LOGGER.debug(child_output)
-        LOGGER.info('Homebrew has successfully been installed')
+        LOGGER.info(format_ansi_string('Homebrew has successfully been '
+                                       'installed', ForeGroundColor.GREEN))
     except pexpect.TIMEOUT:
-        LOGGER.error('Invalid expectation or process timed out')
+        LOGGER.error(format_ansi_string('Invalid expectation or process '
+                                        'timed out', ForeGroundColor.RED))
         sys.exit()
 
 
@@ -90,11 +99,13 @@ def tap_brew_cask():
 
         if err and not tapped_successfully:
             LOGGER.error(err.decode('utf-8'))
-            LOGGER.error('Brew failed to tap into cask')
+            LOGGER.error(format_ansi_string('Brew failed to tap into cask',
+                                            ForeGroundColor.RED))
             sys.exit()
         else:
             LOGGER.debug(out.decode('utf-8'))
-            LOGGER.info('Brew has successfully tapped into cask')
+            LOGGER.info(format_ansi_string('Brew has successfully tapped into '
+                                           'cask', ForeGroundColor.GREEN))
 
 
 def install_all_brew_packages():
@@ -109,8 +120,9 @@ def install_all_brew_packages():
         package_found = call(command.split(), stdout=DEVNULL) == 0
 
         if not package_found:
-            LOGGER.warning(f'This package does not exist in registry - '
-                           f'{package}')
+            LOGGER.warning(format_ansi_string(f'This package does not exist '
+                                              f'in registry - {package}',
+                                              ForeGroundColor.YELLOW))
             return
 
         command = f'brew install {package}'
@@ -120,10 +132,14 @@ def install_all_brew_packages():
 
             if err and not installed_successfully:
                 LOGGER.warning(err.decode('utf-8'))
-                LOGGER.warning(f'{package} - issue during installation')
+                LOGGER.warning(format_ansi_string(f'{package} - issue during '
+                                                  f'installation',
+                                                  ForeGroundColor.YELLOW))
             else:
                 LOGGER.debug(out.decode('utf-8'))
-                LOGGER.info(f'{package} - successfully installed')
+                LOGGER.info(format_ansi_string(f'{package} - successfully '
+                                               f'installed',
+                                               ForeGroundColor.GREEN))
 
     command = 'brew list'
     output = check_output(command.split()).strip()
@@ -132,13 +148,18 @@ def install_all_brew_packages():
     with open(SETUP.brew_config_file) as text_file:
         configured_packages = map(lambda x: x.strip(), text_file.readlines())
 
-    uninstalled_packages = filter(
-        lambda x: x not in brew_list, configured_packages)
+    installed_packages, uninstalled_packages = partition(
+        lambda x: x in brew_list, configured_packages)
+
+    consume(map(lambda x: LOGGER.info(
+        format_ansi_string(f'{x} - already installed',
+                           ForeGroundColor.LIGHT_GREEN)), installed_packages))
 
     uninstalled_packages, uninstalled_packages_copy = tee(uninstalled_packages)
 
     if not next(uninstalled_packages_copy, None):
-        LOGGER.info('No available brew packages to install')
+        LOGGER.info(format_ansi_string('No available brew packages to '
+                                       'install', Format.BOLD))
     else:
         # consume(map(lambda x: process_package(x), uninstalled_packages))
         # TODO remove below
@@ -157,8 +178,9 @@ def install_all_cask_packages():
         package_found = call(command.split(), stdout=DEVNULL) == 0
 
         if not package_found:
-            LOGGER.warning(f'This package does not exist in registry - '
-                           f'{package}')
+            LOGGER.warning(format_ansi_string(f'This package does not exist '
+                                              f'in registry - {package}',
+                                              ForeGroundColor.YELLOW))
             return
 
         command = f'brew cask install {package}'
@@ -168,10 +190,14 @@ def install_all_cask_packages():
 
             if err and not installed_successfully:
                 LOGGER.warning(err.decode('utf-8'))
-                LOGGER.warning(f'{package} - issue during installation')
+                LOGGER.warning(format_ansi_string(f'{package} - issue during '
+                                                  f'installation',
+                                                  ForeGroundColor.YELLOW))
             else:
                 LOGGER.debug(out.decode('utf-8'))
-                LOGGER.info(f'{package} - successfully installed')
+                LOGGER.info(format_ansi_string(f'{package} - successfully '
+                                               f'installed',
+                                               ForeGroundColor.GREEN))
 
     command = 'brew cask list'
     output = check_output(command.split()).strip()
@@ -180,13 +206,18 @@ def install_all_cask_packages():
     with open(SETUP.brew_cask_config_file) as text_file:
         configured_packages = map(lambda x: x.strip(), text_file.readlines())
 
-    uninstalled_packages = filter(
-        lambda x: x not in cask_list, configured_packages)
+    installed_packages, uninstalled_packages = partition(
+        lambda x: x in cask_list, configured_packages)
+
+    consume(map(lambda x: LOGGER.info(
+        format_ansi_string(f'{x} - already installed',
+                           ForeGroundColor.LIGHT_GREEN)), installed_packages))
 
     uninstalled_packages, uninstalled_packages_copy = tee(uninstalled_packages)
 
-    if not uninstalled_packages:
-        LOGGER.info('No available cask packages to install')
+    if not next(uninstalled_packages_copy, None):
+        LOGGER.info(format_ansi_string('No available cask packages to '
+                                       'install', Format.BOLD))
     else:
         # consume(map(lambda x: process_package(x), uninstalled_packages))
         # TODO remove below
@@ -201,7 +232,8 @@ def uninstall_brew():
     bin_exists = call(command.split(), stdout=DEVNULL) == 0
 
     if not bin_exists:
-        LOGGER.info('Homebrew is already uninstalled')
+        LOGGER.info(format_ansi_string('Homebrew is already uninstalled',
+                                       ForeGroundColor.LIGHT_GREEN))
         return
 
     ruby_bin = '/usr/bin/ruby'
@@ -214,15 +246,18 @@ def uninstall_brew():
     try:
         child.expect(r'\[y/N\]', timeout=60*10)
     except pexpect.TIMEOUT:
-        LOGGER.error('Request to uninstall from brew url timed out')
+        LOGGER.error(format_ansi_string('Request to uninstall from brew url '
+                                        'timed out', ForeGroundColor.RED))
+        sys.exit()
 
     child.sendline('y')
 
     try:
         child.expect('Password:', timeout=60*10)
     except pexpect.TIMEOUT:
-        LOGGER.error('Homebrew is cleaned locally but child process timed out '
-                     'from cleanup')
+        LOGGER.error(format_ansi_string('Homebrew is cleaned locally but '
+                                        'child process timed out from cleanup',
+                                        ForeGroundColor.RED))
         sys.exit()
 
     child.sendline(SETUP.password)
@@ -232,15 +267,21 @@ def uninstall_brew():
         index = child.expect(expectations)
 
         if index == 0:
-            LOGGER.error('Incorrect user password given at start of setup')
+            LOGGER.error(format_ansi_string('Incorrect user password given at '
+                                            'start of setup',
+                                            ForeGroundColor.RED))
             sys.exit()
 
-        LOGGER.warning(f'Password provided for root access command - {command}')
+        LOGGER.warning(format_ansi_string(f'Password provided for root access'
+                                          f' command - {command}',
+                                          ForeGroundColor.YELLOW))
 
         child_output = child.before
 
         LOGGER.debug(child_output)
-        LOGGER.info('Homebrew has successfully been uninstalled')
+        LOGGER.info(format_ansi_string('Homebrew has successfully been '
+                                       'uninstalled', ForeGroundColor.GREEN))
     except pexpect.TIMEOUT:
-        LOGGER.error('Invalid expectation or process timed out')
+        LOGGER.error(format_ansi_string('Invalid expectation or process timed '
+                                        'out', ForeGroundColor.RED))
         sys.exit()

@@ -12,6 +12,8 @@ from subprocess import Popen, call, PIPE, DEVNULL
 # Custom Modules
 from singletons.setup import SetupSingleton
 from singletons.github import GithubSingleton
+from utils.general import format_ansi_string
+from utils.unicode import *
 
 SETUP: SetupSingleton = SetupSingleton.get_instance()
 GITHUB: GithubSingleton = GithubSingleton.get_instance()
@@ -28,11 +30,14 @@ def install_powerline_at_user():
 
         if err:
             LOGGER.error(err.decode('utf-8'))
-            LOGGER.error('Failed to install powerline from pip3')
+            LOGGER.error(format_ansi_string('Failed to install powerline from '
+                                            'pip3', ForeGroundColor.RED))
             sys.exit()
         else:
             LOGGER.debug(out.decode('utf-8'))
-            LOGGER.info('Powerline now installed from pip3 at the user level')
+            LOGGER.info(format_ansi_string('Powerline now installed from pip3 '
+                                           'at the user level',
+                                           ForeGroundColor.GREEN))
 
 
 def write_bash_daemon():
@@ -64,16 +69,18 @@ def write_bash_daemon():
     config_match = re.search(pattern, content)
 
     if not config_match:
-        LOGGER.info('Appended powerline configuration in bash profile')
-
         with open(SETUP.bash_profile_file, 'a') as text_file:
             text_file.write(f"\n{daemon_config}\n")
+        LOGGER.info(format_ansi_string('Appended powerline configuration in '
+                                       'bash profile', ForeGroundColor.GREEN))
         return
 
     current_config = config_match[0]
 
     if current_config == daemon_config:
-        LOGGER.info('Powerline already configured in bash profile')
+        LOGGER.info(format_ansi_string('Powerline already configured in '
+                                       'bash profile',
+                                       ForeGroundColor.LIGHT_GREEN))
         return
 
     start, end = config_match.span()
@@ -82,7 +89,8 @@ def write_bash_daemon():
     with open(SETUP.bash_profile_file, 'w') as text_file:
         text_file.write(content)
 
-    LOGGER.info('Powerline configuration updated in bash profile')
+    LOGGER.info(format_ansi_string('Powerline configuration updated in '
+                                   'bash profile', ForeGroundColor.GREEN))
 
 
 def write_vim_config():
@@ -110,7 +118,8 @@ def write_vim_config():
     config_match = re.search(pattern, content)
 
     if not config_match:
-        LOGGER.info('Appended powerline configuration in vimrc')
+        LOGGER.info(format_ansi_string('Appended powerline configuration in '
+                                       'vimrc', ForeGroundColor.GREEN))
 
         with open(SETUP.vimrc_file, 'a') as text_file:
             text_file.write(f"\n{config}\n")
@@ -119,7 +128,8 @@ def write_vim_config():
     current_config = config_match[0]
 
     if current_config == config:
-        LOGGER.info('Powerline already configured in vimrc')
+        LOGGER.info(format_ansi_string('Powerline already configured in '
+                                       'vimrc', ForeGroundColor.LIGHT_GREEN))
         return
 
     start, end = config_match.span()
@@ -128,17 +138,19 @@ def write_vim_config():
     with open(SETUP.vimrc_file, 'w') as text_file:
         text_file.write(content)
 
-    LOGGER.info('Powerline configuration updated in vimrc')
+    LOGGER.info(format_ansi_string('Powerline configuration updated in '
+                                   'vimrc', ForeGroundColor.GREEN))
 
 
-def configure_user_config_directory() -> bool:
+def configure_user_config_directory():
     """
     Checks & creates proper directory for the powerline configs to go
     """
     command = f'mkdir -p {SETUP.powerline_local_config_dir}'
     call(command.split(), stdout=DEVNULL)
 
-    LOGGER.info(f'{SETUP.powerline_local_config_dir} - has been created')
+    LOGGER.info(format_ansi_string(f'{SETUP.powerline_local_config_dir} - has '
+                                   f'been created', ForeGroundColor.GREEN))
 
     command = f'cp -r {SETUP.powerline_system_config_dir}/ ' \
               f'{SETUP.powerline_local_config_dir}'
@@ -147,14 +159,15 @@ def configure_user_config_directory() -> bool:
 
         if err:
             LOGGER.error(err.decode('utf-8'))
-            LOGGER.error(
-                'Failed to copy powerline config from system to user directory'
-            )
+            LOGGER.error(format_ansi_string('Failed to copy powerline config '
+                                            'from system to user directory',
+                                            ForeGroundColor.RED))
             sys.exit()
         else:
             LOGGER.debug(out.decode('utf-8'))
-            LOGGER.info('Successfully copied powerline config from system to '
-                        'user directory')
+            LOGGER.info(format_ansi_string('Successfully copied powerline '
+                                           'config from system to user '
+                                           'directory', ForeGroundColor.GREEN))
 
 
 def install_fonts():
@@ -168,7 +181,8 @@ def install_fonts():
     directory_found = call(command.split(), stdout=DEVNULL) == 0
 
     if directory_found:
-        LOGGER.info('Powerline fonts are already installed')
+        LOGGER.info(format_ansi_string('Powerline fonts are already installed',
+                                       ForeGroundColor.LIGHT_GREEN))
         return
 
     # Check if repository is forked in configured account
@@ -185,11 +199,14 @@ def install_fonts():
 
         if err and not cloned_successfully:
             LOGGER.error(err.decode('utf-8'))
-            LOGGER.error('Failed to clone powerline fonts from github')
+            LOGGER.error(format_ansi_string('Failed to clone powerline fonts '
+                                            'from github', ForeGroundColor.RED))
             sys.exit()
         else:
             LOGGER.debug(out.decode('utf-8'))
-            LOGGER.info('Successfully cloned powerline fonts from github')
+            LOGGER.info(format_ansi_string('Successfully cloned powerline '
+                                           'fonts from github',
+                                           ForeGroundColor.GREEN))
 
     command = f'/bin/bash {destination}/install.sh'
     with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
@@ -197,11 +214,13 @@ def install_fonts():
 
         if err:
             LOGGER.error(err.decode('utf-8'))
-            LOGGER.error('Failed to install powerline fonts')
+            LOGGER.error(format_ansi_string('Failed to install powerline fonts',
+                                            ForeGroundColor.RED))
             sys.exit()
         else:
             LOGGER.debug(out.decode('utf-8'))
-            LOGGER.info('Successfully installed powerline fonts')
+            LOGGER.info(format_ansi_string('Successfully installed powerline '
+                                           'fonts', ForeGroundColor.GREEN))
 
 
 def install_gitstatus_at_user():
@@ -214,12 +233,15 @@ def install_gitstatus_at_user():
 
         if err:
             LOGGER.error(err.decode('utf-8'))
-            LOGGER.error('Failed to install powerline-gitstatus through pip3')
+            LOGGER.error(format_ansi_string('Failed to install '
+                                            'powerline-gitstatus through pip3',
+                                            ForeGroundColor.RED))
             sys.exit()
         else:
             LOGGER.debug(out.decode('utf-8'))
-            LOGGER.info('Powerline-gitstatus successfully installed through '
-                        'pip3')
+            LOGGER.info(format_ansi_string('Powerline-gitstatus successfully '
+                                           'installed through pip3',
+                                           ForeGroundColor.GREEN))
 
 
 def config_git_colorscheme():
@@ -238,8 +260,9 @@ def config_git_colorscheme():
         config_group = config_data['groups']
 
         if all([group in default_group for group in config_group]):
-            LOGGER.info('Color scheme for git status for powerline is already '
-                        'configured')
+            LOGGER.info(format_ansi_string('Color scheme for git status for '
+                                           'powerline is already configured',
+                                           ForeGroundColor.LIGHT_GREEN))
             return
 
         data = default_data
@@ -248,7 +271,9 @@ def config_git_colorscheme():
     with open(default_block, 'w+', encoding='utf-8') as default_json:
         json.dump(data, default_json, ensure_ascii=False, indent=4)
 
-    LOGGER.info('Finish configuring color scheme for git status in powerline!')
+    LOGGER.info(format_ansi_string('Finish configuring color scheme for git '
+                                   'status in powerline!',
+                                   ForeGroundColor.GREEN))
 
 
 def config_git_shell():
@@ -266,8 +291,10 @@ def config_git_shell():
 
         for function in function_list:
             if function == config_data:
-                LOGGER.info('Shell for git stats for powerline is already '
-                            'configured')
+                LOGGER.info(format_ansi_string('Shell for git stats for '
+                                               'powerline is already '
+                                               'configured',
+                                               ForeGroundColor.LIGHT_GREEN))
                 return
 
         function_list.append(config_data)
@@ -277,7 +304,8 @@ def config_git_shell():
     with open(default_block, 'w+', encoding='utf-8') as default_json:
         json.dump(data, default_json, ensure_ascii=False, indent=4)
 
-    LOGGER.info('Finish configuring shell for git status in powerline!')
+    LOGGER.info(format_ansi_string('Finish configuring shell for git status '
+                                   'in powerline!', ForeGroundColor.GREEN))
 
 
 def uninstall_gitstatus():
@@ -288,43 +316,53 @@ def uninstall_gitstatus():
     bin_exists = call(command.split(), stdout=DEVNULL) == 0
 
     if not bin_exists:
-        LOGGER.info('Powerline-gitstatus has already been uninstalled')
+        LOGGER.info(format_ansi_string('Powerline-gitstatus has already been '
+                                       'uninstalled',
+                                       ForeGroundColor.LIGHT_GREEN))
         return
 
     command = 'pip3 show powerline-gitstatus'
     package_found = call(command.split(), stdout=DEVNULL) == 0
 
     if not package_found:
-        LOGGER.info('Powerline-gitstatus has already been uninstalled')
+        LOGGER.info(format_ansi_string('Powerline-gitstatus has already been '
+                                       'uninstalled',
+                                       ForeGroundColor.LIGHT_GREEN))
         return
 
     command = 'pip3 uninstall powerline-gitstatus'
-    with Popen(command.split(), stdin=PIPE, stdout=PIPE, stderr=PIPE) as process:
+    with Popen(command.split(), stdin=PIPE, stdout=PIPE, stderr=PIPE) \
+            as process:
         out, err = process.communicate(input=b"y\n")
 
         if err:
             LOGGER.error(err.decode('utf-8'))
-            LOGGER.error('Failed to uninstall powerline-gitstatus at the user '
-                         'level')
+            LOGGER.error(format_ansi_string('Failed to uninstall '
+                                            'powerline-gitstatus at the user '
+                                            'level', ForeGroundColor.RED))
             sys.exit()
         else:
             LOGGER.debug(out.decode('utf-8'))
-            LOGGER.info('Powerline-gitstatus has successfully been uninstalled '
-                        'at the user level')
+            LOGGER.info(format_ansi_string('Powerline-gitstatus has '
+                                           'successfully been uninstalled '
+                                           'at the user level',
+                                           ForeGroundColor.GREEN))
 
 
 def delete_fonts():
     """
     Deletes all font files assosciated with powerline from installation
     """
-    user_config_dir = SETUP.dir['powerline_config']
-    uninstall_font_script = f'{user_config_dir}/fonts/uninstall.sh'
+    uninstall_font_script = f'{SETUP.powerline_local_config_dir}' \
+                            f'/fonts/uninstall.sh'
 
     command = f'find {uninstall_font_script}'
     script_exists = call(command.split(), stdout=DEVNULL) == 0
 
     if not script_exists:
-        LOGGER.info('Powerline fonts are already uninstalled')
+        LOGGER.info(format_ansi_string('Powerline fonts are already '
+                                       'uninstalled',
+                                       ForeGroundColor.LIGHT_GREEN))
         return
 
     command = f'/bin/bash {uninstall_font_script}'
@@ -333,63 +371,65 @@ def delete_fonts():
 
         if err:
             LOGGER.error(err.decode('utf-8'))
-            LOGGER.error('Failed to uninstall powerline fonts')
+            LOGGER.error(format_ansi_string('Failed to uninstall powerline '
+                                            'fonts', ForeGroundColor.RED))
             sys.exit()
         else:
             LOGGER.debug(out.decode('utf-8'))
-            LOGGER.info('Powerline fonts has successfully been uninstalled')
+            LOGGER.info(format_ansi_string('Powerline fonts has successfully '
+                                           'been uninstalled',
+                                           ForeGroundColor.GREEN))
 
-    command = f'rm -rf {user_config_dir}/fonts'
+    command = f'rm -rf {SETUP.powerline_local_config_dir}/fonts'
     with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
         out, err = process.communicate()
 
         if err:
             LOGGER.error(err.decode('utf-8'))
-            LOGGER.error(
-                'Failed to remove powerline fonts in the user config directory'
-            )
+            LOGGER.error(format_ansi_string('Failed to remove powerline fonts '
+                                            'in the user config directory',
+                                            ForeGroundColor.RED))
             sys.exit()
         else:
             LOGGER.debug(out.decode('utf-8'))
-            LOGGER.info('Powerline fonts in user config directory has '
-                        'successfully been removed')
+            LOGGER.info(format_ansi_string('Powerline fonts in user config '
+                                           'directory has successfully been '
+                                           'removed', ForeGroundColor.GREEN))
 
 
-def delete_config():
+def delete_powerline_config_folder():
     """
     Deletes the entire powerline folder in user config
     """
-    user_config_dir = SETUP.dir['powerline_config']
-
-    command = f'find {user_config_dir}'
+    command = f'find {SETUP.powerline_local_config_dir}'
     directory_found = call(command.split(), stdout=DEVNULL) == 0
 
     if not directory_found:
-        LOGGER.info('Powerline config has already been removed')
+        LOGGER.info(format_ansi_string('Powerline config has already been '
+                                       'removed', ForeGroundColor.LIGHT_GREEN))
         return
 
-    command = f'rm -rf {user_config_dir}'
+    command = f'rm -rf {SETUP.powerline_local_config_dir}'
     with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
         out, err = process.communicate()
 
         if err:
             LOGGER.error(err.decode('utf-8'))
-            LOGGER.error('Failed to remove powerline config at user config '
-                         'directory')
+            LOGGER.error(format_ansi_string('Failed to remove powerline '
+                                            'config at user config directory',
+                                            ForeGroundColor.RED))
             sys.exit()
         else:
             LOGGER.debug(out.decode('utf-8'))
-            LOGGER.info('Powerline config has successfully been removed at '
-                        'user config directory')
+            LOGGER.info(format_ansi_string('Powerline config has successfully'
+                                           ' been removed at user config '
+                                           'directory', ForeGroundColor.GREEN))
 
 
 def remove_bash_daemon():
     """
     Remove powerline config block in bash profile
     """
-    home_dir = SETUP.dir['home']
-    bash_profile = f'{home_dir}/.bash_profile'
-
     pattern = []
     pattern.append("# Powerline user config")
     pattern.append('powerline-daemon -q')
@@ -399,32 +439,32 @@ def remove_bash_daemon():
 
     pattern = "\n".join(pattern)
 
-    with open(bash_profile) as text_file:
+    with open(SETUP.bash_profile_file) as text_file:
         content = ''.join(text_file.readlines())
 
     pattern = re.compile(pattern)
     config_match = re.search(pattern, content)
 
     if not config_match:
-        LOGGER.info('Powerline configuration in bash profile already removed')
+        LOGGER.info(format_ansi_string('Powerline configuration in bash '
+                                       'profile already removed',
+                                       ForeGroundColor.LIGHT_GREEN))
         return
 
     start, end = config_match.span()
     content = content[:start] + content[end:]
 
-    with open(bash_profile, 'w') as text_file:
+    with open(SETUP.bash_profile_file, 'w') as text_file:
         text_file.write(content)
 
-    LOGGER.info('Powerline configuration removed in bash profile')
+    LOGGER.info(format_ansi_string('Powerline configuration removed in '
+                                   'bash profile', ForeGroundColor.GREEN))
 
 
 def remove_vim_config():
     """
     Remove powerline config block in vimrc
     """
-    home_dir = SETUP.dir['home']
-    vimrc = f'{home_dir}/.vimrc'
-
     pattern = []
     pattern.append('" Powerline')
     pattern.append(r"set rtp\+\=[\w(\-)/.]+/vim")
@@ -433,23 +473,26 @@ def remove_vim_config():
 
     pattern = "\n".join(pattern)
 
-    with open(vimrc) as text_file:
+    with open(SETUP.vimrc_file) as text_file:
         content = ''.join(text_file.readlines())
 
     pattern = re.compile(pattern)
     config_match = re.search(pattern, content)
 
     if not config_match:
-        LOGGER.info('Powerline configuration in vimrc already removed')
+        LOGGER.info(format_ansi_string('Powerline configuration in vimrc '
+                                       'already removed',
+                                       ForeGroundColor.LIGHT_GREEN))
         return
 
     start, end = config_match.span()
     content = content[:start] + content[end:]
 
-    with open(vimrc, 'w') as text_file:
+    with open(SETUP.vimrc_file, 'w') as text_file:
         text_file.write(content)
 
-    LOGGER.info('Powerline configuration removed in vimrc')
+    LOGGER.info(format_ansi_string('Powerline configuration removed in vimrc',
+                                   ForeGroundColor.GREEN))
 
 
 def uninstall_powerline_status():
@@ -460,25 +503,33 @@ def uninstall_powerline_status():
     bin_exists = call(command.split(), stdout=DEVNULL) == 0
 
     if not bin_exists:
-        LOGGER.info('Powerline-gitstatus has already been uninstalled')
+        LOGGER.info(format_ansi_string('Powerline-gitstatus has already been '
+                                       'uninstalled',
+                                       ForeGroundColor.LIGHT_GREEN))
         return
 
     command = 'pip3 show powerline-status'
     package_found = call(command.split(), stdout=DEVNULL) == 0
 
     if not package_found:
-        LOGGER.info('Powerline-status has already been uninstalled')
+        LOGGER.info(format_ansi_string('Powerline-status has already been '
+                                       'uninstalled',
+                                       ForeGroundColor.LIGHT_GREEN))
         return
 
     command = 'pip3 uninstall powerline-status'
-    with Popen(command.split(), stdin=PIPE, stdout=PIPE, stderr=PIPE) as process:
+    with Popen(command.split(), stdin=PIPE, stdout=PIPE, stderr=PIPE) \
+            as process:
         out, err = process.communicate(input=b"y\n")
 
         if err:
             LOGGER.error(err.decode('utf-8'))
-            LOGGER.error('Failed to uninstall powerline through pipe3')
+            LOGGER.error(format_ansi_string('Failed to uninstall powerline '
+                                            'through pipe3',
+                                            ForeGroundColor.RED))
             sys.exit()
         else:
             LOGGER.debug(out.decode('utf-8'))
-            LOGGER.info('Powerline has successfully been uninstalled through '
-                        'pip3')
+            LOGGER.info(format_ansi_string('Powerline has successfully been '
+                                           'uninstalled through pip3',
+                                           ForeGroundColor.GREEN))

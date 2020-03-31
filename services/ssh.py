@@ -8,9 +8,10 @@ import logging
 from subprocess import call, Popen, PIPE, DEVNULL
 
 # Custom Modules
-from utils import general
 from singletons.setup import SetupSingleton
 from singletons.github import GithubSingleton
+from utils.general import random_string, format_ansi_string, consume
+from utils.unicode import *
 
 SETUP: SetupSingleton = SetupSingleton.get_instance()
 GITHUB: GithubSingleton = GithubSingleton.get_instance()
@@ -25,9 +26,11 @@ def public_key_exists() -> bool:
     file_found = call(command.split(), stdout=DEVNULL, stderr=DEVNULL) == 0
 
     if not file_found:
-        LOGGER.info('Git SSH hasn\'t been configured locally')
+        LOGGER.info(format_ansi_string('Git SSH hasn\'t been configured '
+                                       'locally', ForeGroundColor.LIGHT_RED))
     else:
-        LOGGER.info('Git SSH has been configured locally')
+        LOGGER.info(format_ansi_string('Git SSH has been configured locally',
+                                       ForeGroundColor.LIGHT_GREEN))
 
     return file_found
 
@@ -36,7 +39,7 @@ def generate_rsa_keypair():
     """
     Generate asymmetric public/private keypair for ssh use
     """
-    passphrase = general.random_string(8)
+    passphrase = random_string(8)
     command = f'ssh-keygen -t rsa -b 4096 -C \"{GITHUB.email}\" -N {passphrase}'
     with Popen(command.split(), stdin=PIPE, stdout=PIPE, stderr=PIPE) \
             as process:
@@ -44,11 +47,14 @@ def generate_rsa_keypair():
 
         if err:
             LOGGER.error(err.decode('utf-8'))
-            LOGGER.error('RSA keypair for SSH has failed to generated')
+            LOGGER.error(format_ansi_string('RSA keypair for SSH failed to '
+                                            'generated', ForeGroundColor.RED))
             sys.exit()
         else:
             LOGGER.debug(out.decode('utf-8'))
-            LOGGER.info('RSA keypair for SSH has successfully been generated')
+            LOGGER.info(format_ansi_string('RSA keypair for SSH has '
+                                           'successfully been generated',
+                                           ForeGroundColor.GREEN))
 
 
 def start_ssh_agent():
@@ -80,12 +86,13 @@ def start_ssh_agent():
 
         if err and not grepped:
             LOGGER.error(err.decode('utf-8'))
-            LOGGER.error('Failed to grep')
+            LOGGER.error(format_ansi_string('Failed to grep for the ssh-agent'
+                                            ' process', ForeGroundColor.RED))
             sys.exit()
 
         parsed_output = out.decode('utf-8').split('\n')
 
-    list(lambda x: find_ssh_process(x), parsed_output)
+    consume(lambda x: find_ssh_process(x), parsed_output)
 
     command_list = ['sh', '-c', f'eval \"$(ssh-agent -s)\"']
     with Popen(command_list, stdout=PIPE, stderr=PIPE) as process:
@@ -93,11 +100,14 @@ def start_ssh_agent():
 
         if err:
             LOGGER.error(err.decode('utf-8'))
-            LOGGER.error('SSH-agent process has failed to start')
+            LOGGER.error(format_ansi_string('SSH-agent process failed to '
+                                            'start', ForeGroundColor.RED))
             sys.exit()
         else:
             LOGGER.debug(out.decode('utf-8'))
-            LOGGER.info('SSH-agent process has successfully started')
+            LOGGER.info(format_ansi_string('SSH-agent process has '
+                                           'successfully started',
+                                           ForeGroundColor.GREEN))
 
 
 def register_private_key_to_ssh_agent():
@@ -108,10 +118,13 @@ def register_private_key_to_ssh_agent():
     ssh_added = call(command.split(), stdout=DEVNULL) == 0
 
     if ssh_added:
-        LOGGER.info('SSH private key has successfully been added to the '
-                    'ssh-agent')
+        LOGGER.info(format_ansi_string('SSH private key has successfully been'
+                                       ' added to the ssh-agent',
+                                       ForeGroundColor.GREEN))
     else:
-        LOGGER.error('SSH private key has failed to be added to the ssh-agent')
+        LOGGER.error(format_ansi_string('SSH private key coudln\'t be added '
+                                        'to the ssh-agent',
+                                        ForeGroundColor.RED))
         sys.exit()
 
 
@@ -125,7 +138,8 @@ def get_public_key() -> str:
 
         if err:
             LOGGER.error(err.decode('utf-8'))
-            LOGGER.error('SSH public key is missing')
+            LOGGER.error(format_ansi_string('SSH public key is missing',
+                                            ForeGroundColor.RED))
             sys.exit()
 
         LOGGER.debug(out.decode('utf-8'))
@@ -148,12 +162,15 @@ def delete_ssh_rsa_keypair():
 
         if err:
             LOGGER.error(err.decode('utf-8'))
-            LOGGER.error('Failed to remove RSA keypairs configured for SSH')
+            LOGGER.error(format_ansi_string('Failed to remove RSA keypairs '
+                                            'configured for SSH',
+                                            ForeGroundColor.RED))
             sys.exit()
         else:
             LOGGER.debug(out.decode('utf-8'))
-            LOGGER.info('RSA keypairs configured for SSH has successfully been '
-                        'removed')
+            LOGGER.info(format_ansi_string('RSA keypairs configured for SSH '
+                                           'has successfully been removed',
+                                           ForeGroundColor.GREEN))
 
 
 def stop_ssh_agent():
@@ -172,7 +189,7 @@ def stop_ssh_agent():
 
     if err and not grepped:
         LOGGER.error(err.decode('utf-8'))
-        LOGGER.error('Failed to grep')
+        LOGGER.error(format_ansi_string('Failed to grep', ForeGroundColor.RED))
         sys.exit()
 
     ps_process.communicate()
@@ -197,10 +214,12 @@ def stop_ssh_agent():
 
             if err:
                 LOGGER.error(err.decode('utf-8'))
-                LOGGER.error('Failed to stop ssh-agent process')
+                LOGGER.error(format_ansi_string('Failed to stop ssh-agent '
+                                                'process', ForeGroundColor.RED))
                 sys.exit()
             else:
                 LOGGER.debug(out.decode('utf-8'))
                 LOGGER.debug('SSH-agent pid {pid} has been terminated')
 
-    LOGGER.info('SSH-agent process has successfully been stopped')
+    LOGGER.info(format_ansi_string('SSH-agent process has successfully been '
+                                   'stopped', ForeGroundColor.GREEN))
