@@ -4,10 +4,13 @@ Module holding helper methods for functional tasks
 
 # Native Modules
 import collections
-from itertools import islice
-from typing import Iterable
 import random
 import string
+from itertools import islice
+from typing import Iterable, Union
+
+# Custom Modules
+from utils.unicode import Symbols, Format, ForeGroundColor, BackgroundColor
 
 
 def consume(iterator: Iterable[any], n: int = None) -> None:
@@ -33,5 +36,28 @@ def random_string(n: int = 8) -> str:
     return ''.join(random.choice(latin_letters) for i in range(n))
 
 
+def format_ansi_string(message: str,
+                       *formats: Union[Symbols, Format, ForeGroundColor,
+                                       BackgroundColor]) -> str:
+    """
+    Return ANSI formatted string with the following properties passed in from
+    unicode.py. (Exclude Format.RESET if passed in)
+    """
+    valid_formats = filter(lambda x: x is not Format.RESET, formats)
+    starting_format = ''.join(map(lambda x: x.value, valid_formats))
+
+    return f'{starting_format}{message}{Format.RESET.value}'
 
 
+def get_green_check() -> str:
+    """
+    Returns a ANSI formatted string representing a green tick
+    """
+    return format_ansi_string(f'{Symbols.TICK.value}', ForeGroundColor.GREEN)
+
+
+def get_red_cross() -> str:
+    """
+    Returns a ANSI formatted string representing a red cross
+    """
+    return format_ansi_string(f'{Symbols.CROSS.value}', ForeGroundColor.RED)

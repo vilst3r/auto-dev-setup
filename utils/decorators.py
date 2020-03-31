@@ -7,6 +7,10 @@ import logging
 from time import time
 from typing import Callable
 
+# Custom Modules
+from utils.unicode import *
+from utils.general import format_ansi_string, get_green_check, get_red_cross
+
 LOGGER = logging.getLogger()
 
 
@@ -23,29 +27,30 @@ def measure_time(wrapped_function: Callable) -> Callable:
         finish_time = time()
 
         time_elapsed = finish_time - start_time
-        LOGGER.info(f'{wrapped_function.__name__}() execution time:'
-                    f' {time_elapsed} seconds')
+        message = f'{wrapped_function.__name__}() execution time: ' \
+                  f'{time_elapsed} seconds'
+
+        LOGGER.info(format_ansi_string(message, ForeGroundColor.LIGHT_RED,
+                                       Format.UNDERLINE, Format.BOLD))
     return decorator
 
 
 def print_process_step(step_no: int, begin_message: str,
                        end_message: str) -> Callable:
-    def log_message(message: str):
+    def format_template(message: str):
         """
         Prints each step of the installation process in a pretty format
         """
-        template = f"| {step_no}. {message} |"
-
-        horizontal_bars = f"+{('-' * (len(template) - 2))}+"
-
-        LOGGER.info(horizontal_bars)
-        LOGGER.info(template)
-        LOGGER.info(horizontal_bars)
+        return format_ansi_string(message, ForeGroundColor.LIGHT_BLUE,
+                                  Format.UNDERLINE, Format.BOLD)
 
     def decorator(wrapped_function: Callable):
         def wrapper(*args, **kwargs):
-            log_message(begin_message)
+            LOGGER.info(format_template(f'{step_no}. {begin_message}'))
             wrapped_function(*args, **kwargs)
-            log_message(end_message)
+
+            final_string = format_template(f'{step_no}. {end_message}')
+            LOGGER.info(f'{final_string} {get_green_check()}')
+            print()
         return wrapper
     return decorator
