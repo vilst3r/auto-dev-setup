@@ -61,3 +61,11 @@ def get_red_cross() -> str:
     Returns a ANSI formatted string representing a red cross
     """
     return format_ansi_string(f'{Symbols.CROSS.value}', ForeGroundColor.RED)
+
+
+def get_green_right_arrow() -> str:
+    """
+    Returns a ANSI formatted string representing a arrow
+    """
+    return format_ansi_string(f'{Symbols.RIGHT_ARROW.value}',
+                              ForeGroundColor.GREEN)

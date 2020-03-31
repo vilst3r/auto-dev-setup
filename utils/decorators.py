@@ -9,7 +9,7 @@ from typing import Callable
 
 # Custom Modules
 from utils.unicode import *
-from utils.general import format_ansi_string, get_green_check, get_red_cross
+from utils.general import format_ansi_string, get_green_check, get_green_right_arrow
 
 LOGGER = logging.getLogger()
 
@@ -46,11 +46,15 @@ def print_process_step(step_no: int, begin_message: str,
 
     def decorator(wrapped_function: Callable):
         def wrapper(*args, **kwargs):
-            LOGGER.info(format_template(f'{step_no}. {begin_message}'))
+            begin_string = format_template(f'{step_no}. {begin_message}')
+            LOGGER.info(f'{begin_string} {get_green_right_arrow()}')
+
             wrapped_function(*args, **kwargs)
 
             final_string = format_template(f'{step_no}. {end_message}')
             LOGGER.info(f'{final_string} {get_green_check()}')
+
+            # Add empty line in between steps in stdout
             print()
         return wrapper
     return decorator

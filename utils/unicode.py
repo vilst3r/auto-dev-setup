@@ -59,4 +59,5 @@ class Symbols(enum.Enum):
     """
     TICK = '\u2713'
     CROSS = '\u274C'
+    RIGHT_ARROW = '\u27A4'
 
