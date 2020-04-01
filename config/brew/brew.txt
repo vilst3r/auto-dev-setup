@@ -5,3 +5,4 @@ postgresql
 node
 docker
 vim
+gcc

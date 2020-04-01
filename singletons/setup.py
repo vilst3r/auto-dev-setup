@@ -9,8 +9,13 @@ import logging
 import pathlib
 import pprint
 import re
+import sys
 import traceback
 from subprocess import check_output, call, DEVNULL
+
+# Custom Modules
+from utils.general import format_ansi_string
+from utils.unicode import *
 
 LOGGER = logging.getLogger()
 
@@ -45,8 +50,19 @@ class SetupSingleton:
         self.ssh_dir = f'{home}/.ssh'
         self.vim_color_dir = f'{home}/.vim/colors'
 
-        self.brew_config_file = 'config/brew/brew.txt'
-        self.brew_cask_config_file = 'config/brew/brew-cask.txt'
+        if '--test' in sys.argv:
+            LOGGER.info(format_ansi_string('Executing with minimal non-user '
+                                           'configurations for testing...',
+                                           ForeGroundColor.LIGHT_RED))
+            self.brew_config_file = 'config/brew/test-brew.txt'
+            self.brew_cask_config_file = 'config/brew/test-brew-cask.txt'
+        else:
+            LOGGER.info(format_ansi_string('Executing with your user '
+                                           'configurations for your setup...',
+                                           ForeGroundColor.LIGHT_GREEN))
+            self.brew_config_file = 'config/brew/brew.txt'
+            self.brew_cask_config_file = 'config/brew/brew-cask.txt'
+
         self.bash_profile_file = f'{home}/.bash_profile'
         self.vimrc_file = f'{home}/.vimrc'
 
