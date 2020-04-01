@@ -230,11 +230,10 @@ def uninstall_brew():
     Uninstalls brew from the web via git
     """
     command = 'which brew'
-    bin_exists = call(command.split(), stdout=DEVNULL) == 0
+    brew_installed = call(command.split(), stdout=DEVNULL) == 0
 
-    if not bin_exists:
-        LOGGER.info(format_ansi_string('Homebrew is already uninstalled',
-                                       ForeGroundColor.LIGHT_GREEN))
+    if not brew_installed:
+        LOGGER.info(format_success_message('Homebrew is already uninstalled'))
         return
 
     ruby_bin = '/usr/bin/ruby'
@@ -280,8 +279,8 @@ def uninstall_brew():
         child_output = child.before
 
         LOGGER.debug(child_output)
-        LOGGER.info(format_ansi_string('Homebrew has successfully been '
-                                       'uninstalled', ForeGroundColor.GREEN))
+        LOGGER.info(format_success_message(
+            'Homebrew has successfully been uninstalled'))
     except pexpect.TIMEOUT:
         LOGGER.error(format_ansi_string('Invalid expectation or process timed '
                                         'out', ForeGroundColor.RED))

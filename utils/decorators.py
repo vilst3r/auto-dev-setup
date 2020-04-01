@@ -9,7 +9,7 @@ from typing import Callable
 
 # Custom Modules
 from utils.unicode import *
-from utils.general import format_ansi_string, get_green_check, get_green_right_arrow
+from utils.general import format_ansi_string, get_green_right_arrow
 
 LOGGER = logging.getLogger()
 

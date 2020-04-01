@@ -78,11 +78,11 @@ def configure_dotfiles():
     Configure user bash, vim & emacs settings
     """
 
-    # dotfiles.pull_dotfile_settings()
-    # dotfiles.configure_vimrc()
-    # dotfiles.configure_vim_color_themes()
-    # dotfiles.configure_bash_profile()
-    # dotfiles.configure_emacs()
+    dotfiles.pull_dotfile_settings()
+    dotfiles.configure_vimrc()
+    dotfiles.configure_vim_color_themes()
+    dotfiles.configure_bash_profile()
+    dotfiles.configure_emacs()
 
 
 @print_process_step(step_no=6, title='Installing powerline...')
@@ -105,9 +105,7 @@ if __name__ == '__main__':
     @measure_time
     def build_dev_environment():
         """
-        Run the following installation processes in sequential order with a
-        single thread for now
-        TODO - Add multithreading for idle-dependencies, chart dependency graph
+        Run the following installation processes in sequential order
         """
         configure_git_ssh()
         install_homebrew()

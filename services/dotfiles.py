@@ -10,7 +10,7 @@ from subprocess import Popen, call, DEVNULL, PIPE
 # Custom Modules
 from singletons.setup import SetupSingleton
 from singletons.github import GithubSingleton
-from utils.general import format_ansi_string
+from utils.general import format_ansi_string, format_success_message
 from utils.unicode import *
 
 SETUP: SetupSingleton = SetupSingleton.get_instance()
@@ -183,14 +183,14 @@ def remove_color_themes():
 
 def remove_dotfiles_settings():
     """
-    Remove dotfile setting repository cloned from github
+    Remove dotfiles setting repository cloned from github
     """
     command = f'find {SETUP.dotfiles_dir}'
     directory_found = call(command.split(), stdout=DEVNULL) == 0
 
     if not directory_found:
-        LOGGER.info(format_ansi_string('Dotfile settings has been already '
-                                       'removed', ForeGroundColor.LIGHT_GREEN))
+        LOGGER.info(format_success_message(
+            'Dotfile settings has been already removed'))
         return
 
     command = f'rm -rf {SETUP.dotfiles_dir}'
@@ -200,14 +200,13 @@ def remove_dotfiles_settings():
         if err:
             LOGGER.error(err.decode('utf-8'))
             LOGGER.error(format_ansi_string('Failed to remove the dotfiles '
-                                            'settings respository cloned from '
+                                            'settings repository cloned from '
                                             'github', ForeGroundColor.RED))
             sys.exit()
         else:
             LOGGER.debug(out.decode('utf-8'))
-            LOGGER.info(format_ansi_string('Dotfiles settings repository '
-                                           'cloned from github has '
-                                           'successfully been removed',
-                                           ForeGroundColor.GREEN))
+            LOGGER.info(format_success_message('Dotfiles settings repository '
+                                               'cloned from github has '
+                                               'successfully been removed'))
 
 

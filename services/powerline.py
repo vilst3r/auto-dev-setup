@@ -12,7 +12,7 @@ from subprocess import Popen, call, PIPE, DEVNULL
 # Custom Modules
 from singletons.setup import SetupSingleton
 from singletons.github import GithubSingleton
-from utils.general import format_ansi_string
+from utils.general import format_ansi_string, format_success_message
 from utils.unicode import *
 
 SETUP: SetupSingleton = SetupSingleton.get_instance()
@@ -308,23 +308,17 @@ def config_git_shell():
                                    'in powerline!', ForeGroundColor.GREEN))
 
 
-def uninstall_gitstatus():
+def uninstall_powerline_gitstatus():
     """
-    Uninstalls git powerline status at user level of system
+    Uninstalls the powerline git-status package from the system
     """
     command = 'which pip3'
-    bin_exists = call(command.split(), stdout=DEVNULL) == 0
-
-    if not bin_exists:
-        LOGGER.info(format_ansi_string('Powerline-gitstatus has already been '
-                                       'uninstalled',
-                                       ForeGroundColor.LIGHT_GREEN))
-        return
+    pip_installed = call(command.split(), stdout=DEVNULL) == 0
 
     command = 'pip3 show powerline-gitstatus'
     package_found = call(command.split(), stdout=DEVNULL) == 0
 
-    if not package_found:
+    if not pip_installed or not package_found:
         LOGGER.info(format_ansi_string('Powerline-gitstatus has already been '
                                        'uninstalled',
                                        ForeGroundColor.LIGHT_GREEN))
@@ -337,21 +331,21 @@ def uninstall_gitstatus():
 
         if err:
             LOGGER.error(err.decode('utf-8'))
-            LOGGER.error(format_ansi_string('Failed to uninstall '
-                                            'powerline-gitstatus at the user '
-                                            'level', ForeGroundColor.RED))
+            LOGGER.error(format_ansi_string('Failed to uninstall the '
+                                            'powerline-gitstatus package',
+                                            ForeGroundColor.RED))
             sys.exit()
         else:
             LOGGER.debug(out.decode('utf-8'))
-            LOGGER.info(format_ansi_string('Powerline-gitstatus has '
-                                           'successfully been uninstalled '
-                                           'at the user level',
+            LOGGER.info(format_ansi_string('The powerline-gitstatus package '
+                                           'has successfully been uninstalled',
                                            ForeGroundColor.GREEN))
 
 
-def delete_fonts():
+def delete_powerline_fonts():
     """
-    Deletes all font files assosciated with powerline from installation
+    Deletes all font files associated with the powerline package from
+    installation
     """
     uninstall_font_script = f'{SETUP.powerline_local_config_dir}' \
                             f'/fonts/uninstall.sh'
@@ -372,13 +366,14 @@ def delete_fonts():
         if err:
             LOGGER.error(err.decode('utf-8'))
             LOGGER.error(format_ansi_string('Failed to uninstall powerline '
-                                            'fonts', ForeGroundColor.RED))
+                                            'fonts in the system level',
+                                            ForeGroundColor.RED))
             sys.exit()
         else:
             LOGGER.debug(out.decode('utf-8'))
             LOGGER.info(format_ansi_string('Powerline fonts has successfully '
-                                           'been uninstalled',
-                                           ForeGroundColor.GREEN))
+                                           'been uninstalled in the system '
+                                           'level', ForeGroundColor.GREEN))
 
     command = f'rm -rf {SETUP.powerline_local_config_dir}/fonts'
     with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
@@ -387,14 +382,14 @@ def delete_fonts():
         if err:
             LOGGER.error(err.decode('utf-8'))
             LOGGER.error(format_ansi_string('Failed to remove powerline fonts '
-                                            'in the user config directory',
+                                            'in the user level',
                                             ForeGroundColor.RED))
             sys.exit()
         else:
             LOGGER.debug(out.decode('utf-8'))
-            LOGGER.info(format_ansi_string('Powerline fonts in user config '
-                                           'directory has successfully been '
-                                           'removed', ForeGroundColor.GREEN))
+            LOGGER.info(format_ansi_string('Powerline fonts in the user level '
+                                           'has successfully been removed',
+                                           ForeGroundColor.GREEN))
 
 
 def delete_powerline_config_folder():
@@ -405,8 +400,9 @@ def delete_powerline_config_folder():
     directory_found = call(command.split(), stdout=DEVNULL) == 0
 
     if not directory_found:
-        LOGGER.info(format_ansi_string('Powerline config has already been '
-                                       'removed', ForeGroundColor.LIGHT_GREEN))
+        LOGGER.info(format_ansi_string('Powerline config at the user config '
+                                       'directory has already been removed',
+                                       ForeGroundColor.LIGHT_GREEN))
         return
 
     command = f'rm -rf {SETUP.powerline_local_config_dir}'
@@ -415,18 +411,18 @@ def delete_powerline_config_folder():
 
         if err:
             LOGGER.error(err.decode('utf-8'))
-            LOGGER.error(format_ansi_string('Failed to remove powerline '
-                                            'config at user config directory',
-                                            ForeGroundColor.RED))
+            LOGGER.error(format_ansi_string('Failed to remove the powerline '
+                                            'config at the user config '
+                                            'directory', ForeGroundColor.RED))
             sys.exit()
         else:
             LOGGER.debug(out.decode('utf-8'))
             LOGGER.info(format_ansi_string('Powerline config has successfully'
-                                           ' been removed at user config '
+                                           ' been removed at the user config '
                                            'directory', ForeGroundColor.GREEN))
 
 
-def remove_bash_daemon():
+def remove_powerline_daemon_in_bash_profile():
     """
     Remove powerline config block in bash profile
     """
@@ -446,7 +442,7 @@ def remove_bash_daemon():
     config_match = re.search(pattern, content)
 
     if not config_match:
-        LOGGER.info(format_ansi_string('Powerline configuration in bash '
+        LOGGER.info(format_ansi_string('Powerline daemon in bash '
                                        'profile already removed',
                                        ForeGroundColor.LIGHT_GREEN))
         return
@@ -457,13 +453,13 @@ def remove_bash_daemon():
     with open(SETUP.bash_profile_file, 'w') as text_file:
         text_file.write(content)
 
-    LOGGER.info(format_ansi_string('Powerline configuration removed in '
-                                   'bash profile', ForeGroundColor.GREEN))
+    LOGGER.info(format_ansi_string(
+        'Powerline daemon removed in bash profile', ForeGroundColor.GREEN))
 
 
-def remove_vim_config():
+def remove_powerline_config_in_vimrc():
     """
-    Remove powerline config block in vimrc
+    Remove the powerline config block in vimrc
     """
     pattern = []
     pattern.append('" Powerline')
@@ -491,8 +487,8 @@ def remove_vim_config():
     with open(SETUP.vimrc_file, 'w') as text_file:
         text_file.write(content)
 
-    LOGGER.info(format_ansi_string('Powerline configuration removed in vimrc',
-                                   ForeGroundColor.GREEN))
+    LOGGER.info(format_ansi_string(
+        'Powerline configuration removed in vimrc', ForeGroundColor.GREEN))
 
 
 def uninstall_powerline_status():
@@ -500,21 +496,14 @@ def uninstall_powerline_status():
     Uninstalls the powerline tool
     """
     command = 'which pip3'
-    bin_exists = call(command.split(), stdout=DEVNULL) == 0
-
-    if not bin_exists:
-        LOGGER.info(format_ansi_string('Powerline-gitstatus has already been '
-                                       'uninstalled',
-                                       ForeGroundColor.LIGHT_GREEN))
-        return
+    pip_installed = call(command.split(), stdout=DEVNULL) == 0
 
     command = 'pip3 show powerline-status'
     package_found = call(command.split(), stdout=DEVNULL) == 0
 
-    if not package_found:
-        LOGGER.info(format_ansi_string('Powerline-status has already been '
-                                       'uninstalled',
-                                       ForeGroundColor.LIGHT_GREEN))
+    if not pip_installed or not package_found:
+        LOGGER.info(format_success_message(
+            'Powerline-status has already been uninstalled'))
         return
 
     command = 'pip3 uninstall powerline-status'
@@ -524,12 +513,12 @@ def uninstall_powerline_status():
 
         if err:
             LOGGER.error(err.decode('utf-8'))
-            LOGGER.error(format_ansi_string('Failed to uninstall powerline '
-                                            'through pipe3',
-                                            ForeGroundColor.RED))
+            LOGGER.error(format_ansi_string('Failed to uninstall the '
+                                            'powerline-status package through '
+                                            'pip3', ForeGroundColor.RED))
             sys.exit()
         else:
             LOGGER.debug(out.decode('utf-8'))
-            LOGGER.info(format_ansi_string('Powerline has successfully been '
-                                           'uninstalled through pip3',
-                                           ForeGroundColor.GREEN))
+            LOGGER.info(format_success_message('The powerline-status package '
+                                               'has successfully been '
+                                               'uninstalled through pip3'))

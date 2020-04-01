@@ -13,7 +13,7 @@ from singletons.setup import SetupSingleton
 from singletons.github import GithubSingleton
 from services import powerline, git, ssh, brew, dotfiles
 from utils.decorators import measure_time, print_process_step
-from utils.general import format_ansi_string
+from utils.general import format_ansi_string, format_success_message
 from utils.unicode import *
 
 SETUP: SetupSingleton = SetupSingleton.get_instance()
@@ -21,37 +21,29 @@ GITHUB: GithubSingleton = GithubSingleton.get_instance()
 LOGGER = logging.getLogger()
 
 
-@print_process_step(step_no=1, title='Uninstalling powerline...')
+@print_process_step(step_no=1, title='Uninstalling Powerline...')
 def uninstall_powerline():
     """
     Remove existing powerline configurations
     """
-    # powerline.uninstall_gitstatus()
-    # powerline.delete_fonts()
+    # powerline.uninstall_powerline_gitstatus()
+    # powerline.delete_powerline_fonts()
     # powerline.delete_powerline_config_folder()
-    # powerline.remove_bash_daemon()
-    # powerline.remove_vim_config()
+    # powerline.remove_powerline_daemon_in_bash_profile()
+    # powerline.remove_powerline_config_in_vimrc()
     # powerline.uninstall_powerline_status()
 
 
-@print_process_step(step_no=2, title='Uninstalling bash...')
-def uninstall_bash():
+@print_process_step(step_no=2, title='Uninstalling dotfiles...')
+def uninstall_dotfiles():
     """
-    Remove existing bash configurations
+    Remove existing dotfile configurations
     """
-    # bash.remove_bash_settings()
+    # dotfiles.remove_color_themes()
+    # dotfiles.remove_dotfiles_settings()
 
 
-@print_process_step(step_no=3, title='Uninstalling vim...')
-def uninstall_vim():
-    """
-    Remove existing vim configurations
-    """
-    # vim.remove_color_themes()
-    # vim.remove_vim_settings()
-
-
-@print_process_step(step_no=4, title='Uninstalling homebrew...')
+@print_process_step(step_no=3, title='Uninstalling Homebrew...')
 def uninstall_brew():
     """
     Uninstall brew and cask together
@@ -59,37 +51,34 @@ def uninstall_brew():
     # brew.uninstall_brew()
 
 
-@print_process_step(step_no=5, title='Uninstalling Git SSH...')
+@print_process_step(step_no=4, title='Uninstalling Git SSH...')
 def uninstall_git_ssh():
     """
-    Remove existing git ssh configurations locally and on github
+    Remove existing git ssh configurations locally & on github
     """
-    # if not ssh.public_key_exists() and not git.public_key_exists_on_github():
-    #     LOGGER.info(format_ansi_string('Git SSH already uninstalled!',
-    #                                    ForeGroundColor.LIGHT_GREEN))
-    #     return
-    #
-    # current_public_key = ssh.get_public_key()
-    # public_keys = GITHUB.get_public_keys().json()
-    #
-    # git.delete_github_pub_key(current_public_key, public_keys)
-    # ssh.delete_ssh_rsa_keypair()
-    # ssh.stop_ssh_agent()
-    # git.remove_ssh_config()
-    # git.remove_ssh_github_host()
+    if not ssh.public_key_exists() and not git.public_key_exists_on_github():
+        LOGGER.info(format_success_message('Git SSH already uninstalled!'))
+        return
+
+    current_public_key = ssh.get_public_key()
+    public_keys = GITHUB.get_public_keys().json()
+
+    git.delete_github_pub_key(current_public_key, public_keys)
+    ssh.delete_ssh_rsa_keypair()
+    ssh.stop_ssh_agent()
+    git.remove_ssh_config()
+    git.remove_ssh_github_host()
 
 
 if __name__ == '__main__':
     @measure_time
     def clean_dev_environment():
         """
-        Cleans up the development environment that was automated
-        TODO - Add multithreading for idle-dependencies, chart dependency graph
+        Cleans up the development environment that was automatically setup
+        previously
         """
         uninstall_powerline()
-        uninstall_bash()
-        # TODO - add uninstall for dotfiles later
-        uninstall_vim()
+        uninstall_dotfiles()
         uninstall_brew()
         uninstall_git_ssh()
 

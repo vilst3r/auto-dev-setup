@@ -10,7 +10,7 @@ import re
 from services import ssh
 from singletons.setup import SetupSingleton
 from singletons.github import GithubSingleton
-from utils.general import format_ansi_string
+from utils.general import format_ansi_string, format_success_message
 from utils.unicode import *
 
 SETUP: SetupSingleton = SetupSingleton.get_instance()
@@ -137,9 +137,8 @@ def remove_ssh_github_host():
     key_match = re.search(pattern, content)
 
     if not key_match:
-        LOGGER.info(format_ansi_string('Github host value already deleted from '
-                                       'known_host file',
-                                       ForeGroundColor.LIGHT_GREEN))
+        LOGGER.info(format_success_message(
+            'Github host value already deleted from known_host file'))
         return
 
     start, end = key_match.span()
@@ -148,5 +147,5 @@ def remove_ssh_github_host():
     with open(known_hosts, 'w') as text_file:
         text_file.write(content)
 
-    LOGGER.info(format_ansi_string('Github host value is now removed from '
-                                   'known_host file', ForeGroundColor.GREEN))
+    LOGGER.info(format_success_message(
+        'Github host value is now removed from known_host file'))
