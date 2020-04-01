@@ -32,6 +32,7 @@ class SetupSingleton:
         initialise_logger()
 
         self.brew_dir = '/usr/local/Caskroom'
+        self.entry_point = get_entry_point()
 
         home = str(pathlib.Path.home())
         self.home_dir = home
@@ -39,8 +40,8 @@ class SetupSingleton:
         self.dotfiles_dir = f'{home}/dotfiles'
 
         command = 'python3 -m site --user-site'
-        python_site = check_output(
-            command.split()).decode('utf-8').strip()
+        python_site = check_output(command.split()).decode('utf-8').strip()
+
         self.python_site_dir = python_site
 
         self.powerline_local_config_dir = f'{home}/.config/powerline'
@@ -51,19 +52,11 @@ class SetupSingleton:
         self.vim_color_dir = f'{home}/.vim/colors'
 
         if '--test' in sys.argv:
-            LOGGER.info(format_ansi_string(' Executing with minimal non-user '
-                                           'configurations for testing...\n',
-                                           ForeGroundColor.LIGHT_RED,
-                                           Symbols.RIGHT_ARROW,
-                                           Format.BOLD, Format.UNDERLINE))
+            self.log_initial_message()
             self.brew_config_file = 'config/brew/test-brew.txt'
             self.brew_cask_config_file = 'config/brew/test-brew-cask.txt'
         else:
-            LOGGER.info(format_ansi_string(' Executing with your user '
-                                           'configurations for your setup...\n',
-                                           ForeGroundColor.LIGHT_RED,
-                                           Symbols.RIGHT_ARROW,
-                                           Format.BOLD, Format.UNDERLINE))
+            self.log_initial_message()
             self.brew_config_file = 'config/brew/brew.txt'
             self.brew_cask_config_file = 'config/brew/brew-cask.txt'
 
@@ -112,36 +105,64 @@ class SetupSingleton:
             SetupSingleton()
         return SetupSingleton.__instance
 
+    def log_initial_message(self):
+        """
+        Logs initial message based on the entry point of the program or the
+        flag passed in
+        """
+        if self.entry_point == 'clean':
+            LOGGER.info(format_ansi_string(' Executing cleanup against '
+                                           'the development environment...\n',
+                                           ForeGroundColor.LIGHT_RED,
+                                           Symbols.RIGHT_ARROW,
+                                           Format.BOLD, Format.UNDERLINE))
+            return
+
+        if '--test' in sys.argv:
+            LOGGER.info(format_ansi_string(' Executing with minimal non-user '
+                                           'configurations for testing...\n',
+                                           ForeGroundColor.LIGHT_RED,
+                                           Symbols.RIGHT_ARROW,
+                                           Format.BOLD, Format.UNDERLINE))
+        else:
+            LOGGER.info(format_ansi_string(' Executing with your user '
+                                           'configurations for your setup...\n',
+                                           ForeGroundColor.LIGHT_RED,
+                                           Symbols.RIGHT_ARROW,
+                                           Format.BOLD, Format.UNDERLINE))
+
+
+def get_entry_point() -> str:
+    """
+    Determines the entry point of the program based on the filename executed.
+    There can only be two candidate values based on the project:
+        - "setup"
+        - "clean"
+    """
+    first_stack_message = traceback.format_stack()[0]
+
+    pattern = re.compile(r'File ".*"')
+    match_object = re.search(pattern, first_stack_message).group(0)
+
+    # Expected match template -> "**/**/<file>.py"
+    file = match_object.split()[1].replace('\"', '')
+    file = file.split('/')[-1]
+    file = file.split('.')[0]
+    return file.lower()
+
 
 def initialise_logger():
     """
     Set up logging for writing stdout & stderr to files based on the
     filename executed
     """
-    def determine_log_output() -> str:
-        """
-        Determines where to log the output by reading the first stack frame
-        :return: root file that executed the containing process
-        """
-        first_stack_message = traceback.format_stack()[0]
-
-        pattern = re.compile(r'File ".*"')
-        match_object = re.search(pattern, first_stack_message).group(0)
-
-        # Expected match template -> "**/**/<file>.py"
-        file = match_object.split()[1].replace('\"', '')
-        file = file.split('/')[-1]
-        file = file.split('.')[0]
-
-        return f'logs/{file.lower()}'
-
     LOGGER.setLevel(logging.DEBUG)
 
     formatter = logging.Formatter("[%(asctime)s - %(levelname)s - "
                                   "%(filename)s.%(funcName)s.%(lineno)d] : "
                                   "%(message)s")
 
-    log_dir = determine_log_output()
+    log_dir = f'logs/{get_entry_point()}'
 
     command = f'mkdir -p {log_dir}'
     call(command.split(), stdout=DEVNULL)
