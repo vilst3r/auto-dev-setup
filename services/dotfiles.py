@@ -18,9 +18,27 @@ GITHUB: GithubSingleton = GithubSingleton.get_instance()
 LOGGER = logging.getLogger()
 
 
+def user_has_dotfiles_repo() -> bool:
+    """
+    Check if the user has the `dotfiles` repository on Github to configure
+    during the process
+    """
+    source = f'git@github.com:{GITHUB.username}/dotfiles.git'
+
+    command = f'git ls-remote {source}'
+    repo_exists = call(command.split(), stdout=DEVNULL) == 0
+
+    if not repo_exists:
+        LOGGER.warning(format_ansi_string(f'This step is optional but it '
+                                          f'requires - \'{source}\' to proceed',
+                                          ForeGroundColor.YELLOW))
+    return repo_exists
+
+
 def pull_dotfile_settings():
     """
-    Pull dotfiles repository from github account
+    Pull the dotfiles repository from the github account assuming the user has
+    this repository setup
     """
     command = f'find {SETUP.dotfiles_dir}'
     directory_found = call(command.split(), stdout=DEVNULL) == 0
@@ -30,17 +48,7 @@ def pull_dotfile_settings():
                                        'git', ForeGroundColor.LIGHT_GREEN))
         return
 
-    # Check if repository is forked in configured account
     source = f'git@github.com:{GITHUB.username}/dotfiles.git'
-    command = f'git ls-remote {source}'
-    fork_exists = call(command.split(), stdout=DEVNULL) == 0
-
-    if not fork_exists:
-        LOGGER.warning(format_ansi_string(f'This step is optional but it '
-                                          f'requires - {source} to proceed',
-                                          ForeGroundColor.YELLOW, Format.BOLD))
-        return
-
     command = f'git clone {source} {SETUP.dotfiles_dir}'
     with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
         out, err = process.communicate()
@@ -62,6 +70,15 @@ def configure_vimrc():
     """
     Copies vimrc from dotfile settings to user settings
     """
+    command = f'find {SETUP.dotfiles_dir}/.vimrc'
+    dotfiles_vimrc_exists = call(command.split(), stdout=DEVNULL) == 0
+
+    if not dotfiles_vimrc_exists:
+        LOGGER.info(format_ansi_string('Missing the \'.vimrc\' file in the '
+                                       'dotfiles repository',
+                                       ForeGroundColor.YELLOW))
+        return
+
     command = f'cp {SETUP.dotfiles_dir}/.vimrc {SETUP.vimrc_file}'
     with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
         out, err = process.communicate()
@@ -84,6 +101,15 @@ def configure_vim_color_themes():
     Moves the vim color theme scripts from the dotfiles settings repository to
     the correct location
     """
+    command = f'find {SETUP.dotfiles_dir}/vim_color_themes/'
+    dotfiles_color_dir_exists = call(command.split(), stdout=DEVNULL) == 0
+
+    if not dotfiles_color_dir_exists:
+        LOGGER.info(format_ansi_string('Missing the \'vim_color_themes\' '
+                                       'directory in the dotfiles repository',
+                                       ForeGroundColor.YELLOW))
+        return
+
     command = f'mkdir -p {SETUP.vim_color_dir}'
     call(command.split(), stdout=DEVNULL)
     LOGGER.info(format_ansi_string(f'{SETUP.vim_color_dir} - has been '
@@ -110,6 +136,15 @@ def configure_bash_profile():
     """
     Copies bash profile from dotfile settings to user settings
     """
+    command = f'find {SETUP.dotfiles_dir}/.bash_profile'
+    dotfiles_bash_profile_exists = call(command.split(), stdout=DEVNULL) == 0
+
+    if not dotfiles_bash_profile_exists:
+        LOGGER.info(format_ansi_string('Missing the \'.bash_profile\' file in '
+                                       'the dotfiles repository',
+                                       ForeGroundColor.YELLOW))
+        return
+
     command = f'cp {SETUP.dotfiles_dir}/.bash_profile ' \
               f'{SETUP.bash_profile_file}'
     with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
@@ -132,8 +167,25 @@ def configure_emacs():
     """
     Maps `.emacs` from dotfile settings to `init.el` in user settings
     """
+    command = f'find {SETUP.emacs_dir}'
+    emacs_exists = call(command.split(), stdout=DEVNULL) == 0
+
+    if not emacs_exists:
+        LOGGER.info(format_ansi_string('Missing emacs application in the user '
+                                       'level config', ForeGroundColor.YELLOW))
+        return
+
+    command = f'find {SETUP.dotfiles_dir}/.emacs'
+    dotfiles_emacs_config_exists = call(command.split(), stdout=DEVNULL) == 0
+
+    if not dotfiles_emacs_config_exists:
+        LOGGER.info(format_ansi_string('Missing the \'.emacs\' file in '
+                                       'the dotfiles repository',
+                                       ForeGroundColor.YELLOW))
+        return
+
     command = f'cp {SETUP.dotfiles_dir}/.emacs ' \
-              f'{SETUP.home_dir}/.emacs'
+              f'{SETUP.emacs_file}'
     with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
         out, err = process.communicate()
 
@@ -145,9 +197,9 @@ def configure_emacs():
             sys.exit()
         else:
             LOGGER.debug(out.decode('utf-8'))
-            LOGGER.info(format_ansi_string('Emacs settings are now configured'
-                                           ' from the dotfiles repository',
-                                           ForeGroundColor.GREEN))
+            LOGGER.info(format_success_message('Emacs settings are now '
+                                               'configured from the dotfiles '
+                                               'repository'))
 
 
 def remove_color_themes():

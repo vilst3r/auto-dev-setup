@@ -77,6 +77,11 @@ def configure_dotfiles():
     """
     Configure user bash, vim & emacs settings
     """
+    if not dotfiles.user_has_dotfiles_repo():
+        LOGGER.info(format_success_message('User account doesn\'t have a '
+                                           'dotfiles repository. Skipping '
+                                           'this step...'))
+        return
 
     dotfiles.pull_dotfile_settings()
     dotfiles.configure_vimrc()

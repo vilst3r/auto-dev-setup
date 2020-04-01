@@ -38,6 +38,7 @@ class SetupSingleton:
         self.home_dir = home
 
         self.dotfiles_dir = f'{home}/dotfiles'
+        self.emacs_dir = f'{home}/.emacs.d'
 
         command = 'python3 -m site --user-site'
         python_site = check_output(command.split()).decode('utf-8').strip()
@@ -63,6 +64,7 @@ class SetupSingleton:
         self.git_credentials_file = 'config/git-credentials.txt'
         self.bash_profile_file = f'{home}/.bash_profile'
         self.vimrc_file = f'{home}/.vimrc'
+        self.emacs_file = f'{home}/.emacs.d/init.el'
 
         LOGGER.info(format_ansi_string('Ensure you\'ve configured the '
                                        'following files before proceeding: ',
