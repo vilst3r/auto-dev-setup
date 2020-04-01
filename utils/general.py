@@ -66,6 +66,18 @@ def format_ansi_string(message: str,
     return f'{starting_format}{message}{Format.RESET.value}'
 
 
+def format_success_message(message: str) -> str:
+    """
+    Return ANSI formatted string intended for the last step of a process with
+    the following properties passed in from unicode.py.
+    (Exclude Format.RESET if passed in)
+    """
+
+    formatted_message = format_ansi_string(message, Format.BOLD)
+    final_message = f'{formatted_message} {get_green_check()}'
+    return final_message
+
+
 def get_green_check() -> str:
     """
     Returns a ANSI formatted string representing a green tick

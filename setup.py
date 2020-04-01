@@ -13,7 +13,7 @@ from singletons.setup import SetupSingleton
 from singletons.github import GithubSingleton
 from services import powerline, git, ssh, brew, dotfiles
 from utils.decorators import measure_time, print_process_step
-from utils.general import format_ansi_string
+from utils.general import format_ansi_string, format_success_message
 from utils.unicode import *
 
 SETUP: SetupSingleton = SetupSingleton.get_instance()
@@ -21,16 +21,13 @@ GITHUB: GithubSingleton = GithubSingleton.get_instance()
 LOGGER = logging.getLogger()
 
 
-@print_process_step(step_no=1,
-                    begin_message='Configuring Git SSH...',
-                    end_message='SSH key for Git is now configured!')
+@print_process_step(step_no=1, title='Configuring Git SSH...')
 def configure_git_ssh():
     """
     Configure git ssh key to user ssh agent
     """
     if ssh.public_key_exists() and git.public_key_exists_on_github():
-        LOGGER.info(format_ansi_string('Git SSH is already configured!',
-                                       Format.BOLD))
+        LOGGER.info(format_success_message('Git SSH is already configured!'))
         return
 
     ssh.generate_rsa_keypair()
@@ -44,28 +41,21 @@ def configure_git_ssh():
     GITHUB.create_public_key(payload)
 
 
-@print_process_step(step_no=2,
-                    begin_message='Installing Homebrew...',
-                    end_message='Homebrew is now successfully setup!')
+@print_process_step(step_no=2, title='Installing Homebrew...')
 def install_homebrew():
     """
     Install homebrew & cask if it doesn't exist in *nix environment and requires
     password input
     """
     if brew.brew_exists():
-        LOGGER.info(format_ansi_string('Homebrew is already installed!',
-                                       Format.BOLD))
+        LOGGER.info(format_success_message('Homebrew is already installed!'))
         return
 
     brew.install_brew()
     brew.tap_brew_cask()
 
 
-@print_process_step(step_no=3,
-                    begin_message='Installing brew packages...',
-                    end_message='Brew packages listed in '
-                                '\'./config/brew/brew.txt\' are now '
-                                'configured!')
+@print_process_step(step_no=3, title='Installing brew packages...')
 def install_brew_packages():
     """
     Install brew packages
@@ -73,11 +63,7 @@ def install_brew_packages():
     brew.install_all_brew_packages()
 
 
-@print_process_step(step_no=4,
-                    begin_message='Installing cask packages...',
-                    end_message='Cask packages listed in '
-                                '\'./config/brew/brew-cask.txt\' are now '
-                                'configured!')
+@print_process_step(step_no=4, title='Installing cask packages...')
 def install_cask_packages():
     """
     Reads brew-cask.txt file in child config directory to install all software
@@ -86,9 +72,7 @@ def install_cask_packages():
     brew.install_all_cask_packages()
 
 
-@print_process_step(step_no=5,
-                    begin_message='Configuring dotfiles...',
-                    end_message='Dotfiles are now configured!')
+@print_process_step(step_no=5, title='Configuring dotfiles...')
 def configure_dotfiles():
     """
     Configure user bash, vim & emacs settings
@@ -101,9 +85,7 @@ def configure_dotfiles():
     # dotfiles.configure_emacs()
 
 
-@print_process_step(step_no=6,
-                    begin_message='Installing powerline...',
-                    end_message='Powerline is installed & configured!')
+@print_process_step(step_no=6, title='Installing powerline...')
 def install_powerline():
     """
     Install powerline & configure it to bash & vim

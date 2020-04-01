@@ -2,13 +2,13 @@
 Singleton object for setup script
 """
 
-## Native Modules
+# Native Modules
 import logging
 import pprint
 import sys
 
 # Custom Modules
-from utils.general import format_ansi_string
+from utils.general import format_ansi_string, format_success_message
 from utils.unicode import *
 
 
@@ -88,9 +88,8 @@ class GithubSingleton:
                                             ForeGroundColor.RED))
             sys.exit()
         else:
-            LOGGER.info(format_ansi_string('Github public key has '
-                                           'successfully been created!',
-                                           ForeGroundColor.GREEN))
+            LOGGER.info(format_success_message(
+                'Github public key has successfully been created!'))
             return res
 
     def delete_public_key(self, key_id: int):

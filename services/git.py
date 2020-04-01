@@ -69,7 +69,7 @@ def public_key_exists_on_github() -> bool:
         lambda x: re.match(pattern, x['key']), public_keys), None)
 
     if key_found:
-        LOGGER.info(format_ansi_string('Git SSH has been configured on '
+        LOGGER.info(format_ansi_string('Git SSH has already been configured on '
                                        'Github', ForeGroundColor.LIGHT_GREEN))
     else:
         LOGGER.info(format_ansi_string('Git SSH is not configured on Github',

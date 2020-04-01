@@ -29,8 +29,8 @@ def public_key_exists() -> bool:
         LOGGER.info(format_ansi_string('Git SSH hasn\'t been configured '
                                        'locally', ForeGroundColor.LIGHT_RED))
     else:
-        LOGGER.info(format_ansi_string('Git SSH has been configured locally',
-                                       ForeGroundColor.LIGHT_GREEN))
+        LOGGER.info(format_ansi_string('Git SSH has already been configured '
+                                       'locally', ForeGroundColor.LIGHT_GREEN))
 
     return file_found
 

@@ -21,9 +21,7 @@ GITHUB: GithubSingleton = GithubSingleton.get_instance()
 LOGGER = logging.getLogger()
 
 
-@print_process_step(step_no=1,
-                    begin_message='Uninstalling powerline...',
-                    end_message='Powerline uninstalled!')
+@print_process_step(step_no=1, title='Uninstalling powerline...')
 def uninstall_powerline():
     """
     Remove existing powerline configurations
@@ -36,9 +34,7 @@ def uninstall_powerline():
     # powerline.uninstall_powerline_status()
 
 
-@print_process_step(step_no=2,
-                    begin_message='Uninstalling bash...',
-                    end_message='Bash uninstalled!')
+@print_process_step(step_no=2, title='Uninstalling bash...')
 def uninstall_bash():
     """
     Remove existing bash configurations
@@ -46,9 +42,7 @@ def uninstall_bash():
     # bash.remove_bash_settings()
 
 
-@print_process_step(step_no=3,
-                    begin_message='Uninstalling vim...',
-                    end_message='Vim uninstalled!')
+@print_process_step(step_no=3, title='Uninstalling vim...')
 def uninstall_vim():
     """
     Remove existing vim configurations
@@ -57,9 +51,7 @@ def uninstall_vim():
     # vim.remove_vim_settings()
 
 
-@print_process_step(step_no=4,
-                    begin_message='Uninstalling homebrew...',
-                    end_message='Homebrew uninstalled!')
+@print_process_step(step_no=4, title='Uninstalling homebrew...')
 def uninstall_brew():
     """
     Uninstall brew and cask together
@@ -67,9 +59,7 @@ def uninstall_brew():
     # brew.uninstall_brew()
 
 
-@print_process_step(step_no=5,
-                    begin_message='Uninstalling Git SSH...',
-                    end_message='Git SSH uninstalled!')
+@print_process_step(step_no=5, title='Uninstalling Git SSH...')
 def uninstall_git_ssh():
     """
     Remove existing git ssh configurations locally and on github

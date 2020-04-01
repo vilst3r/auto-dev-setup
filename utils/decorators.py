@@ -27,16 +27,16 @@ def measure_time(wrapped_function: Callable) -> Callable:
         finish_time = time()
 
         time_elapsed = finish_time - start_time
-        message = f'{wrapped_function.__name__}() execution time: ' \
+        message = f' Execution Time - {wrapped_function.__name__}(): ' \
                   f'{time_elapsed} seconds'
 
         LOGGER.info(format_ansi_string(message, ForeGroundColor.LIGHT_RED,
-                                       Format.UNDERLINE, Format.BOLD))
+                                       Symbols.RIGHT_ARROW, Format.UNDERLINE,
+                                       Format.BOLD))
     return decorator
 
 
-def print_process_step(step_no: int, begin_message: str,
-                       end_message: str) -> Callable:
+def print_process_step(step_no: int, title: str) -> Callable:
     def format_template(message: str):
         """
         Prints each step of the installation process in a pretty format
@@ -46,13 +46,10 @@ def print_process_step(step_no: int, begin_message: str,
 
     def decorator(wrapped_function: Callable):
         def wrapper(*args, **kwargs):
-            begin_string = format_template(f'{step_no}. {begin_message}')
-            LOGGER.info(f'{begin_string} {get_green_right_arrow()}')
+            message = format_template(f'{step_no}. {title}')
+            LOGGER.info(f'{message} {get_green_right_arrow()}')
 
             wrapped_function(*args, **kwargs)
-
-            final_string = format_template(f'{step_no}. {end_message}')
-            LOGGER.info(f'{final_string} {get_green_check()}')
 
             # Add empty line in between steps in stdout
             print()

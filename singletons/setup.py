@@ -51,23 +51,39 @@ class SetupSingleton:
         self.vim_color_dir = f'{home}/.vim/colors'
 
         if '--test' in sys.argv:
-            LOGGER.info(format_ansi_string('Executing with minimal non-user '
-                                           'configurations for testing...',
-                                           ForeGroundColor.LIGHT_RED))
+            LOGGER.info(format_ansi_string(' Executing with minimal non-user '
+                                           'configurations for testing...\n',
+                                           ForeGroundColor.LIGHT_RED,
+                                           Symbols.RIGHT_ARROW,
+                                           Format.BOLD, Format.UNDERLINE))
             self.brew_config_file = 'config/brew/test-brew.txt'
             self.brew_cask_config_file = 'config/brew/test-brew-cask.txt'
         else:
-            LOGGER.info(format_ansi_string('Executing with your user '
-                                           'configurations for your setup...',
-                                           ForeGroundColor.LIGHT_GREEN))
+            LOGGER.info(format_ansi_string(' Executing with your user '
+                                           'configurations for your setup...\n',
+                                           ForeGroundColor.LIGHT_RED,
+                                           Symbols.RIGHT_ARROW,
+                                           Format.BOLD, Format.UNDERLINE))
             self.brew_config_file = 'config/brew/brew.txt'
             self.brew_cask_config_file = 'config/brew/brew-cask.txt'
 
+        self.git_credentials_file = 'config/git-credentials.txt'
         self.bash_profile_file = f'{home}/.bash_profile'
         self.vimrc_file = f'{home}/.vimrc'
 
+        LOGGER.info(format_ansi_string('Ensure you\'ve configured the '
+                                       'following files before proceeding: ',
+                                       ForeGroundColor.LIGHT_RED))
+        LOGGER.info(format_ansi_string(f'- {self.brew_config_file}',
+                                       Format.BOLD))
+        LOGGER.info(format_ansi_string(f'- {self.brew_cask_config_file}',
+                                       Format.BOLD))
+        LOGGER.info(format_ansi_string(f'- {self.git_credentials_file}\n',
+                                       Format.BOLD))
+
         self.username = getpass.getuser()
         self.password = getpass.getpass()
+        print()
 
     def __init__(self):
         """ Virtually private constructor """

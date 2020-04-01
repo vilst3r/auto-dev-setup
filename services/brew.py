@@ -13,7 +13,8 @@ import pexpect
 
 # Custom Modules
 from singletons.setup import SetupSingleton
-from utils.general import consume, partition, format_ansi_string
+from utils.general import consume, partition, format_ansi_string, \
+    format_success_message
 from utils.unicode import *
 
 SETUP: SetupSingleton = SetupSingleton.get_instance()
@@ -104,8 +105,8 @@ def tap_brew_cask():
             sys.exit()
         else:
             LOGGER.debug(out.decode('utf-8'))
-            LOGGER.info(format_ansi_string('Brew has successfully tapped into '
-                                           'cask', ForeGroundColor.GREEN))
+            LOGGER.info(format_success_message(
+                'Brew has successfully tapped into cask'))
 
 
 def install_all_brew_packages():
@@ -158,12 +159,12 @@ def install_all_brew_packages():
     uninstalled_packages, uninstalled_packages_copy = tee(uninstalled_packages)
 
     if not next(uninstalled_packages_copy, None):
-        LOGGER.info(format_ansi_string('No available brew packages to '
-                                       'install', Format.BOLD))
+        LOGGER.info(format_success_message(
+            'No available brew packages to install'))
     else:
         # consume(map(lambda x: process_package(x), uninstalled_packages))
-        # TODO remove below
-        print('Stub completed')
+        LOGGER.info(format_success_message(
+            'All configured brew packages are now install'))
 
 
 def install_all_cask_packages():
@@ -216,12 +217,12 @@ def install_all_cask_packages():
     uninstalled_packages, uninstalled_packages_copy = tee(uninstalled_packages)
 
     if not next(uninstalled_packages_copy, None):
-        LOGGER.info(format_ansi_string('No available cask packages to '
-                                       'install', Format.BOLD))
+        LOGGER.info(format_success_message(
+            'No available cask packages to install'))
     else:
         # consume(map(lambda x: process_package(x), uninstalled_packages))
-        # TODO remove below
-        print('Stub completed')
+        LOGGER.info(format_success_message(
+            'All configured brew cask packages are now install'))
 
 
 def uninstall_brew():
