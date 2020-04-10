@@ -11,7 +11,7 @@ from services import ssh
 from singletons.setup import SetupSingleton
 from singletons.github import GithubSingleton
 from utils.general import format_ansi_string, format_success_message
-from utils.unicode import *
+from utils.unicode import ForeGroundColor
 
 SETUP: SetupSingleton = SetupSingleton.get_instance()
 GITHUB: GithubSingleton = GithubSingleton.get_instance()
@@ -35,8 +35,8 @@ def update_ssh_config():
     if not key_match:
         with open(ssh_config_file, 'a') as text_file:
             text_file.write(identity_val)
-        LOGGER.info(format_ansi_string('IdentityFile key value appended to ssh '
-                                       'config file', ForeGroundColor.GREEN))
+        LOGGER.info(format_ansi_string('IdentityFile key value appended to ssh'
+                                       ' config file', ForeGroundColor.GREEN))
         return
 
     start, end = key_match.span()
@@ -69,8 +69,8 @@ def public_key_exists_on_github() -> bool:
         lambda x: re.match(pattern, x['key']), public_keys), None)
 
     if key_found:
-        LOGGER.info(format_ansi_string('Git SSH has already been configured on '
-                                       'Github', ForeGroundColor.LIGHT_GREEN))
+        LOGGER.info(format_ansi_string('Git SSH has already been configured on'
+                                       ' Github', ForeGroundColor.LIGHT_GREEN))
     else:
         LOGGER.info(format_ansi_string('Git SSH is not configured on Github',
                                        ForeGroundColor.LIGHT_RED))
@@ -120,8 +120,8 @@ def remove_ssh_config():
     with open(ssh_config_file, 'w') as text_file:
         text_file.write(content)
 
-    LOGGER.info(format_ansi_string('IdentityFile key value is now removed from '
-                                   'ssh config file', ForeGroundColor.GREEN))
+    LOGGER.info(format_ansi_string('IdentityFile key value is now removed from'
+                                   ' ssh config file', ForeGroundColor.GREEN))
 
 
 def remove_ssh_github_host():

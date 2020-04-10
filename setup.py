@@ -13,10 +13,9 @@ from singletons.setup import SetupSingleton
 from singletons.github import GithubSingleton
 from services import powerline, git, ssh, brew, dotfiles
 from utils.decorators import measure_time, print_process_step
-from utils.general import format_ansi_string, format_success_message
-from utils.unicode import *
+from utils.general import format_success_message
 
-SETUP: SetupSingleton = SetupSingleton.get_instance()
+setup: SetupSingleton = SetupSingleton.get_instance()
 GITHUB: GithubSingleton = GithubSingleton.get_instance()
 LOGGER = logging.getLogger()
 
@@ -44,7 +43,7 @@ def configure_git_ssh():
 @print_process_step(step_no=2, title='Installing Homebrew...')
 def install_homebrew():
     """
-    Install homebrew & cask if it doesn't exist in *nix environment and requires
+    Install homebrew & cask if it doesn't exist in *nix environment & requires
     password input
     """
     if brew.brew_exists():
@@ -85,7 +84,6 @@ def configure_dotfiles():
 
     dotfiles.pull_dotfile_settings()
     dotfiles.configure_vimrc()
-    dotfiles.configure_vim_color_themes()
     dotfiles.configure_bash_profile()
     dotfiles.configure_emacs()
 
@@ -95,15 +93,15 @@ def install_powerline():
     """
     Install powerline & configure it to bash & vim
     """
-    # powerline.install_powerline_at_user()
-    # powerline.write_bash_daemon()
-    # powerline.write_vim_config()
-    # powerline.configure_user_config_directory()
-    # powerline.install_fonts()
-    #
-    # powerline.install_gitstatus_at_user()
-    # powerline.config_git_colorscheme()
-    # powerline.config_git_shell()
+    powerline.install_powerline_at_user()
+    powerline.write_bash_daemon()
+    powerline.write_vim_config()
+    powerline.configure_user_config_directory()
+    powerline.install_fonts()
+
+    powerline.install_gitstatus_at_user()
+    powerline.config_git_colorscheme()
+    powerline.config_git_shell()
 
 
 if __name__ == '__main__':
@@ -120,4 +118,3 @@ if __name__ == '__main__':
         install_powerline()
 
     build_dev_environment()
-

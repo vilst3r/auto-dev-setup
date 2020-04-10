@@ -15,7 +15,7 @@ import pexpect
 from singletons.setup import SetupSingleton
 from utils.general import consume, partition, format_ansi_string, \
     format_success_message
-from utils.unicode import *
+from utils.unicode import ForeGroundColor
 
 SETUP: SetupSingleton = SetupSingleton.get_instance()
 LOGGER = logging.getLogger()
@@ -26,7 +26,8 @@ def brew_exists() -> bool:
     Check if the brew dependency management tool exists in the system
     """
     command = f'find {SETUP.brew_dir}'
-    directory_found = call(command.split(), stdout=DEVNULL, stderr=DEVNULL) == 0
+    directory_found = call(
+        command.split(), stdout=DEVNULL, stderr=DEVNULL) == 0
 
     if not directory_found:
         LOGGER.info(format_ansi_string('Brew hasn\'t been configured',

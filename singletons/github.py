@@ -9,7 +9,7 @@ import sys
 
 # Custom Modules
 from utils.general import format_ansi_string, format_success_message
-from utils.unicode import *
+from utils.unicode import ForeGroundColor
 
 
 # Third Party Modules
@@ -138,8 +138,8 @@ def read_git_credentials() -> dict:
                 text_file.write(f"{prop}: <INSERT OWN VALUE>\n")
 
         LOGGER.error(ierr)
-        LOGGER.error(format_ansi_string(f'Git credential file does not exist '
-                                        f'- now generated in {git_credentials}',
+        LOGGER.error(format_ansi_string(f'Git credential file does not exist -'
+                                        ' now generated in {git_credentials}',
                                         ForeGroundColor.RED))
         sys.exit()
 

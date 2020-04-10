@@ -13,7 +13,7 @@ from subprocess import Popen, call, PIPE, DEVNULL
 from singletons.setup import SetupSingleton
 from singletons.github import GithubSingleton
 from utils.general import format_ansi_string, format_success_message
-from utils.unicode import *
+from utils.unicode import ForeGroundColor
 
 SETUP: SetupSingleton = SetupSingleton.get_instance()
 GITHUB: GithubSingleton = GithubSingleton.get_instance()
@@ -174,7 +174,7 @@ def install_fonts():
     """
     Downloads & installs all font files to proper location
     """
-    source = f"git@github.com:{GITHUB.username}/fonts.git"
+    source = f'git@github.com:powerline/fonts.git'
     destination = f'{SETUP.powerline_local_config_dir}/fonts'
 
     command = f'find {destination}'
@@ -199,8 +199,9 @@ def install_fonts():
 
         if err and not cloned_successfully:
             LOGGER.error(err.decode('utf-8'))
-            LOGGER.error(format_ansi_string('Failed to clone powerline fonts '
-                                            'from github', ForeGroundColor.RED))
+            LOGGER.error(format_ansi_string('Failed to clone powerline fonts'
+                                            ' from github',
+                                            ForeGroundColor.RED))
             sys.exit()
         else:
             LOGGER.debug(out.decode('utf-8'))
@@ -214,8 +215,8 @@ def install_fonts():
 
         if err:
             LOGGER.error(err.decode('utf-8'))
-            LOGGER.error(format_ansi_string('Failed to install powerline fonts',
-                                            ForeGroundColor.RED))
+            LOGGER.error(format_ansi_string('Failed to install powerline '
+                                            'fonts', ForeGroundColor.RED))
             sys.exit()
         else:
             LOGGER.debug(out.decode('utf-8'))
@@ -253,7 +254,8 @@ def config_git_colorscheme():
                     f'colorschemes/default.json'
     config_block = 'config/powerline/powerline_git_color.json'
 
-    with open(default_block) as default_json, open(config_block) as config_json:
+    with open(default_block) as default_json, open(config_block) \
+            as config_json:
         default_data = json.load(default_json)
         config_data = json.load(config_json)
         default_group = default_data['groups']
@@ -284,7 +286,8 @@ def config_git_shell():
                     f'themes/shell/default.json'
     config_block = 'config/powerline/powerline_git_shell.json'
 
-    with open(default_block) as default_json, open(config_block) as config_json:
+    with open(default_block) as default_json, open(config_block)\
+            as config_json:
         default_data = json.load(default_json)
         config_data = json.load(config_json)
         function_list = default_data['segments']['left']

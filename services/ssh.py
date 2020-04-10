@@ -11,7 +11,7 @@ from subprocess import call, Popen, PIPE, DEVNULL
 from singletons.setup import SetupSingleton
 from singletons.github import GithubSingleton
 from utils.general import random_string, format_ansi_string, consume
-from utils.unicode import *
+from utils.unicode import ForeGroundColor
 
 SETUP: SetupSingleton = SetupSingleton.get_instance()
 GITHUB: GithubSingleton = GithubSingleton.get_instance()
@@ -40,7 +40,8 @@ def generate_rsa_keypair():
     Generate asymmetric public/private keypair for ssh use
     """
     passphrase = random_string(8)
-    command = f'ssh-keygen -t rsa -b 4096 -C \"{GITHUB.email}\" -N {passphrase}'
+    command = f'ssh-keygen -t rsa -b 4096 -C \"{GITHUB.email}\" -N\
+                {passphrase}'
     with Popen(command.split(), stdin=PIPE, stdout=PIPE, stderr=PIPE) \
             as process:
         out, err = process.communicate(input=b'\ny\n')
@@ -182,7 +183,8 @@ def stop_ssh_agent():
     ps_process = Popen(command.split(), stdout=PIPE)
 
     command = 'egrep ssh-agent'
-    egrep_process = Popen(command.split(), stdin=ps_process.stdout, stdout=PIPE)
+    egrep_process = Popen(
+        command.split(), stdin=ps_process.stdout, stdout=PIPE)
 
     out, err = egrep_process.communicate()
     grepped = egrep_process.returncode == 0
@@ -215,7 +217,8 @@ def stop_ssh_agent():
             if err:
                 LOGGER.error(err.decode('utf-8'))
                 LOGGER.error(format_ansi_string('Failed to stop ssh-agent '
-                                                'process', ForeGroundColor.RED))
+                                                'process',
+                                                ForeGroundColor.RED))
                 sys.exit()
             else:
                 LOGGER.debug(out.decode('utf-8'))

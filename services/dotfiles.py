@@ -11,7 +11,7 @@ from subprocess import Popen, call, DEVNULL, PIPE
 from singletons.setup import SetupSingleton
 from singletons.github import GithubSingleton
 from utils.general import format_ansi_string, format_success_message
-from utils.unicode import *
+from utils.unicode import ForeGroundColor
 
 SETUP: SetupSingleton = SetupSingleton.get_instance()
 GITHUB: GithubSingleton = GithubSingleton.get_instance()
@@ -29,8 +29,8 @@ def user_has_dotfiles_repo() -> bool:
     repo_exists = call(command.split(), stdout=DEVNULL) == 0
 
     if not repo_exists:
-        LOGGER.warning(format_ansi_string(f'This step is optional but it '
-                                          f'requires - \'{source}\' to proceed',
+        LOGGER.warning(format_ansi_string(f'This step is optional but it'
+                                          f' requires - {source} to proceed',
                                           ForeGroundColor.YELLOW))
     return repo_exists
 
@@ -57,7 +57,8 @@ def pull_dotfile_settings():
         if err and not cloned_successfully:
             LOGGER.error(err.decode('utf-8'))
             LOGGER.error(format_ansi_string('Failed to clone dotfile settings '
-                                            'from github', ForeGroundColor.RED))
+                                            'from github',
+                                            ForeGroundColor.RED))
             sys.exit()
         else:
             LOGGER.debug(out.decode('utf-8'))
@@ -94,42 +95,6 @@ def configure_vimrc():
             LOGGER.info(format_ansi_string('Vimrc now configured from the '
                                            'dotfiles repository',
                                            ForeGroundColor.GREEN))
-
-
-def configure_vim_color_themes():
-    """
-    Moves the vim color theme scripts from the dotfiles settings repository to
-    the correct location
-    """
-    command = f'find {SETUP.dotfiles_dir}/vim_color_themes/'
-    dotfiles_color_dir_exists = call(command.split(), stdout=DEVNULL) == 0
-
-    if not dotfiles_color_dir_exists:
-        LOGGER.info(format_ansi_string('Missing the \'vim_color_themes\' '
-                                       'directory in the dotfiles repository',
-                                       ForeGroundColor.YELLOW))
-        return
-
-    command = f'mkdir -p {SETUP.vim_color_dir}'
-    call(command.split(), stdout=DEVNULL)
-    LOGGER.info(format_ansi_string(f'{SETUP.vim_color_dir} - has been '
-                                   f'created', ForeGroundColor.GREEN))
-
-    command_list = []
-    command_list.append('sh')
-    command_list.append('-c')
-    command_list.append(f'cp {SETUP.dotfiles_dir}/vim_color_themes/*.vim '
-                        f'{SETUP.vim_color_dir}')
-
-    files_copied = call(command_list, stdout=DEVNULL) == 0
-
-    if files_copied:
-        LOGGER.info(format_ansi_string('Vim color themes copied to '
-                                       '~/.vim/colors', ForeGroundColor.GREEN))
-    else:
-        LOGGER.error(format_ansi_string('Error copying vim color themes in '
-                                        'user config', ForeGroundColor.RED))
-        sys.exit()
 
 
 def configure_bash_profile():
@@ -193,7 +158,7 @@ def configure_emacs():
             LOGGER.error(err.decode('utf-8'))
             LOGGER.error(format_ansi_string('Failed to configure emacs '
                                             'settings from the dotfiles '
-                         'repository', ForeGroundColor.RED))
+                                            'repository', ForeGroundColor.RED))
             sys.exit()
         else:
             LOGGER.debug(out.decode('utf-8'))
@@ -260,5 +225,3 @@ def remove_dotfiles_settings():
             LOGGER.info(format_success_message('Dotfiles settings repository '
                                                'cloned from github has '
                                                'successfully been removed'))
-
-

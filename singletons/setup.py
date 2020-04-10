@@ -15,7 +15,7 @@ from subprocess import check_output, call, DEVNULL
 
 # Custom Modules
 from utils.general import format_ansi_string
-from utils.unicode import *
+from utils.unicode import ForeGroundColor, Format, Symbols
 
 LOGGER = logging.getLogger()
 
@@ -50,7 +50,6 @@ class SetupSingleton:
                                            f'powerline/config_files'
 
         self.ssh_dir = f'{home}/.ssh'
-        self.vim_color_dir = f'{home}/.vim/colors'
 
         if '--test' in sys.argv:
             self.log_initial_message()
@@ -128,10 +127,10 @@ class SetupSingleton:
                                            Format.BOLD, Format.UNDERLINE))
         else:
             LOGGER.info(format_ansi_string(' Executing with your user '
-                                           'configurations for your setup...\n',
-                                           ForeGroundColor.LIGHT_RED,
-                                           Symbols.RIGHT_ARROW,
-                                           Format.BOLD, Format.UNDERLINE))
+                                           'configurations for your setup...'
+                                           '\n', ForeGroundColor.LIGHT_RED,
+                                           Symbols.RIGHT_ARROW, Format.BOLD,
+                                           Format.UNDERLINE))
 
 
 def get_entry_point() -> str:
