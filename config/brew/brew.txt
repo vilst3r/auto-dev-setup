@@ -1,8 +1,0 @@
-python
-go
-git
-postgresql
-node
-docker
-vim
-gcc

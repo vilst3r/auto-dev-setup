@@ -8,8 +8,7 @@
 /logs/*
 
 # Git directories
-/config/vim/vim-settings/
-/config/bash/bash-settings/
+venv
 
 # Vim files
 *.swp
