@@ -13,8 +13,7 @@ from singletons.setup import SetupSingleton
 from singletons.github import GithubSingleton
 from services import powerline, git, ssh, brew, dotfiles
 from utils.decorators import measure_time, print_process_step
-from utils.general import format_ansi_string, format_success_message
-from utils.unicode import *
+from utils.general import format_success_message
 
 SETUP: SetupSingleton = SetupSingleton.get_instance()
 GITHUB: GithubSingleton = GithubSingleton.get_instance()
@@ -26,12 +25,12 @@ def uninstall_powerline():
     """
     Remove existing powerline configurations
     """
-    # powerline.uninstall_powerline_gitstatus()
-    # powerline.delete_powerline_fonts()
-    # powerline.delete_powerline_config_folder()
-    # powerline.remove_powerline_daemon_in_bash_profile()
-    # powerline.remove_powerline_config_in_vimrc()
-    # powerline.uninstall_powerline_status()
+    powerline.uninstall_powerline_gitstatus()
+    powerline.delete_powerline_fonts()
+    powerline.delete_powerline_config_folder()
+    powerline.remove_powerline_daemon_in_bash_profile()
+    powerline.remove_powerline_config_in_vimrc()
+    powerline.uninstall_powerline_status()
 
 
 @print_process_step(step_no=2, title='Uninstalling dotfiles...')
@@ -39,8 +38,8 @@ def uninstall_dotfiles():
     """
     Remove existing dotfile configurations
     """
-    # dotfiles.remove_color_themes()
-    # dotfiles.remove_dotfiles_settings()
+    dotfiles.remove_color_themes()
+    dotfiles.remove_dotfiles_settings()
 
 
 @print_process_step(step_no=3, title='Uninstalling Homebrew...')
@@ -48,15 +47,16 @@ def uninstall_brew():
     """
     Uninstall brew and cask together
     """
-    # brew.uninstall_brew()
+    brew.uninstall_brew()
 
 
 @print_process_step(step_no=4, title='Uninstalling Git SSH...')
 def uninstall_git_ssh():
     """
-    Remove existing git ssh configurations locally & on github
+    Remove existing git ssh configurations locally & on github.
+    We only need to verify that the SSH public key is removed from GitHub
     """
-    if not ssh.public_key_exists() and not git.public_key_exists_on_github():
+    if not git.public_key_exists_on_github():
         LOGGER.info(format_success_message('Git SSH already uninstalled!'))
         return
 

@@ -11,7 +11,7 @@ import logging
 # Custom Modules
 from singletons.setup import SetupSingleton
 from singletons.github import GithubSingleton
-from services import powerline, git, ssh, brew, dotfiles
+from services import powerline, git, ssh, brew, dotfiles, pyp
 from utils.decorators import measure_time, print_process_step
 from utils.general import format_success_message
 
@@ -57,7 +57,7 @@ def install_homebrew():
 @print_process_step(step_no=3, title='Installing brew packages...')
 def install_brew_packages():
     """
-    Install brew packages
+    Install all brew binaries for Brew
     """
     brew.install_all_brew_packages()
 
@@ -65,13 +65,20 @@ def install_brew_packages():
 @print_process_step(step_no=4, title='Installing cask packages...')
 def install_cask_packages():
     """
-    Reads brew-cask.txt file in child config directory to install all software
-    applications
+    Installs all cask applications for Brew
     """
     brew.install_all_cask_packages()
 
 
-@print_process_step(step_no=5, title='Configuring dotfiles...')
+@print_process_step(step_no=5, title='Installing PYP packages...')
+def install_pyp_packages():
+    """
+    Installs all packages for PyP
+    """
+    pyp.install_all_pip_packages()
+
+
+@print_process_step(step_no=6, title='Configuring dotfiles...')
 def configure_dotfiles():
     """
     Configure user bash, vim & emacs settings
@@ -88,7 +95,7 @@ def configure_dotfiles():
     dotfiles.configure_emacs()
 
 
-@print_process_step(step_no=6, title='Installing powerline...')
+@print_process_step(step_no=7, title='Installing powerline...')
 def install_powerline():
     """
     Install powerline & configure it to bash & vim
@@ -114,6 +121,7 @@ if __name__ == '__main__':
         install_homebrew()
         install_brew_packages()
         install_cask_packages()
+        install_pyp_packages()
         configure_dotfiles()
         install_powerline()
 

@@ -3,12 +3,11 @@ docker
 fzf
 gcc
 git
-gnutls
 go
 ispell
 markdown
 node
 postgresql
-postgresql@10
-ripgrep
+the_silver_searcher
+tmux
 vim

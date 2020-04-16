@@ -53,12 +53,14 @@ class SetupSingleton:
 
         if '--test' in sys.argv:
             self.log_initial_message()
-            self.brew_config_file = 'config/test-leaves'
-            self.brew_cask_config_file = 'config/test-casks'
+            self.brew_config_file = 'config/test/brew-leaves'
+            self.brew_cask_config_file = 'config/test/casks'
+            self.pyp_config_file = 'config/test/pyp-leaves'
         else:
             self.log_initial_message()
-            self.brew_config_file = 'config/leaves'
+            self.brew_config_file = 'config/brew-leaves'
             self.brew_cask_config_file = 'config/casks'
+            self.pyp_config_file = 'config/pyp-leaves'
 
         self.git_credentials_file = 'config/git-credentials.txt'
         self.bash_profile_file = f'{home}/.bash_profile'
