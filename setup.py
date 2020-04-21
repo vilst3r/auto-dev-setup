@@ -2,19 +2,17 @@
 
 """
 Script to automate setup of development environment with personally configured
-tools & software by mainyl using the subprocess interface
+tools & software by mainly using the subprocess interface
 """
 
 # Native Modules
 import logging
 
 # Custom Modules
-from singletons.github import GithubSingleton
 from services import powerline, git, ssh, brew, dotfiles, pyp
 from utils.decorators import measure_time, print_process_step
 from utils.general import format_success_message
 
-GITHUB: GithubSingleton = GithubSingleton.get_instance()
 LOGGER = logging.getLogger()
 
 
@@ -51,22 +49,20 @@ def configure_ssh_keys():
 @print_process_step(step_no=3, title='Configuring Github SSH connection...')
 def configure_github_connection():
     """
-    Configure git ssh key to user ssh agent
+    Configure the user's SSH key to their own Github account
     """
     if git.public_key_exists_on_github():
         LOGGER.info(format_success_message('Github SSH connection is already'
                                            ' configured!'))
         return
 
-    current_public_key = ssh.get_public_key()
-    payload = {'title': 'script-env-pub-key', 'key': current_public_key}
-    GITHUB.create_public_key(payload)
+    git.upload_ssh_key_to_github()
 
 
 @print_process_step(step_no=4, title='Configuring dotfiles from GitHub...')
 def configure_dotfiles():
     """
-    Configure user bash, vim & emacs settings from their Github account
+    Configure user's bash, vim & emacs settings from their Github account
     """
     if not dotfiles.user_has_dotfiles_repo():
         LOGGER.info(format_success_message('User account doesn\'t have a '
@@ -81,11 +77,12 @@ def configure_dotfiles():
 
 
 @print_process_step(step_no=5, title='Installing PYP packages...')
-def install_pyp():
+def install_pyp_packages():
     """
     Installs PyP & all configured packages
     """
-    pyp.install_all_pip_packages()
+    pyp.install_packages()
+
     powerline.install_powerline_at_user()
     powerline.write_bash_daemon()
     powerline.write_vim_config()
@@ -101,11 +98,11 @@ if __name__ == '__main__':
     @measure_time
     def build_dev_environment():
         """
-        Run the following installation processes in sequential order
+        Runs the following installation processes in sequential order
         """
         install_homebrew()
         configure_ssh_keys()
         configure_github_connection()
         configure_dotfiles()
-        install_pyp()
+        install_pyp_packages()
     build_dev_environment()

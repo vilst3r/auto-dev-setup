@@ -40,6 +40,20 @@ def public_key_exists_on_github() -> bool:
     return key_found is not None
 
 
+def upload_ssh_key_to_github():
+    """
+    Uploads the current SSH key to Github
+    """
+    current_public_key = ssh.get_public_key()
+
+    payload = {
+        'title': 'script-env-pub-key',
+        'key': current_public_key
+    }
+
+    GITHUB.create_public_key(payload)
+
+
 def delete_github_pub_key(current_key: str, public_keys: list):
     """
     Removes current public key in host machine stored on github

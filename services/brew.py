@@ -23,7 +23,7 @@ LOGGER = logging.getLogger()
 
 def brew_exists() -> bool:
     """
-    Check if the brew dependency management tool exists in the system
+    Checks if the brew dependency management tool exists in the system
     """
     command = f'find {SETUP.brew_dir}'
     directory_found = call(
@@ -38,7 +38,7 @@ def brew_exists() -> bool:
 
 def install_brew():
     """
-    Pulls brew from the web via git and installs it with local authentication
+    Pulls brew from the web & installs it with local authentication
     """
     ruby_bin = '/usr/bin/ruby'
     brew_url = 'https://raw.githubusercontent.com/Homebrew/install/master/' \
@@ -92,7 +92,7 @@ def install_brew():
 
 def tap_brew_cask():
     """
-    Self explanatory
+    Registers cask packages for installation through brew
     """
     command = 'brew tap homebrew/cask'
     with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
@@ -112,7 +112,7 @@ def tap_brew_cask():
 
 def install_all_brew_packages():
     """
-    Downloads & installs every package config if it's valid
+    Downloads & installs every package configured
     """
     def process_package(package: str):
         """
@@ -163,6 +163,7 @@ def install_all_brew_packages():
         LOGGER.info(format_success_message(
             'No available brew packages to install'))
     else:
+        # TODO - remove below when project is in final stages
         # consume(map(lambda x: process_package(x), uninstalled_packages))
         LOGGER.info(format_success_message(
             'All configured brew packages are now install'))
@@ -170,7 +171,7 @@ def install_all_brew_packages():
 
 def install_all_cask_packages():
     """
-    Downloads & installs every package config if it's valid
+    Downloads & installs every package configured
     """
     def process_package(package: str):
         """
@@ -221,6 +222,7 @@ def install_all_cask_packages():
         LOGGER.info(format_success_message(
             'No available cask packages to install'))
     else:
+        # TODO - remove below when project is in final stages
         # consume(map(lambda x: process_package(x), uninstalled_packages))
         LOGGER.info(format_success_message(
             'All configured brew cask packages are now install'))

@@ -45,19 +45,16 @@ def write_bash_daemon():
     Append daemon configuration lines to bash profile
     TODO - refactor later
     """
-    source_version = f'source ' \
-                     f'{SETUP.python_site_dir}/powerline/bindings' \
-                     f'/bash/powerline.sh'
-
     daemon_config = []
     daemon_config.append('# Powerline user config')
     daemon_config.append('powerline-daemon -q')
     daemon_config.append('POWERLINE_BASH_CONTINUATION=1')
     daemon_config.append('POWERLINE_BASH_SELECT=1')
-    daemon_config.append(source_version)
+    daemon_config.append(f'source {SETUP.python_site_dir}/powerline/bindings'
+                         '/bash/powerline.sh')
 
     pattern = daemon_config[:-1]
-    pattern.append(r'source [\w(\-)/.]+.sh')
+    pattern.append(r'source [\w(\$)(\-)/.]+.sh')
 
     daemon_config = '\n'.join(daemon_config)
     pattern = '\n'.join(pattern)
@@ -97,11 +94,9 @@ def write_vim_config():
     """
     Append powerline configuration to vimrc
     """
-    rtp_version = f'set rtp+={SETUP.python_site_dir}/powerline/bindings/vim'
-
     config = []
     config.append('" Powerline')
-    config.append(rtp_version)
+    config.append(f'set rtp+={SETUP.python_site_dir}/powerline/bindings/vim')
     config.append("set laststatus=2")
     config.append("set t_Co=256")
 
