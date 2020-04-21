@@ -18,44 +18,6 @@ GITHUB: GithubSingleton = GithubSingleton.get_instance()
 LOGGER = logging.getLogger()
 
 
-def update_ssh_config():
-    """
-    Update config file in .ssh directory
-    """
-    ssh_config_file = f'{SETUP.ssh_dir}/config'
-
-    with open(ssh_config_file) as text_file:
-        content = ''.join(text_file.readlines())
-
-    pattern = re.compile(r'IdentityFile .*')
-    key_match = re.search(pattern, content)
-
-    identity_val = f'IdentityFile {SETUP.home_dir}/.ssh/id_rsa'
-
-    if not key_match:
-        with open(ssh_config_file, 'a') as text_file:
-            text_file.write(identity_val)
-        LOGGER.info(format_ansi_string('IdentityFile key value appended to ssh'
-                                       ' config file', ForeGroundColor.GREEN))
-        return
-
-    start, end = key_match.span()
-    current_config = content[start: end]
-
-    if current_config == identity_val:
-        LOGGER.info(format_ansi_string('IdentityFile key value already '
-                                       'configured in ssh config file',
-                                       ForeGroundColor.LIGHT_GREEN))
-        return
-
-    content = content[:start] + identity_val + content[end:]
-    with open(ssh_config_file, 'w') as text_file:
-        text_file.write(content)
-
-    LOGGER.info(format_ansi_string('IdentityFile key value updated in ssh '
-                                   'config file', ForeGroundColor.GREEN))
-
-
 def public_key_exists_on_github() -> bool:
     """
     Check if current public key passed in exists on github

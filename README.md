@@ -1,12 +1,12 @@
-# auto-dev-setup
+# OSX-Dev-Bootstrap
 
-Python script to replicate personal development environment across any machine 
-with proper packaging, editor profiles & settings. OSX machine environment
- only. This is currently partially personalized to my settings, feel free to
-  use, fork or extend this however you wish.
+Python script to replicate your personal development environment across any OSX
+machine with proper packaging, editor profiles & settings. This is currently 
+partially personalized to my settings, feel free to use, fork or extend this
+however you wish.
 
 # Requirements
-- `Python3` to run the executable scripts
+- `Python-3.6 or above` to run the executable scripts
 - Latest version of `pip3` otherwise the script requires a second run to
  complete
     - Run `pip3 install -r requirements` to fetch all script dependencies

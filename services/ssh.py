@@ -5,6 +5,7 @@ Module delegated to handling ssh logic
 # Native Modules
 import sys
 import logging
+import re
 from subprocess import call, Popen, PIPE, DEVNULL
 
 # Custom Modules
@@ -109,6 +110,45 @@ def start_ssh_agent():
             LOGGER.info(format_ansi_string('SSH-agent process has '
                                            'successfully started',
                                            ForeGroundColor.GREEN))
+
+
+def update_config_identity():
+    """
+    Update config file in .ssh directory
+    TODO - question whether I need this or not?
+    """
+    ssh_config_file = f'{SETUP.ssh_dir}/config'
+
+    with open(ssh_config_file) as text_file:
+        content = ''.join(text_file.readlines())
+
+    pattern = re.compile(r'IdentityFile .*')
+    key_match = re.search(pattern, content)
+
+    identity_val = f'IdentityFile {SETUP.home_dir}/.ssh/id_rsa'
+
+    if not key_match:
+        with open(ssh_config_file, 'a') as text_file:
+            text_file.write(identity_val)
+        LOGGER.info(format_ansi_string('IdentityFile key value appended to ssh'
+                                       ' config file', ForeGroundColor.GREEN))
+        return
+
+    start, end = key_match.span()
+    current_config = content[start: end]
+
+    if current_config == identity_val:
+        LOGGER.info(format_ansi_string('IdentityFile key value already '
+                                       'configured in ssh config file',
+                                       ForeGroundColor.LIGHT_GREEN))
+        return
+
+    content = content[:start] + identity_val + content[end:]
+    with open(ssh_config_file, 'w') as text_file:
+        text_file.write(content)
+
+    LOGGER.info(format_ansi_string('IdentityFile key value updated in ssh '
+                                   'config file', ForeGroundColor.GREEN))
 
 
 def register_private_key_to_ssh_agent():
