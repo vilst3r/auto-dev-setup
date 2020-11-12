@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 """
 Script to automate setup of unix environment with personal configurations and
 tools
@@ -8,15 +6,15 @@ tools
 # Native Modules
 import logging
 
+from lib import brew, dotfiles, git, powerline, ssh
+from singletons.github import GithubSingleton
 # Custom Modules
 from singletons.setup import SetupSingleton
-from singletons.github import GithubSingleton
-from services import powerline, git, ssh, brew, dotfiles
 from utils.decorators import measure_time, print_process_step
 from utils.general import format_success_message
 
-SETUP: SetupSingleton = SetupSingleton.get_instance()
-GITHUB: GithubSingleton = GithubSingleton.get_instance()
+SETUP = SetupSingleton.get_instance()
+GITHUB = GithubSingleton.get_instance()
 LOGGER = logging.getLogger()
 
 

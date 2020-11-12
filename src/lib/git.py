@@ -6,12 +6,13 @@ Module delegated to handling git logic
 import logging
 import re
 
-# Custom Modules
-from services import ssh
-from singletons.setup import SetupSingleton
 from singletons.github import GithubSingleton
+from singletons.setup import SetupSingleton
 from utils.general import format_ansi_string, format_success_message
 from utils.unicode import ForeGroundColor
+
+# Custom Modules
+from lib import ssh
 
 SETUP: SetupSingleton = SetupSingleton.get_instance()
 GITHUB: GithubSingleton = GithubSingleton.get_instance()

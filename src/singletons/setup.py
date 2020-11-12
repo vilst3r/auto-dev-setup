@@ -11,7 +11,7 @@ import pprint
 import re
 import sys
 import traceback
-from subprocess import check_output, call, DEVNULL
+from subprocess import DEVNULL, call, check_output
 
 # Custom Modules
 from utils.general import format_ansi_string
@@ -58,8 +58,8 @@ class SetupSingleton:
             self.pyp_config_file = 'config/test/pyp-leaves'
         else:
             self.log_initial_message()
-            self.brew_config_file = 'config/brew-leaves'
-            self.brew_cask_config_file = 'config/casks'
+            self.brew_config_file = 'config/brew/leaves'
+            self.brew_cask_config_file = 'config/brew/casks'
             self.pyp_config_file = 'config/pyp-leaves'
 
         self.git_credentials_file = 'config/git-credentials.txt'
@@ -137,10 +137,10 @@ class SetupSingleton:
 
 def get_entry_point() -> str:
     """
-    Determines the entry point of the program based on the filename executed.
-    There can only be two candidate values based on the project:
-        - "setup"
-        - "clean"
+    Determines the entry point of the python program based on the filename
+    executed. There can only be two candidate values based on the project:
+        - "run"
+        - "rollback"
     """
     first_stack_message = traceback.format_stack()[0]
 

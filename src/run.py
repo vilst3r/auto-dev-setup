@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 """
 Script to automate setup of development environment with personally configured
 tools & software by mainly using the subprocess interface
@@ -9,7 +7,7 @@ tools & software by mainly using the subprocess interface
 import logging
 
 # Custom Modules
-from services import powerline, git, ssh, brew, dotfiles, pyp
+from lib import brew, dotfiles, git, powerline, pyp, ssh
 from utils.decorators import measure_time, print_process_step
 from utils.general import format_success_message
 
