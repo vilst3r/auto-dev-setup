@@ -1,0 +1,16 @@
+Package             Version
+------------------- ----------
+autopep8            1.5
+black               19.10b0
+flake8              3.7.9
+importmagic         0.1.7
+jedi                0.16.0
+numpy               1.14.5
+pexpect             4.7.0
+pipenv              2018.11.26
+powerline-gitstatus 1.3.1
+powerline-status    2.7
+pylint              2.3.1
+requests            2.22.0
+rope                0.16.0
+wheel               0.34.2

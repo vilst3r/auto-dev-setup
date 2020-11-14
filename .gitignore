@@ -6,6 +6,7 @@
 
 # Log files
 /logs/*
+/e2e-test/logs/*
 
 # Git directories
 venv
