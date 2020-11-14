@@ -5,16 +5,16 @@ Module delegated to handling vim logic
 # Native Modules
 import logging
 import sys
-from subprocess import Popen, call, DEVNULL, PIPE
+from subprocess import DEVNULL, PIPE, Popen, call
 
+from singletons.github import GithubSingleton
 # Custom Modules
 from singletons.setup import SetupSingleton
-from singletons.github import GithubSingleton
 from utils.general import format_ansi_string, format_success_message
 from utils.unicode import ForeGroundColor
 
-SETUP: SetupSingleton = SetupSingleton.get_instance()
-GITHUB: GithubSingleton = GithubSingleton.get_instance()
+SETUP = SetupSingleton.get_instance()
+GITHUB = GithubSingleton.get_instance()
 LOGGER = logging.getLogger()
 
 
@@ -40,7 +40,7 @@ def pull_dotfile_settings():
     Pull the dotfiles repository from the github account assuming the user has
     this repository setup
     """
-    command = f'find {SETUP.dotfiles_dir}'
+    command = f'find {SETUP.directories.dotfiles}'
     directory_found = call(command.split(), stdout=DEVNULL) == 0
 
     if directory_found:
@@ -48,30 +48,30 @@ def pull_dotfile_settings():
                                        'git', ForeGroundColor.LIGHT_GREEN))
         return
 
-    source = f'git@github.com:{GITHUB.username}/dotfiles.git'
-    command = f'git clone {source} {SETUP.dotfiles_dir}'
-    with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
-        out, err = process.communicate()
-        cloned_successfully = process.returncode == 0
+    # source = f'git@github.com:{GITHUB.username}/dotfiles.git'
+    # command = f'git clone {source} {SETUP.directories.dotfiles}'
+    # with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
+    #     out, err = process.communicate()
+    #     cloned_successfully = process.returncode == 0
 
-        if err and not cloned_successfully:
-            LOGGER.error(err.decode('utf-8'))
-            LOGGER.error(format_ansi_string('Failed to clone dotfile settings '
-                                            'from github',
-                                            ForeGroundColor.RED))
-            sys.exit()
-        else:
-            LOGGER.debug(out.decode('utf-8'))
-            LOGGER.info(format_ansi_string('Dotfile settings has successfully '
-                                           'been cloned from github',
-                                           ForeGroundColor.GREEN))
+    #     if err and not cloned_successfully:
+    #         LOGGER.error(err.decode('utf-8'))
+    #         LOGGER.error(format_ansi_string('Failed to clone dotfile settings '
+    #                                         'from github',
+    #                                         ForeGroundColor.RED))
+    #         sys.exit()
+    #     else:
+    #         LOGGER.debug(out.decode('utf-8'))
+    #         LOGGER.info(format_ansi_string('Dotfile settings has successfully '
+    #                                        'been cloned from github',
+    #                                        ForeGroundColor.GREEN))
 
 
 def configure_vimrc():
     """
     Copies vimrc from dotfile settings to user settings
     """
-    command = f'find {SETUP.dotfiles_dir}/.vimrc'
+    command = f'find {SETUP.directories.dotfiles}/.vimrc'
     dotfiles_vimrc_exists = call(command.split(), stdout=DEVNULL) == 0
 
     if not dotfiles_vimrc_exists:
@@ -80,7 +80,7 @@ def configure_vimrc():
                                        ForeGroundColor.YELLOW))
         return
 
-    command = f'cp {SETUP.dotfiles_dir}/.vimrc {SETUP.vimrc_file}'
+    command = f'cp {SETUP.directories.dotfiles}/.vimrc {SETUP.files.vim}'
     with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
         out, err = process.communicate()
 
@@ -101,7 +101,7 @@ def configure_bash_profile():
     """
     Copies bash profile from dotfile settings to user settings
     """
-    command = f'find {SETUP.dotfiles_dir}/.bash_profile'
+    command = f'find {SETUP.directories.dotfiles}/.bash_profile'
     dotfiles_bash_profile_exists = call(command.split(), stdout=DEVNULL) == 0
 
     if not dotfiles_bash_profile_exists:
@@ -110,8 +110,8 @@ def configure_bash_profile():
                                        ForeGroundColor.YELLOW))
         return
 
-    command = f'cp {SETUP.dotfiles_dir}/.bash_profile ' \
-              f'{SETUP.bash_profile_file}'
+    command = f'cp {SETUP.directories.dotfiles}/.bash_profile ' \
+              f'{SETUP.files.bash}'
     with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
         out, err = process.communicate()
 
@@ -130,9 +130,9 @@ def configure_bash_profile():
 
 def configure_emacs():
     """
-    Maps `.emacs` from dotfile settings to `init.el` in user settings
+    Copies init.el file from dotfile settings to user settings
     """
-    command = f'find {SETUP.emacs_dir}'
+    command = f'find {SETUP.directories.emacs}'
     emacs_exists = call(command.split(), stdout=DEVNULL) == 0
 
     if not emacs_exists:
@@ -140,17 +140,17 @@ def configure_emacs():
                                        'level config', ForeGroundColor.YELLOW))
         return
 
-    command = f'find {SETUP.dotfiles_dir}/.emacs'
+    command = f'find {SETUP.directories.dotfiles}/init.el'
     dotfiles_emacs_config_exists = call(command.split(), stdout=DEVNULL) == 0
 
     if not dotfiles_emacs_config_exists:
-        LOGGER.info(format_ansi_string('Missing the \'.emacs\' file in '
+        LOGGER.info(format_ansi_string('Missing the \'init.el\' file in '
                                        'the dotfiles repository',
                                        ForeGroundColor.YELLOW))
         return
 
-    command = f'cp {SETUP.dotfiles_dir}/.emacs ' \
-              f'{SETUP.emacs_file}'
+    command = f'cp {SETUP.directories.dotfiles}/init.el ' \
+              f'{SETUP.files.emacs}'
     with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
         out, err = process.communicate()
 
@@ -162,47 +162,16 @@ def configure_emacs():
             sys.exit()
         else:
             LOGGER.debug(out.decode('utf-8'))
-            LOGGER.info(format_success_message('Emacs settings are now '
-                                               'configured from the dotfiles '
-                                               'repository'))
-
-
-def remove_color_themes():
-    """
-    Remove all color themes in the vim config folder of user
-    """
-    command = f'find {SETUP.vim_color_dir}'
-    directory_found = call(command.split(), stdout=DEVNULL) == 0
-
-    if not directory_found:
-        LOGGER.info(format_ansi_string('Vim color themes already removed',
-                                       ForeGroundColor.LIGHT_GREEN))
-        return
-
-    command_list = []
-    command_list.append('sh')
-    command_list.append('-c')
-    command_list.append(f'rm {SETUP.vim_color_dir}/*.vim')
-    with Popen(command_list, stdout=PIPE, stderr=PIPE) as process:
-        out, err = process.communicate()
-
-        if err:
-            LOGGER.debug(err.decode('utf-8'))
-            LOGGER.info(format_ansi_string('Vim color themes has already been '
-                                           'removed',
-                                           ForeGroundColor.LIGHT_GREEN))
-        else:
-            LOGGER.debug(out.decode('utf-8'))
-            LOGGER.info(format_ansi_string('Vim color themes has successfully '
-                                           'been removed',
-                                           ForeGroundColor.GREEN))
+            LOGGER.info(format_ansi_string('Emacs settings are now '
+                                           'configured from the dotfiles '
+                                           'repository', ForeGroundColor.GREEN))
 
 
 def remove_dotfiles_settings():
     """
     Remove dotfiles setting repository cloned from github
     """
-    command = f'find {SETUP.dotfiles_dir}'
+    command = f'find {SETUP.directories.dotfiles}'
     directory_found = call(command.split(), stdout=DEVNULL) == 0
 
     if not directory_found:
@@ -210,7 +179,7 @@ def remove_dotfiles_settings():
             'Dotfile settings has been already removed'))
         return
 
-    command = f'rm -rf {SETUP.dotfiles_dir}'
+    command = f'rm -rf {SETUP.directories.dotfiles}'
     with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
         out, err = process.communicate()
 

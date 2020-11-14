@@ -2,20 +2,20 @@
 Module delegated to handling ssh logic
 """
 
-# Native Modules
-import sys
 import logging
 import re
-from subprocess import call, Popen, PIPE, DEVNULL
+# Native Modules
+import sys
+from subprocess import DEVNULL, PIPE, Popen, call
 
+from singletons.github import GithubSingleton
 # Custom Modules
 from singletons.setup import SetupSingleton
-from singletons.github import GithubSingleton
-from utils.general import random_string, format_ansi_string, consume
+from utils.general import consume, format_ansi_string, random_string
 from utils.unicode import ForeGroundColor
 
-SETUP: SetupSingleton = SetupSingleton.get_instance()
-GITHUB: GithubSingleton = GithubSingleton.get_instance()
+SETUP = SetupSingleton.get_instance()
+GITHUB = GithubSingleton.get_instance()
 LOGGER = logging.getLogger()
 
 
@@ -23,7 +23,7 @@ def public_key_exists() -> bool:
     """
     Check if public key exists to confirm whether ssh is already configured
     """
-    command = f'find {SETUP.ssh_dir}/id_rsa.pub'
+    command = f'find {SETUP.directories.ssh}/id_rsa.pub'
     file_found = call(command.split(), stdout=DEVNULL, stderr=DEVNULL) == 0
 
     if not file_found:
@@ -94,7 +94,7 @@ def start_ssh_agent():
 
         parsed_output = out.decode('utf-8').split('\n')
 
-    consume(lambda x: find_ssh_process(x), parsed_output)
+    consume(map(lambda x: find_ssh_process(x), parsed_output))
 
     command_list = ['sh', '-c', f'eval \"$(ssh-agent -s)\"']
     with Popen(command_list, stdout=PIPE, stderr=PIPE) as process:
@@ -117,7 +117,7 @@ def update_config_identity():
     Update config file in .ssh directory
     TODO - question whether I need this or not?
     """
-    ssh_config_file = f'{SETUP.ssh_dir}/config'
+    ssh_config_file = f'{SETUP.directories.ssh}/config'
 
     with open(ssh_config_file) as text_file:
         content = ''.join(text_file.readlines())
@@ -125,7 +125,7 @@ def update_config_identity():
     pattern = re.compile(r'IdentityFile .*')
     key_match = re.search(pattern, content)
 
-    identity_val = f'IdentityFile {SETUP.home_dir}/.ssh/id_rsa'
+    identity_val = f'IdentityFile {SETUP.directories.ssh}/id_rsa'
 
     if not key_match:
         with open(ssh_config_file, 'a') as text_file:
@@ -155,7 +155,7 @@ def register_private_key_to_ssh_agent():
     """
     Add ssh private key to ssh-agent
     """
-    command = f'ssh-add -K {SETUP.ssh_dir}/id_rsa'
+    command = f'ssh-add -K {SETUP.directories.ssh}/id_rsa'
     ssh_added = call(command.split(), stdout=DEVNULL) == 0
 
     if ssh_added:
@@ -173,7 +173,7 @@ def get_public_key() -> str:
     """
     Return utf-8 string of ssh public key
     """
-    command = f'cat {SETUP.ssh_dir}/id_rsa.pub'
+    command = f'cat {SETUP.directories.ssh}/id_rsa.pub'
     with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
         out, err = process.communicate()
 
@@ -196,7 +196,7 @@ def delete_ssh_rsa_keypair():
     """
     Delete both public and private key configured for ssh
     """
-    command_list = ['sh', '-c', f'rm {SETUP.ssh_dir}/id_rsa*']
+    command_list = ['sh', '-c', f'rm {SETUP.directories.ssh}/id_rsa*']
 
     with Popen(command_list, stdout=PIPE, stderr=PIPE) as process:
         out, err = process.communicate()

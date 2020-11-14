@@ -2,21 +2,21 @@
 Module delegated to handling powerline status logic
 """
 
+import json
 # Native Modules
 import logging
-import sys
 import re
-import json
-from subprocess import Popen, call, PIPE, DEVNULL
+import sys
+from subprocess import DEVNULL, PIPE, Popen, call
 
+from singletons.github import GithubSingleton
 # Custom Modules
 from singletons.setup import SetupSingleton
-from singletons.github import GithubSingleton
 from utils.general import format_ansi_string, format_success_message
 from utils.unicode import ForeGroundColor
 
-SETUP: SetupSingleton = SetupSingleton.get_instance()
-GITHUB: GithubSingleton = GithubSingleton.get_instance()
+SETUP = SetupSingleton.get_instance()
+GITHUB = GithubSingleton.get_instance()
 LOGGER = logging.getLogger()
 
 
@@ -40,115 +40,18 @@ def install_powerline_at_user():
                                            ForeGroundColor.GREEN))
 
 
-def write_bash_daemon():
-    """
-    Append daemon configuration lines to bash profile
-    TODO - refactor later
-    """
-    daemon_config = []
-    daemon_config.append('# Powerline user config')
-    daemon_config.append('powerline-daemon -q')
-    daemon_config.append('POWERLINE_BASH_CONTINUATION=1')
-    daemon_config.append('POWERLINE_BASH_SELECT=1')
-    daemon_config.append(f'source {SETUP.python_site_dir}/powerline/bindings'
-                         '/bash/powerline.sh')
-
-    pattern = daemon_config[:-1]
-    pattern.append(r'source [\w(\$)(\-)/.]+.sh')
-
-    daemon_config = '\n'.join(daemon_config)
-    pattern = '\n'.join(pattern)
-
-    with open(SETUP.bash_profile_file) as text_file:
-        content = ''.join(text_file.readlines())
-
-    pattern = re.compile(pattern)
-    config_match = re.search(pattern, content)
-
-    if not config_match:
-        with open(SETUP.bash_profile_file, 'a') as text_file:
-            text_file.write(f"\n{daemon_config}\n")
-        LOGGER.info(format_ansi_string('Appended powerline configuration in '
-                                       'bash profile', ForeGroundColor.GREEN))
-        return
-
-    current_config = config_match[0]
-
-    if current_config == daemon_config:
-        LOGGER.info(format_ansi_string('Powerline already configured in '
-                                       'bash profile',
-                                       ForeGroundColor.LIGHT_GREEN))
-        return
-
-    start, end = config_match.span()
-    content = content[:start] + daemon_config + content[end:]
-
-    with open(SETUP.bash_profile_file, 'w') as text_file:
-        text_file.write(content)
-
-    LOGGER.info(format_ansi_string('Powerline configuration updated in '
-                                   'bash profile', ForeGroundColor.GREEN))
-
-
-def write_vim_config():
-    """
-    Append powerline configuration to vimrc
-    """
-    config = []
-    config.append('" Powerline')
-    config.append(f'set rtp+={SETUP.python_site_dir}/powerline/bindings/vim')
-    config.append("set laststatus=2")
-    config.append("set t_Co=256")
-
-    pattern = config[::]
-    pattern[1] = r"set rtp\+\=[\w(\-)/.]+/vim"
-
-    config = "\n".join(config)
-    pattern = "\n".join(pattern)
-
-    with open(SETUP.vimrc_file) as text_file:
-        content = "".join(text_file.readlines())
-
-    pattern = re.compile(pattern)
-    config_match = re.search(pattern, content)
-
-    if not config_match:
-        LOGGER.info(format_ansi_string('Appended powerline configuration in '
-                                       'vimrc', ForeGroundColor.GREEN))
-
-        with open(SETUP.vimrc_file, 'a') as text_file:
-            text_file.write(f"\n{config}\n")
-        return
-
-    current_config = config_match[0]
-
-    if current_config == config:
-        LOGGER.info(format_ansi_string('Powerline already configured in '
-                                       'vimrc', ForeGroundColor.LIGHT_GREEN))
-        return
-
-    start, end = config_match.span()
-    content = content[:start] + config + content[end:]
-
-    with open(SETUP.vimrc_file, 'w') as text_file:
-        text_file.write(content)
-
-    LOGGER.info(format_ansi_string('Powerline configuration updated in '
-                                   'vimrc', ForeGroundColor.GREEN))
-
-
-def configure_user_config_directory():
+def configure_user_config():
     """
     Checks & creates proper directory for the powerline configs to go
     """
-    command = f'mkdir -p {SETUP.powerline_local_config_dir}'
+    command = f'mkdir -p {SETUP.directories.powerline}'
     call(command.split(), stdout=DEVNULL)
 
-    LOGGER.info(format_ansi_string(f'{SETUP.powerline_local_config_dir} - has '
+    LOGGER.info(format_ansi_string(f'{SETUP.directories.powerline} - has '
                                    f'been created', ForeGroundColor.GREEN))
 
-    command = f'cp -r {SETUP.powerline_system_config_dir}/ ' \
-              f'{SETUP.powerline_local_config_dir}'
+    command = f'cp -r {SETUP.directories.python_site}/powerline/config_files/ ' \
+              f'{SETUP.directories.powerline}'
     with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
         out, err = process.communicate()
 
@@ -169,8 +72,8 @@ def install_fonts():
     """
     Downloads & installs all font files to proper location
     """
-    source = f'git@github.com:powerline/fonts.git'
-    destination = f'{SETUP.powerline_local_config_dir}/fonts'
+
+    destination = f'{SETUP.directories.powerline}/fonts'
 
     command = f'find {destination}'
     directory_found = call(command.split(), stdout=DEVNULL) == 0
@@ -180,13 +83,7 @@ def install_fonts():
                                        ForeGroundColor.LIGHT_GREEN))
         return
 
-    # Check if repository is forked in configured account
-    command = f'git ls-remote {source}'
-    fork_exists = call(command.split(), stdout=DEVNULL) == 0
-
-    if not fork_exists:
-        source = "git@github.com:powerline/powerline.git"
-
+    source = f'git@github.com:powerline/fonts.git'
     command = f'git clone {source} {destination}'
     with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
         out, err = process.communicate()
@@ -245,7 +142,7 @@ def config_git_colorscheme():
     Configures color scheme for git status in powerline
     """
     # TODO Double check these two lines again
-    default_block = f'{SETUP.powerline_local_config_dir}/' \
+    default_block = f'{SETUP.directories.powerline}/' \
                     f'colorschemes/default.json'
     config_block = 'config/powerline/powerline_git_color.json'
 
@@ -277,7 +174,7 @@ def config_git_shell():
     """
     Configure shell to display git status
     """
-    default_block = f'{SETUP.powerline_local_config_dir}/' \
+    default_block = f'{SETUP.directories.powerline}/' \
                     f'themes/shell/default.json'
     config_block = 'config/powerline/powerline_git_shell.json'
 
@@ -345,7 +242,7 @@ def delete_powerline_fonts():
     Deletes all font files associated with the powerline package from
     installation
     """
-    uninstall_font_script = f'{SETUP.powerline_local_config_dir}' \
+    uninstall_font_script = f'{SETUP.directories.powerline}' \
                             f'/fonts/uninstall.sh'
 
     command = f'find {uninstall_font_script}'
@@ -373,7 +270,7 @@ def delete_powerline_fonts():
                                            'been uninstalled in the system '
                                            'level', ForeGroundColor.GREEN))
 
-    command = f'rm -rf {SETUP.powerline_local_config_dir}/fonts'
+    command = f'rm -rf {SETUP.directories.powerline}/fonts'
     with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
         out, err = process.communicate()
 
@@ -394,7 +291,7 @@ def delete_powerline_config_folder():
     """
     Deletes the entire powerline folder in user config
     """
-    command = f'find {SETUP.powerline_local_config_dir}'
+    command = f'find {SETUP.directories.powerline}'
     directory_found = call(command.split(), stdout=DEVNULL) == 0
 
     if not directory_found:
@@ -403,7 +300,7 @@ def delete_powerline_config_folder():
                                        ForeGroundColor.LIGHT_GREEN))
         return
 
-    command = f'rm -rf {SETUP.powerline_local_config_dir}'
+    command = f'rm -rf {SETUP.directories.powerline}'
     with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
         out, err = process.communicate()
 
@@ -433,7 +330,7 @@ def remove_powerline_daemon_in_bash_profile():
 
     pattern = "\n".join(pattern)
 
-    with open(SETUP.bash_profile_file) as text_file:
+    with open(SETUP.files.bash) as text_file:
         content = ''.join(text_file.readlines())
 
     pattern = re.compile(pattern)
@@ -448,7 +345,7 @@ def remove_powerline_daemon_in_bash_profile():
     start, end = config_match.span()
     content = content[:start] + content[end:]
 
-    with open(SETUP.bash_profile_file, 'w') as text_file:
+    with open(SETUP.files.bash, 'w') as text_file:
         text_file.write(content)
 
     LOGGER.info(format_ansi_string(
@@ -467,7 +364,7 @@ def remove_powerline_config_in_vimrc():
 
     pattern = "\n".join(pattern)
 
-    with open(SETUP.vimrc_file) as text_file:
+    with open(SETUP.files.vim) as text_file:
         content = ''.join(text_file.readlines())
 
     pattern = re.compile(pattern)
@@ -482,7 +379,7 @@ def remove_powerline_config_in_vimrc():
     start, end = config_match.span()
     content = content[:start] + content[end:]
 
-    with open(SETUP.vimrc_file, 'w') as text_file:
+    with open(SETUP.files.vim, 'w') as text_file:
         text_file.write(content)
 
     LOGGER.info(format_ansi_string(

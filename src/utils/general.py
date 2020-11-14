@@ -7,13 +7,13 @@ import collections
 import random
 import string
 from itertools import islice
-from typing import Iterable, Union, Callable
+from typing import Any, Callable, Iterable, Union
 
 # Custom Modules
-from utils.unicode import Symbols, Format, ForeGroundColor, BackgroundColor
+from utils.unicode import BackgroundColor, ForeGroundColor, Format, Symbols
 
 
-def partition(predicate: Callable, iterable: Iterable[any]) -> tuple:
+def partition(predicate: Callable, iterable: Iterable[Any]) -> tuple:
     """
     Partition a iterable into two lists, representing true & false values
     respectively, the iterable is partitioned by the predicate function
@@ -30,7 +30,7 @@ def partition(predicate: Callable, iterable: Iterable[any]) -> tuple:
     return true_values, false_values
 
 
-def consume(iterator: Iterable[any], n: int = None) -> None:
+def consume(iterator: Iterable[Any], n: int = None) -> None:
     """
     Fastest pythonic implementation of consuming iterables
         - 'Advance the iterator n-steps ahead. If n is None, consume entirely.'
@@ -50,7 +50,7 @@ def random_string(n: int = 8) -> str:
     """
 
     latin_letters = string.ascii_letters
-    return ''.join(random.choice(latin_letters) for i in range(n))
+    return ''.join(random.choice(latin_letters) for _ in range(n))
 
 
 def format_ansi_string(message: str,

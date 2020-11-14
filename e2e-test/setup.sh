@@ -1,12 +1,17 @@
 #!/usr/bin/env bash
 
+# Use this script for testing
+
+if [ $(basename $PWD) == "e2e-test" ]; then
+    cd ..
+fi
+
 if [ $(basename $PWD) != "osx-dev-bootstrap" ]; then
     echo "Cannot execute script in this directory"
     exit 1
 fi
 
-# Use this script for testing
-python3 src/run.py
+python3 src/run.py --test
 
 # # UNCOMMENT WHEN READY FOR PRODUCTION
 # # Require root user to execute

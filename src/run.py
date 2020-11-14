@@ -7,7 +7,7 @@ tools & software by mainly using the subprocess interface
 import logging
 
 # Custom Modules
-from lib import brew, dotfiles, git, powerline, pyp, ssh
+from lib import brew, dotfiles, git, pip, powerline, ssh
 from utils.decorators import measure_time, print_process_step
 from utils.general import format_success_message
 
@@ -15,16 +15,10 @@ LOGGER = logging.getLogger()
 
 
 @print_process_step(step_no=1, title='Installing Homebrew...')
-def install_homebrew():
+def configure_brew():
     """
-    Installs homebrew & all configured system & application packages
+    Installs all configured system & application packages
     """
-    if brew.brew_exists():
-        LOGGER.info(format_success_message('Homebrew is already installed!'))
-        return
-
-    brew.install_brew()
-    brew.tap_brew_cask()
     brew.install_all_brew_packages()
     brew.install_all_cask_packages()
 
@@ -74,22 +68,25 @@ def configure_dotfiles():
     dotfiles.configure_emacs()
 
 
-@print_process_step(step_no=5, title='Installing PYP packages...')
-def install_pyp_packages():
+@print_process_step(step_no=5, title='Configuring powerline for terminal...')
+def configure_powerline():
     """
-    Installs PyP & all configured packages
+    Installs pip & all configured packages
     """
-    pyp.install_packages()
-
     powerline.install_powerline_at_user()
-    powerline.write_bash_daemon()
-    powerline.write_vim_config()
-    powerline.configure_user_config_directory()
+    powerline.configure_user_config()
     powerline.install_fonts()
-
     powerline.install_gitstatus_at_user()
     powerline.config_git_colorscheme()
     powerline.config_git_shell()
+
+
+@print_process_step(step_no=6, title='Configuring other PIP packages...')
+def configure_pip():
+    """
+    Installs pip & all configured packages
+    """
+    pip.install_all_pip_packages()
 
 
 if __name__ == '__main__':
@@ -98,9 +95,10 @@ if __name__ == '__main__':
         """
         Runs the following installation processes in sequential order
         """
-        install_homebrew()
+        configure_brew()
         configure_ssh_keys()
         configure_github_connection()
         configure_dotfiles()
-        install_pyp_packages()
+        configure_powerline()
+        # configure_pip()
     build_dev_environment()

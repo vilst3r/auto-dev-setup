@@ -14,8 +14,8 @@ from utils.unicode import ForeGroundColor
 # Custom Modules
 from lib import ssh
 
-SETUP: SetupSingleton = SetupSingleton.get_instance()
-GITHUB: GithubSingleton = GithubSingleton.get_instance()
+SETUP = SetupSingleton.get_instance()
+GITHUB = GithubSingleton.get_instance()
 LOGGER = logging.getLogger()
 
 
@@ -77,7 +77,7 @@ def remove_ssh_config():
     """
     Removes the identity value of the rsa private key from the ssh config file
     """
-    ssh_config_file = f'{SETUP.ssh_dir}/config'
+    ssh_config_file = f'{SETUP.directories.ssh}/config'
 
     with open(ssh_config_file) as text_file:
         content = ''.join(text_file.readlines())
@@ -105,7 +105,7 @@ def remove_ssh_github_host():
     """
     Remove host key & agent from known_host file in .ssh directory
     """
-    known_hosts = f'{SETUP.ssh_dir}/known_hosts'
+    known_hosts = f'{SETUP.directories.ssh}/known_hosts'
 
     with open(known_hosts) as text_file:
         content = ''.join(text_file.readlines())

@@ -6,18 +6,19 @@ Module delegated to handling pyp logic
 import logging
 import sys
 from itertools import tee
-from subprocess import Popen, call, check_output, PIPE, DEVNULL
-
-# Third Party Modules
-import pexpect
+from subprocess import DEVNULL, PIPE, Popen, call, check_output
 
 # Custom Modules
 from singletons.setup import SetupSingleton
-from utils.general import consume, partition, format_ansi_string, \
-    format_success_message
+from utils.general import (consume, format_ansi_string, format_success_message,
+                           partition)
 from utils.unicode import ForeGroundColor
 
-SETUP: SetupSingleton = SetupSingleton.get_instance()
+# Third Party Modules
+# import pexpect
+
+
+SETUP = SetupSingleton.get_instance()
 LOGGER = logging.getLogger()
 
 
@@ -37,8 +38,8 @@ def process_file() -> list:
     We need to parse from the third line onwards & install the latest by
     reading the first column only of each line
     """
-    return
-    # with open(SETUP.pyp_config_file) as text_file:
+    return []
+    # with open(SETUP.files.pip) as text_file:
 
 
 def install_packages():

@@ -36,7 +36,6 @@ def uninstall_dotfiles():
     """
     Remove existing dotfile configurations
     """
-    dotfiles.remove_color_themes()
     dotfiles.remove_dotfiles_settings()
 
 
@@ -45,7 +44,7 @@ def uninstall_brew():
     """
     Uninstall brew and cask together
     """
-    brew.uninstall_brew()
+    # brew.uninstall_brew()
 
 
 @print_process_step(step_no=4, title='Uninstalling Git SSH...')

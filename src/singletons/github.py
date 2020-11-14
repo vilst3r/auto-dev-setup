@@ -1,5 +1,5 @@
 """
-Singleton object for setup script
+Singleton object for setup script regarding Github
 """
 
 # Native Modules
@@ -7,13 +7,11 @@ import logging
 import pprint
 import sys
 
+# Third Party Modules
+import requests
 # Custom Modules
 from utils.general import format_ansi_string, format_success_message
 from utils.unicode import ForeGroundColor
-
-
-# Third Party Modules
-import requests
 
 LOGGER = logging.getLogger()
 
