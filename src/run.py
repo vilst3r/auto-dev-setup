@@ -68,7 +68,7 @@ def configure_dotfiles():
     dotfiles.configure_emacs()
 
 
-@print_process_step(step_no=5, title='Configuring other PIP packages...')
+@print_process_step(step_no=5, title='Configuring PIP packages...')
 def configure_pip():
     """
     Installs pip & all configured packages
@@ -95,11 +95,11 @@ if __name__ == '__main__':
         """
         Runs the following installation processes in sequential order
         """
-        # configure_brew()
-        # configure_ssh_keys()
-        # configure_github_connection()
-        # configure_dotfiles()
-        # configure_pip()
-        # configure_powerline()
+        configure_brew()
+        configure_ssh_keys()
+        configure_github_connection()
+        configure_dotfiles()
+        configure_pip()
+        configure_powerline()
 
     build_dev_environment()

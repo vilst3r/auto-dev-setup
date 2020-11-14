@@ -113,17 +113,17 @@ proceeding)
  & bash settings
 6. Installs all other pip packages from './config/pip/leaves
 
+![E2E demo](e2e-demo.gif)
+
 # Notes & Issues
 - Password is required when OS X prompts you to enter your password for the
     keychain access, choosing 'Always Allow' would make the whole process
     seamless without any prompts from then onwards
 - If any issues arises during the process, log output is available to diagnose
- for either `logs/setup/*.log` or `logs/clean/*.log` & run `./cleanup` to
-  undo automated installations
+ in `logs/run/*.log` & also run `./clean.sh` to undo automated installations
 - An E2E test is availabe for simulation before you run the main script, just
   run `./e2e-test/setup.sh` from the root directory (*Recommended*)
 
 # TODO (potentially)
-- Add iTerm2 configuration in spare time in the future
-- Add C++ bits/header to setup
+- Parallelise the package installations for brew, pip and etc
 - Add npm packages
