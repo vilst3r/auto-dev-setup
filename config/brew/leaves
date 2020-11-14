@@ -1,3 +1,5 @@
+ccls
+cmake
 ctags
 docker
 fzf
@@ -8,6 +10,8 @@ ispell
 markdown
 node
 postgresql
+pyenv
+python@3.8
 the_silver_searcher
 tmux
 vim
