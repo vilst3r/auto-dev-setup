@@ -93,7 +93,7 @@ proceeding)
 
 - A `dotfiles` git repository to take advantage of vim, bash & emac
  configurations. As long as you have that specific github repository name &
-  the following three files:
+  any of the following three files:
     - `.bash_profile`
     - `.vimrc`
     - `.emacs`

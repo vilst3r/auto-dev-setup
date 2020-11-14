@@ -48,23 +48,23 @@ def pull_dotfile_settings():
                                        'git', ForeGroundColor.LIGHT_GREEN))
         return
 
-    # source = f'git@github.com:{GITHUB.username}/dotfiles.git'
-    # command = f'git clone {source} {SETUP.directories.dotfiles}'
-    # with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
-    #     out, err = process.communicate()
-    #     cloned_successfully = process.returncode == 0
+    source = f'git@github.com:{GITHUB.username}/dotfiles.git'
+    command = f'git clone {source} {SETUP.directories.dotfiles}'
+    with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
+        out, err = process.communicate()
+        cloned_successfully = process.returncode == 0
 
-    #     if err and not cloned_successfully:
-    #         LOGGER.error(err.decode('utf-8'))
-    #         LOGGER.error(format_ansi_string('Failed to clone dotfile settings '
-    #                                         'from github',
-    #                                         ForeGroundColor.RED))
-    #         sys.exit()
-    #     else:
-    #         LOGGER.debug(out.decode('utf-8'))
-    #         LOGGER.info(format_ansi_string('Dotfile settings has successfully '
-    #                                        'been cloned from github',
-    #                                        ForeGroundColor.GREEN))
+        if err and not cloned_successfully:
+            LOGGER.error(err.decode('utf-8'))
+            LOGGER.error(format_ansi_string('Failed to clone dotfile settings '
+                                            'from github',
+                                            ForeGroundColor.RED))
+            sys.exit()
+        else:
+            LOGGER.debug(out.decode('utf-8'))
+            LOGGER.info(format_ansi_string('Dotfile settings has successfully '
+                                           'been cloned from github',
+                                           ForeGroundColor.GREEN))
 
 
 def configure_vimrc():
