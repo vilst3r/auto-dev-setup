@@ -51,10 +51,16 @@ class SetupSingleton:
         LOGGER.info(format_ansi_string('Ensure you\'ve configured the '
                                        'following files before proceeding: ',
                                        ForeGroundColor.LIGHT_RED))
-        LOGGER.info(format_ansi_string(f'- {self.files.brew}', Format.BOLD))
-        LOGGER.info(format_ansi_string(f'- {self.files.cask}', Format.BOLD))
+        LOGGER.info(format_ansi_string(
+            f'- {self.files.brew} (optional)', Format.BOLD))
+        LOGGER.info(format_ansi_string(
+            f'- {self.files.cask} (optional)', Format.BOLD))
+        LOGGER.info(format_ansi_string(
+            f'- {self.files.pip} (optional)', Format.BOLD))
         LOGGER.info(format_ansi_string(f'- {self.files.git}\n', Format.BOLD))
+
         print()
+
         SetupSingleton.__instance = self
 
         LOGGER.debug(f'SetupSingleton:\n {self}')

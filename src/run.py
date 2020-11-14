@@ -1,6 +1,6 @@
 """
 Script to automate setup of development environment with personally configured
-tools & software by mainly using the subprocess interface
+tools & software
 """
 
 # Native Modules
@@ -68,10 +68,18 @@ def configure_dotfiles():
     dotfiles.configure_emacs()
 
 
-@print_process_step(step_no=5, title='Configuring powerline for terminal...')
-def configure_powerline():
+@print_process_step(step_no=5, title='Configuring other PIP packages...')
+def configure_pip():
     """
     Installs pip & all configured packages
+    """
+    pip.install_all_pip_packages_at_user()
+
+
+@print_process_step(step_no=6, title='Configuring powerline for terminal...')
+def configure_powerline():
+    """
+    Configures powerline for the terminal emulator via PIP
     """
     powerline.install_powerline_at_user()
     powerline.configure_user_config()
@@ -81,24 +89,17 @@ def configure_powerline():
     powerline.config_git_shell()
 
 
-@print_process_step(step_no=6, title='Configuring other PIP packages...')
-def configure_pip():
-    """
-    Installs pip & all configured packages
-    """
-    pip.install_all_pip_packages()
-
-
 if __name__ == '__main__':
     @measure_time
     def build_dev_environment():
         """
         Runs the following installation processes in sequential order
         """
-        configure_brew()
-        configure_ssh_keys()
-        configure_github_connection()
-        configure_dotfiles()
-        configure_powerline()
+        # configure_brew()
+        # configure_ssh_keys()
+        # configure_github_connection()
+        # configure_dotfiles()
         # configure_pip()
+        # configure_powerline()
+
     build_dev_environment()

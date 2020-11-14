@@ -6,7 +6,8 @@ Module delegated to handling PIP logic
 import logging
 import sys
 from itertools import tee
-from subprocess import DEVNULL, PIPE, Popen, call, check_output
+from subprocess import PIPE, Popen, check_output
+from typing import List
 
 # Custom Modules
 from singletons.setup import SetupSingleton
@@ -14,24 +15,16 @@ from utils.general import (consume, format_ansi_string, format_success_message,
                            partition)
 from utils.unicode import ForeGroundColor
 
-# Third Party Modules
-# import pexpect
-
-
 SETUP = SetupSingleton.get_instance()
 LOGGER = logging.getLogger()
 
 
-def install_all_pip_packages():
-    pass
-
-
-def process_file() -> list:
+def retrieve_processed_packages(filename: str = None) -> List[str]:
     """
-    Parses the config file generated from 'pip freeze > pip_leaves' located in
-    the config directory
+    Parses the output format generated from 'pip3 list --user' from either the
+    the config directory for PIP or the user system
 
-    The content of the file will look like this (excluding the (-|+) border):
+    The output will look like this (excluding the (-|+) border):
     +-------------------------------+
     | Package             Version   |
     | ------------------- ----------|
@@ -39,35 +32,89 @@ def process_file() -> list:
     | ...                           |
     | ...                           |
     +-------------------------------+
+
     We need to parse from the third line onwards & install the latest by
-    reading the first column only of each line
+    reading the first column only of each line based on this 'assumption'
     """
-    return []
-    # with open(SETUP.files.pip) as text_file:
+    if not filename:
+        command = "pip3 list --user"
+        output = check_output(command.split())
+        pip_list = output.decode('utf-8').strip().split('\n')[2:]
+        packages = [x.split()[0] for x in pip_list]
+    else:
+        with open(filename) as text_file:
+            data = [x.strip() for x in text_file.readlines()[2:]]
+            packages = [x.split()[0] for x in data]
+    return packages
 
 
-def install_packages():
+def install_all_pip_packages_at_user():
     """
     Downloads & installs every package config if it's valid
     """
-    return
+    def process_package(package: str):
+        """
+        Installs the package if possible & logs correspondingly
+        """
+        command = f'pip3 install --user {package}'
+        with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
+            out, err = process.communicate()
+            installed_successfully = process.returncode == 0
+
+            if err and not installed_successfully:
+                LOGGER.warning(err.decode('utf-8'))
+                LOGGER.warning(format_ansi_string(f'{package} - issue during '
+                                                  f'installation or it the '
+                                                  f'package doesn\'t exist',
+                                                  ForeGroundColor.YELLOW))
+            else:
+                LOGGER.debug(out.decode('utf-8'))
+                LOGGER.info(format_ansi_string(f'{package} - successfully '
+                                               f'installed',
+                                               ForeGroundColor.GREEN))
+
+    user_packages = retrieve_processed_packages()
+    configured_packages = retrieve_processed_packages(SETUP.files.pip)
+
+    installed_packages, uninstalled_packages = partition(
+        lambda x: x in user_packages, configured_packages)
+
+    consume(map(lambda x: LOGGER.info(
+        format_ansi_string(f'{x} - already installed',
+                           ForeGroundColor.LIGHT_GREEN)), installed_packages))
+
+    uninstalled_packages, uninstalled_packages_copy = tee(uninstalled_packages)
+
+    if not next(uninstalled_packages_copy, None):
+        LOGGER.info(format_success_message(
+            'No available pip packages to install'))
+    else:
+        consume(map(lambda x: process_package(x), uninstalled_packages))
+        LOGGER.info(format_success_message(
+            'All configured pip packages are now installed'))
 
 
-# def install_powerline_at_user():
-#     """
-#     Installs the powerline tool at the user level of the system
-#     """
-#     command = 'pip3 install --user powerline-status'
-#     with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
-#         out, err = process.communicate()
+def delete_all_user_packages():
+    """
+    Uninstalls all PIP packages at the user level
+    """
+    command = "pip3 freeze --user"
+    pip_freeze_process = Popen(command.split(), stdout=PIPE)
 
-#         if err:
-#             LOGGER.error(err.decode('utf-8'))
-#             LOGGER.error(format_ansi_string('Failed to install powerline from '
-#                                             'pip3', ForeGroundColor.RED))
-#             sys.exit()
-#         else:
-#             LOGGER.debug(out.decode('utf-8'))
-#             LOGGER.info(format_ansi_string('Powerline now installed from pip3 '
-#                                            'at the user level',
-#                                            ForeGroundColor.GREEN))
+    command = "xargs pip3 uninstall -y"
+    with Popen(command.split(), stdin=pip_freeze_process.stdout, stdout=PIPE) \
+            as process:
+        out, err = process.communicate()
+
+        if err:
+            LOGGER.error(err.decode('utf-8'))
+            LOGGER.error(format_ansi_string('Failed to delete PIP packages '
+                                            'via piped shell process',
+                                            ForeGroundColor.RED))
+            sys.exit()
+
+        parsed_output = out.decode('utf-8')
+
+        LOGGER.debug(parsed_output)
+        LOGGER.info(format_success_message(
+            'All configured PIP packages are now deleted'))

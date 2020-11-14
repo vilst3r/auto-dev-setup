@@ -1,12 +1,11 @@
 """
-Script to automate setup of unix environment with personal configurations and
-tools
+Script to automate  cleanup of developement environment
 """
 
 # Native Modules
 import logging
 
-from lib import brew, dotfiles, git, powerline, ssh
+from lib import dotfiles, git, pip, powerline, ssh
 from singletons.github import GithubSingleton
 # Custom Modules
 from singletons.setup import SetupSingleton
@@ -18,33 +17,30 @@ GITHUB = GithubSingleton.get_instance()
 LOGGER = logging.getLogger()
 
 
-@print_process_step(step_no=1, title='Uninstalling Powerline...')
+@print_process_step(step_no=1, title='Uninstalling PIP...')
+def uninstall_pip():
+    """
+    Remove all packages installed on PIP
+    """
+    pip.delete_all_user_packages()
+
+
+@print_process_step(step_no=2, title='Uninstalling Powerline...')
 def uninstall_powerline():
     """
     Remove existing powerline configurations
     """
-    powerline.uninstall_powerline_gitstatus()
     powerline.delete_powerline_fonts()
     powerline.delete_powerline_config_folder()
-    powerline.remove_powerline_daemon_in_bash_profile()
-    powerline.remove_powerline_config_in_vimrc()
-    powerline.uninstall_powerline_status()
 
 
-@print_process_step(step_no=2, title='Uninstalling dotfiles...')
+@print_process_step(step_no=3, title='Uninstalling dotfiles...')
 def uninstall_dotfiles():
     """
-    Remove existing dotfile configurations
+    Remove dotfiles configurations
     """
-    dotfiles.remove_dotfiles_settings()
-
-
-@print_process_step(step_no=3, title='Uninstalling Homebrew...')
-def uninstall_brew():
-    """
-    Uninstall brew and cask together
-    """
-    # brew.uninstall_brew()
+    dotfiles.remove_dotfiles_repository()
+    dotfiles.remove_user_dotfiles()
 
 
 @print_process_step(step_no=4, title='Uninstalling Git SSH...')
@@ -74,9 +70,9 @@ if __name__ == '__main__':
         Cleans up the development environment that was automatically setup
         previously
         """
+        uninstall_pip()
         uninstall_powerline()
         uninstall_dotfiles()
-        uninstall_brew()
         uninstall_git_ssh()
 
     clean_dev_environment()

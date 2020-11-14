@@ -60,14 +60,41 @@ proceeding)
     visual-studio-code
     ```
 
+- `config/pip/leaves`: will contain all the pip packages in a special format
+    - See the [PyPi registry](https://pypi.org/project/registry/) for the list
+      of python packages that are available
+    - Use `pip list --user > leaves` to capture a snapshot of an existing
+      environment's PIP dependencies to use for this script
+    - **Note**: Manual extension is quite tricky but as long as you specify the
+      package name and its corresponding version delimited by a white space,
+      then it should be fine.
+    - E.g. `config/brew/casks`
+    ```text
+    Package             Version
+    ------------------- ----------
+    autopep8            1.5
+    black               19.10b0
+    flake8              3.7.9
+    importmagic         0.1.7
+    jedi                0.16.0
+    numpy               1.14.5
+    pexpect             4.7.0
+    pipenv              2018.11.26
+    powerline-gitstatus 1.3.1
+    powerline-status    2.7
+    pylint              2.3.1
+    requests            2.22.0
+    rope                0.16.0
+    wheel               0.34.2
+    ```
+
+
 - A `dotfiles` git repository to take advantage of vim, bash & emac
  configurations. As long as you have that specific github repository name &
   the following three files:
     - `.bash_profile`
     - `.vimrc`
     - `.emacs`
-- Then the script program will automatically set these configs for you with
- the `powerline` package from pip3
 
 # How to use
 - Run `sudo ./setup.sh` to automate the processes within the script
@@ -82,6 +109,7 @@ proceeding)
   settings
 5. Installs the powerline-status & configures it accordingly with your vim
  & bash settings
+6. Installs all other pip packages from './config/pip/leaves
 
 # Notes & Issues
 - Password is required when OS X prompts you to enter your password for the
@@ -90,8 +118,9 @@ proceeding)
 - If any issues arises during the process, log output is available to diagnose
  for either `logs/setup/*.log` or `logs/clean/*.log` & run `./cleanup` to
   undo automated installations
+- An E2E test is availabe for simulation before you run the main script, just
+  run `./e2e-test/setup.sh` from the root directory (*Recommended*)
 
 # TODO (potentially)
 - Add iTerm2 configuration in spare time in the future
 - Add C++ bits/header to setup
-- Automate pip installation

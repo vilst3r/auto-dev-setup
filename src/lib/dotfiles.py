@@ -1,5 +1,5 @@
 """
-Module delegated to handling vim logic
+Module delegated to handling logic related to dotfiles
 """
 
 # Native Modules
@@ -167,7 +167,7 @@ def configure_emacs():
                                            'repository', ForeGroundColor.GREEN))
 
 
-def remove_dotfiles_settings():
+def remove_dotfiles_repository():
     """
     Remove dotfiles setting repository cloned from github
     """
@@ -194,3 +194,38 @@ def remove_dotfiles_settings():
             LOGGER.info(format_success_message('Dotfiles settings repository '
                                                'cloned from github has '
                                                'successfully been removed'))
+
+
+def remove_user_dotfiles():
+    """
+    Remove dotfiles setting in $HOME, bash, vim & emacs if applicable
+    """
+    def remove_file(filename: str):
+        """
+        Helper method to remove individual user config files
+        """
+        command = f'find {filename}'
+        file_found = call(command.split(), stdout=DEVNULL) == 0
+
+        if not file_found:
+            LOGGER.info(format_success_message(
+                f'\"{filename}\" has been already removed'))
+            return
+
+        command = f'rm {filename}'
+        with Popen(command.split(), stdout=PIPE, stderr=PIPE) as process:
+            out, err = process.communicate()
+
+            if err:
+                LOGGER.error(err.decode('utf-8'))
+                LOGGER.error(format_ansi_string(
+                    f'Failed to remove \"{filename}\"', ForeGroundColor.RED))
+                sys.exit()
+            else:
+                LOGGER.debug(out.decode('utf-8'))
+                LOGGER.info(format_ansi_string(
+                    f'\"{filename}\" has successfully been removed', ForeGroundColor.GREEN))
+
+    remove_file(SETUP.files.bash)
+    remove_file(SETUP.files.vim)
+    remove_file(SETUP.files.emacs)

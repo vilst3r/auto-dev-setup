@@ -73,7 +73,7 @@ def install_all_brew_packages():
         else:
             consume(map(lambda x: process_package(x), uninstalled_packages))
             LOGGER.info(format_success_message(
-                'All configured brew packages are now install'))
+                'All configured brew packages are now installed'))
 
 
 def install_all_cask_packages():
@@ -132,4 +132,4 @@ def install_all_cask_packages():
         else:
             consume(map(lambda x: process_package(x), uninstalled_packages))
             LOGGER.info(format_success_message(
-                'All configured brew cask packages are now install'))
+                'All configured brew cask packages are now installed'))
