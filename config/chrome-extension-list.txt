@@ -1,3 +1,0 @@
-vimium
-ublock-origin
-momentum

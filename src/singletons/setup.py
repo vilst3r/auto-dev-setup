@@ -15,7 +15,7 @@ import traceback
 from subprocess import DEVNULL, call, check_output
 
 # Custom Modules
-from utils.general import format_ansi_string
+from utils.general import format_ansi_string, random_string
 from utils.unicode import ForeGroundColor, Format, Symbols
 
 LOGGER = logging.getLogger()
@@ -43,6 +43,7 @@ class SetupSingleton:
         initialise_logger()
 
         self.username = getpass.getuser()
+        self.ssh_passphrase = random_string(8)
         self.entry_point = get_entry_point()
         self.directories: Directories = retrieve_directories()
         self.files: Files = retrieve_files(

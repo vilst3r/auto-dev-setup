@@ -1,13 +1,16 @@
 #!/usr/bin/env bash
 
 if [ $(basename $PWD) != "osx-dev-bootstrap" ]; then
-    echo "Cannot execute script in this directory"
+    echo "Cannot execute script in this directory, must be in \"osx-dev-bootstrap\""
     exit 1
 fi
 
-# Require root user to execute
-if [ "$(whoami)" != "root" ]; then
-    echo "Please run the script as the root user"
+
+if test ! $(find config/git-credentials.txt); then
+    echo "username: <INSERT OWN VALUE>" >> config/git-credentials.txt
+    echo "email: <INSERT OWN VALUE>" >> config/git-credentials.txt
+    echo "token: <INSERT OWN VALUE>" >> config/git-credentials.txt
+    echo "Please configure ./config/git-credentials.txt"
     exit 1
 fi
 
@@ -15,7 +18,6 @@ fi
 if test ! $(which brew); then
     echo "Installing homebrew..."
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
-    ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
     brew install python
 fi
 

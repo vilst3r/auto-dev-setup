@@ -11,7 +11,7 @@ from subprocess import DEVNULL, PIPE, Popen, call
 from singletons.github import GithubSingleton
 # Custom Modules
 from singletons.setup import SetupSingleton
-from utils.general import consume, format_ansi_string, random_string
+from utils.general import consume, format_ansi_string
 from utils.unicode import ForeGroundColor
 
 SETUP = SetupSingleton.get_instance()
@@ -40,9 +40,8 @@ def generate_rsa_keypair():
     """
     Generate asymmetric public/private keypair for ssh use
     """
-    passphrase = random_string(8)
     command = f'ssh-keygen -t rsa -b 4096 -C \"{GITHUB.email}\" -N\
-                {passphrase}'
+                {SETUP.ssh_passphrase}'
     with Popen(command.split(), stdin=PIPE, stdout=PIPE, stderr=PIPE) \
             as process:
         out, err = process.communicate(input=b'\ny\n')
@@ -115,9 +114,11 @@ def start_ssh_agent():
 def update_config_identity():
     """
     Update config file in .ssh directory
-    TODO - question whether I need this or not?
     """
     ssh_config_file = f'{SETUP.directories.ssh}/config'
+
+    command = f'touch {ssh_config_file}'
+    call(command.split(), stdout=DEVNULL)
 
     with open(ssh_config_file) as text_file:
         content = ''.join(text_file.readlines())
@@ -129,6 +130,9 @@ def update_config_identity():
 
     if not key_match:
         with open(ssh_config_file, 'a') as text_file:
+            text_file.write("Host *\n")
+            text_file.write("AddKeysToAgent yes\n")
+            text_file.write("UseKeychain yes\n")
             text_file.write(identity_val)
         LOGGER.info(format_ansi_string('IdentityFile key value appended to ssh'
                                        ' config file', ForeGroundColor.GREEN))
@@ -155,6 +159,9 @@ def register_private_key_to_ssh_agent():
     """
     Add ssh private key to ssh-agent
     """
+    LOGGER.info(format_ansi_string(f'Passphrase for the newly generated SSH key '
+                                   f'to cache - {SETUP.ssh_passphrase}'))
+
     command = f'ssh-add -K {SETUP.directories.ssh}/id_rsa'
     ssh_added = call(command.split(), stdout=DEVNULL) == 0
 

@@ -132,13 +132,8 @@ def configure_emacs():
     """
     Copies init.el file from dotfile settings to user settings
     """
-    command = f'find {SETUP.directories.emacs}'
-    emacs_exists = call(command.split(), stdout=DEVNULL) == 0
-
-    if not emacs_exists:
-        LOGGER.info(format_ansi_string('Missing emacs application in the user '
-                                       'level config', ForeGroundColor.YELLOW))
-        return
+    command = f'mkdir -p {SETUP.directories.emacs}'
+    call(command.split(), stdout=DEVNULL)
 
     command = f'find {SETUP.directories.dotfiles}/init.el'
     dotfiles_emacs_config_exists = call(command.split(), stdout=DEVNULL) == 0

@@ -11,7 +11,6 @@ if [ "$(whoami)" == "root" ]; then
     exit 1
 fi
 
-
 if test $(which brew); then
     brew leaves > brew/leaves
     brew list --cask > brew/casks

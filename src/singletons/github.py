@@ -120,26 +120,13 @@ class GithubSingleton:
 def read_git_credentials() -> dict:
     """
     Read credentials from file into wrapper object from project directory
-    TODO - think about refactoring this later...
     """
     res = {}
     git_credentials = 'config/git-credentials.txt'
     valid_properties = ['username', 'email', 'token']
 
-    try:
-        with open(git_credentials) as text_file:
-            buff = text_file.readlines()
-    except IOError as ierr:
-        # Generate git credential template
-        with open(git_credentials, 'w') as text_file:
-            for prop in valid_properties:
-                text_file.write(f"{prop}: <INSERT OWN VALUE>\n")
-
-        LOGGER.error(ierr)
-        LOGGER.error(format_ansi_string(f'Git credential file does not exist -'
-                                        ' now generated in {git_credentials}',
-                                        ForeGroundColor.RED))
-        sys.exit()
+    with open(git_credentials) as text_file:
+        buff = text_file.readlines()
 
     for line in buff:
         key, val = line.split(':')

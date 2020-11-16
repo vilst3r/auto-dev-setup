@@ -141,7 +141,6 @@ def config_git_colorscheme():
     """
     Configures color scheme for git status in powerline
     """
-    # TODO Double check these two lines again
     default_block = f'{SETUP.directories.powerline}/' \
                     f'colorschemes/default.json'
     config_block = 'config/powerline/powerline_git_color.json'

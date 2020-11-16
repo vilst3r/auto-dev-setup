@@ -69,11 +69,11 @@ def install_all_brew_packages():
 
         if not next(uninstalled_packages_copy, None):
             LOGGER.info(format_success_message(
-                'No available brew packages to install'))
+                'No available brew packages to install\n'))
         else:
             consume(map(lambda x: process_package(x), uninstalled_packages))
             LOGGER.info(format_success_message(
-                'All configured brew packages are now installed'))
+                'All configured brew packages are now installed\n'))
 
 
 def install_all_cask_packages():
